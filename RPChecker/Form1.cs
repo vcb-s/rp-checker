@@ -140,6 +140,10 @@ namespace RPChecker
             {
                 comboBox1.Items.Add(Rpath.Match(item.fileName).Groups["fileName"].Value);
             }
+            if (comboBox1.Items.Count > 0)  
+            {
+                comboBox1.SelectedIndex = 0;
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
