@@ -69,11 +69,11 @@ namespace RPChecker
                 dataGridView1.Rows[index].Cells[2].Value = time2string(temp);
                 if (item.Value<30)
                 {
-                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = Color.OrangeRed;
+                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = Color.FromArgb(233,76,60);
                 }
                 else
                 {
-                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = Color.LawnGreen;
+                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = Color.FromArgb(46,205,112);
                 }
                 
             }
@@ -147,12 +147,12 @@ namespace RPChecker
             FrmLoadFiles flf = new FrmLoadFiles(this);
             flf.Show();
         }
-        double[] FrameRate = {24000 / 1001, 24000 / 1000,
-                              25000 / 1000, 30000 / 1001,
-                              50000 / 1000, 60000 / 1001 };
+        double[] FrameRate = {24000 / 1001.0, 24000 / 1000.0,
+                              25000 / 1000.0, 30000 / 1001.0,
+                              50000 / 1000.0, 60000 / 1001.0 };
         private void comboBox1_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox1.SelectedIndex]);
+            updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox2.SelectedIndex]);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -175,6 +175,14 @@ namespace RPChecker
                  temp.Minutes.ToString("00") + ":" +
                  temp.Seconds.ToString("00") + "." +
             temp.Milliseconds.ToString("000");
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.SelectedIndex != -1)
+            {
+                updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox2.SelectedIndex]);
+            }
         }
     }
 }
