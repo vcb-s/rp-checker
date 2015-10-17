@@ -143,6 +143,7 @@ namespace RPChecker
             if (comboBox1.Items.Count > 0)  
             {
                 comboBox1.SelectedIndex = 0;
+                updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox2.SelectedIndex]);
             }
         }
 
