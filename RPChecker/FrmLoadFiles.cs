@@ -20,8 +20,7 @@ namespace RPChecker
             InitializeComponent();
         }
 
-        Regex Rpath = new Regex(@".+\\(?<fileName>.+\\.*)");
-
+        Regex Rpath = new Regex(@".+\\(?<fileName>.+(?:\\.*)?)");
 
         private void listView1_ItemDrag(object sender, ItemDragEventArgs e)
         {

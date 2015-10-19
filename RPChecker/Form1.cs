@@ -63,7 +63,7 @@ namespace RPChecker
             {
                 var item = info.data[index];
                 TimeSpan temp = second2Time(item.Key / frameRate);
-                dataGridView1.Rows[index].Tag = item;
+                //dataGridView1.Rows[index].Tag = item;
                 dataGridView1.Rows[index].Cells[0].Value = item.Key;
                 dataGridView1.Rows[index].Cells[1].Value = item.Value;
                 dataGridView1.Rows[index].Cells[2].Value = time2string(temp);
@@ -75,7 +75,6 @@ namespace RPChecker
                 {
                     dataGridView1.Rows[index].DefaultCellStyle.BackColor = Color.FromArgb(46,205,112);
                 }
-                
             }
         }
 
