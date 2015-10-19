@@ -58,6 +58,7 @@
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
+            this.listView1.ItemActivate += new System.EventHandler(this.listView1_ItemActivate);
             this.listView1.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.listView1_ItemDrag);
             this.listView1.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
             this.listView1.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
@@ -82,6 +83,7 @@
             this.listView2.TabIndex = 1;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
+            this.listView2.ItemActivate += new System.EventHandler(this.listView2_ItemActivate);
             this.listView2.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.listView2_ItemDrag);
             this.listView2.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView2_DragDrop);
             this.listView2.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView2_DragEnter);
