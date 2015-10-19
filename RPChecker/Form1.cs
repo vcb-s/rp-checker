@@ -33,7 +33,7 @@ namespace RPChecker
             }
         }
 
-
+        int Threshold = 30;
 
 
         static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b)
@@ -56,26 +56,35 @@ namespace RPChecker
             return data;
         }
 
-        void updataGridView(reSulT info, double frameRate)
+
+        void updataGridView(reSulT info, double frameRate,bool clear = true)
         {
-            //dataGridView1.Rows.Clear();
-            for (int index = 0; index < 450 && index < info.data.Count ; ++index)
+            if (clear)
             {
-                var item = info.data[index];
-                TimeSpan temp = second2Time(item.Key / frameRate);
-                //dataGridView1.Rows[index].Tag = item;
-                dataGridView1.Rows[index].Cells[0].Value = item.Key;
-                dataGridView1.Rows[index].Cells[1].Value = item.Value;
-                dataGridView1.Rows[index].Cells[2].Value = time2string(temp);
-                if (item.Value<30)
-                {
-                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = Color.FromArgb(233,76,60);
-                }
-                else
-                {
-                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = Color.FromArgb(46,205,112);
-                }
+                dataGridView1.Rows.Clear();
             }
+            int index = 0;
+            foreach (var item in info.data)
+            {
+                if (dataGridView1.RowCount < 450 || item.Value < Threshold)
+                {
+                    if (clear)
+                    {
+                        index = dataGridView1.Rows.Add();
+                    }
+                    TimeSpan temp = second2Time(item.Key / frameRate);
+                    dataGridView1.Rows[index].Cells[0].Value = item.Key;
+                    dataGridView1.Rows[index].Cells[1].Value = item.Value;
+                    dataGridView1.Rows[index].Cells[2].Value = time2string(temp);
+                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = ((item.Value < Threshold) ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112));
+                    if (!clear) 
+                    {
+                        ++index;
+                    }
+                }
+                if ((item.Value > Threshold && dataGridView1.RowCount >= 450)) { break; }
+            }
+
         }
 
 
@@ -121,6 +130,7 @@ namespace RPChecker
         Regex Rpath = new Regex(@".+\\(?<fileName>.*)");
         private void button1_Click(object sender, EventArgs e)
         {
+            fullData.Clear();
             foreach (var item in FilePathsPair)
             {
                 string avsFile = item.Value + ".avs";
@@ -139,7 +149,7 @@ namespace RPChecker
             {
                 comboBox1.Items.Add(Rpath.Match(item.fileName).Groups["fileName"].Value);
             }
-            if (comboBox1.Items.Count > 0)  
+            if (comboBox1.Items.Count > 0)
             {
                 comboBox1.SelectedIndex = 0;
                 updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox2.SelectedIndex]);
@@ -161,7 +171,7 @@ namespace RPChecker
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            for (int index = 0; index < 450; index = dataGridView1.Rows.Add());
+            //for (int index = 0; index <= 450; index = dataGridView1.Rows.Add());
             comboBox2.SelectedIndex = 0;
         }
 
@@ -185,8 +195,13 @@ namespace RPChecker
         {
             if (comboBox1.SelectedIndex != -1)
             {
-                updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox2.SelectedIndex]);
+                updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox2.SelectedIndex],false);
             }
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            Threshold = Convert.ToInt32(numericUpDown1.Value);
         }
     }
 }
