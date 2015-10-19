@@ -20,8 +20,7 @@ namespace RPChecker
             InitializeComponent();
         }
 
-        Regex Rpath = new Regex(@".+\\(?<fileName>.+\\.*)");
-
+        Regex Rpath = new Regex(@".+\\(?<fileName>.+(?:\\.*)?)");
 
         private void listView1_ItemDrag(object sender, ItemDragEventArgs e)
         {
@@ -165,6 +164,38 @@ namespace RPChecker
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) { e.Effect = DragDropEffects.Copy; }
             else { e.Effect = DragDropEffects.None; }
+        }
+
+        private void listView1_ItemActivate(object sender, EventArgs e)
+        {
+            if (listView1.Items.Count == listView2.Items.Count)
+            {
+                foreach (var item in listView1.Items)
+                {
+                    (item as ListViewItem).ForeColor = Color.Black;
+                }
+                foreach (var item in listView2.Items)
+                {
+                    (item as ListViewItem).ForeColor = Color.Black;
+                }
+                listView2.Items[(sender as ListView).SelectedItems[0].Index].ForeColor = Color.Red;
+            }
+        }
+
+        private void listView2_ItemActivate(object sender, EventArgs e)
+        {
+            if (listView1.Items.Count == listView2.Items.Count)
+            {
+                foreach (var item in listView1.Items)
+                {
+                    (item as ListViewItem).ForeColor = Color.Black;
+                }
+                foreach (var item in listView2.Items)
+                {
+                    (item as ListViewItem).ForeColor = Color.Black;
+                }
+                listView1.Items[(sender as ListView).SelectedItems[0].Index].ForeColor = Color.Red;
+            }
         }
     }
 }
