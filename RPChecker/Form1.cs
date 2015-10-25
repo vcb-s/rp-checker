@@ -57,32 +57,23 @@ namespace RPChecker
         }
 
 
-        void updataGridView(reSulT info, double frameRate,bool clear = true)
+        void updataGridView(reSulT info, double frameRate,bool clear = true, bool updataTime = false)
         {
-            if (clear)
-            {
-                dataGridView1.Rows.Clear();
-            }
+            if (clear) { dataGridView1.Rows.Clear(); }
             int index = 0;
             foreach (var item in info.data)
             {
-                if (dataGridView1.RowCount < 450 || item.Value < Threshold)
+                if ((dataGridView1.RowCount < 450 || item.Value < Threshold || updataTime) && index < dataGridView1.RowCount)
                 {
-                    if (clear)
-                    {
-                        index = dataGridView1.Rows.Add();
-                    }
+                    if (clear) { index = dataGridView1.Rows.Add(); }
                     TimeSpan temp = second2Time(item.Key / frameRate);
                     dataGridView1.Rows[index].Cells[0].Value = item.Key;
                     dataGridView1.Rows[index].Cells[1].Value = item.Value;
                     dataGridView1.Rows[index].Cells[2].Value = time2string(temp);
                     dataGridView1.Rows[index].DefaultCellStyle.BackColor = ((item.Value < Threshold) ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112));
-                    if (!clear) 
-                    {
-                        ++index;
-                    }
+                    if (!clear) { ++index; }
                 }
-                if ((item.Value > Threshold && dataGridView1.RowCount >= 450)) { break; }
+                if ((item.Value > Threshold && dataGridView1.RowCount >= 450) && !updataTime) { break; }
             }
 
         }
@@ -195,7 +186,7 @@ namespace RPChecker
         {
             if (comboBox1.SelectedIndex != -1)
             {
-                updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox2.SelectedIndex],false);
+                updataGridView(fullData[comboBox1.SelectedIndex], FrameRate[comboBox2.SelectedIndex],false,true);
             }
         }
 
