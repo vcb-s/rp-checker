@@ -125,9 +125,10 @@ namespace RPChecker
             
             this.Close();
         }
-        private void button4_MouseDown(object sender, MouseEventArgs e)
+
+        private void button4_MouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)    
+            if (e.Button == MouseButtons.Left)
             {
                 listView1.Items.Clear();
             }
@@ -197,5 +198,7 @@ namespace RPChecker
                 listView1.Items[(sender as ListView).SelectedItems[0].Index].ForeColor = Color.Red;
             }
         }
+
+
     }
 }
