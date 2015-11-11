@@ -163,7 +163,7 @@
             this.button4.TabIndex = 7;
             this.button4.Text = "清空";
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button4_MouseDown);
+            this.button4.MouseUp += new System.Windows.Forms.MouseEventHandler(this.button4_MouseUp);
             // 
             // textBox1
             // 

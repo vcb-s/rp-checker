@@ -96,7 +96,7 @@ namespace RPChecker
                 generateAVS(file1, file2, logFile, avsFile);
                 generateLog(avsFile, false);
                 string[] context = File.ReadAllLines(logFile);
-                for (int i = 6; context[i] != ""; i++)
+                for (int i = 6; !string.IsNullOrWhiteSpace(context[i]); i++)
                 {
                     string str = Regex.Replace(context[i], @"\s+", ",");
                     string[] item = str.Split(',');
