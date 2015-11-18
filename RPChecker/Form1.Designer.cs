@@ -113,7 +113,7 @@
             this.comboBox1.Location = new System.Drawing.Point(391, 12);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(164, 20);
-            this.comboBox1.TabIndex = 3;
+            this.comboBox1.TabIndex = 4;
             this.comboBox1.SelectionChangeCommitted += new System.EventHandler(this.comboBox1_SelectionChangeCommitted);
             // 
             // comboBox2
@@ -131,7 +131,7 @@
             this.comboBox2.Location = new System.Drawing.Point(391, 38);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(164, 20);
-            this.comboBox2.TabIndex = 4;
+            this.comboBox2.TabIndex = 5;
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
             // checkBox1
@@ -141,7 +141,7 @@
             this.checkBox1.Location = new System.Drawing.Point(459, 393);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(96, 16);
-            this.checkBox1.TabIndex = 5;
+            this.checkBox1.TabIndex = 3;
             this.checkBox1.Text = "保留中间文件";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
@@ -162,7 +162,6 @@
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(72, 21);
             this.numericUpDown1.TabIndex = 6;
-            this.numericUpDown1.TabStop = false;
             this.numericUpDown1.Value = new decimal(new int[] {
             30,
             0,
@@ -174,7 +173,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(391, 66);
+            this.label1.Location = new System.Drawing.Point(391, 68);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(89, 12);
             this.label1.TabIndex = 7;
@@ -182,12 +181,15 @@
             // 
             // comboBox3
             // 
+            this.comboBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.Items.AddRange(new object[] {
+            "Default"});
             this.comboBox3.Location = new System.Drawing.Point(393, 91);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(164, 20);
-            this.comboBox3.TabIndex = 8;
+            this.comboBox3.TabIndex = 7;
             // 
             // Form1
             // 

@@ -58,6 +58,7 @@
             this.listView1.ShowItemToolTips = true;
             this.listView1.Size = new System.Drawing.Size(248, 368);
             this.listView1.TabIndex = 0;
+            this.listView1.TabStop = false;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.ItemActivate += new System.EventHandler(this.listView1_ItemActivate);
@@ -84,6 +85,7 @@
             this.listView2.ShowItemToolTips = true;
             this.listView2.Size = new System.Drawing.Size(248, 368);
             this.listView2.TabIndex = 1;
+            this.listView2.TabStop = false;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
             this.listView2.ItemActivate += new System.EventHandler(this.listView2_ItemActivate);
@@ -103,7 +105,7 @@
             this.button1.Location = new System.Drawing.Point(183, 12);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 2;
+            this.button1.TabIndex = 1;
             this.button1.Text = "载入";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -114,7 +116,7 @@
             this.button2.Location = new System.Drawing.Point(439, 12);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 3;
+            this.button2.TabIndex = 2;
             this.button2.Text = "载入";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
@@ -125,7 +127,7 @@
             this.button3.Location = new System.Drawing.Point(520, 386);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 4;
+            this.button3.TabIndex = 3;
             this.button3.Text = "确认";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
@@ -161,6 +163,7 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 7;
+            this.button4.TabStop = false;
             this.button4.Text = "清空";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.MouseUp += new System.Windows.Forms.MouseEventHandler(this.button4_MouseUp);
@@ -175,6 +178,7 @@
             this.textBox1.ReadOnly = true;
             this.textBox1.Size = new System.Drawing.Size(75, 75);
             this.textBox1.TabIndex = 8;
+            this.textBox1.TabStop = false;
             this.textBox1.Text = "请将文件拖到此处以向对照框载入";
             this.textBox1.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBox1_DragDrop);
             this.textBox1.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBox1_DragEnter);
@@ -189,6 +193,7 @@
             this.textBox2.ReadOnly = true;
             this.textBox2.Size = new System.Drawing.Size(75, 75);
             this.textBox2.TabIndex = 9;
+            this.textBox2.TabStop = false;
             this.textBox2.Text = "请将文件拖到此处以向成品框载入";
             this.textBox2.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBox2_DragDrop);
             this.textBox2.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBox2_DragEnter);
