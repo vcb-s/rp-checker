@@ -159,6 +159,10 @@ namespace RPChecker
                                         50000 / 1000.0, 60000 / 1001.0 };
         private void comboBox1_SelectionChangeCommitted(object sender, EventArgs e)
         {
+            if (comboBox1.SelectedIndex < 0 || comboBox1.SelectedIndex > _fullData.Count)
+            {
+                return;
+            }
             UpdataGridView(_fullData[comboBox1.SelectedIndex], _frameRate[comboBox2.SelectedIndex]);
         }
 
@@ -189,6 +193,16 @@ namespace RPChecker
             _threshold = Convert.ToInt32(numericUpDown1.Value);
             if (_fullData == null) return;
             UpdataGridView(_fullData[comboBox1.SelectedIndex], _frameRate[comboBox2.SelectedIndex]);
+        }
+
+        private void comboBox1_MouseEnter(object sender, EventArgs e)
+        {
+            toolTip1.Show(comboBox1.SelectedItem?.ToString(), comboBox1);
+        }
+
+        private void comboBox1_MouseLeave(object sender, EventArgs e)
+        {
+            toolTip1.RemoveAll();
         }
     }
 }
