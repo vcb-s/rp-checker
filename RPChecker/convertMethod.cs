@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RPChecker
 {
-    static class convertMethod
+    static class ConvertMethod
     {
         public static string GetUTF8String(byte[] buffer)
         {
             if (buffer == null) return null;
             if (buffer.Length <= 3) return Encoding.UTF8.GetString(buffer);
-            byte[] bomBuffer = new byte[] { 0xef, 0xbb, 0xbf };
+            byte[] bomBuffer = { 0xef, 0xbb, 0xbf };
 
             if (buffer[0] == bomBuffer[0]
              && buffer[1] == bomBuffer[1]
@@ -23,14 +20,14 @@ namespace RPChecker
             return Encoding.UTF8.GetString(buffer);
         }
 
-        public static TimeSpan second2Time(double second)
+        public static TimeSpan Second2Time(double second)
         {
             double secondPart = Math.Floor(second);
             double millisecondPart = Math.Round((second - secondPart) * 1000);
             return new TimeSpan(0, 0, 0, (int)secondPart, (int)millisecondPart);
         }
 
-        public static string time2string(TimeSpan temp)
+        public static string Time2String(TimeSpan temp)
         {
             return temp.Hours.ToString("00") + ":" +
                  temp.Minutes.ToString("00") + ":" +

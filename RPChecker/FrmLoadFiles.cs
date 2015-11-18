@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
@@ -13,14 +8,14 @@ namespace RPChecker
 {
     public partial class FrmLoadFiles : Form
     {
-        Form1 mainWindow;
+        readonly Form1 _mainWindow;
         public FrmLoadFiles(Form1 arg)
         {
-            mainWindow = arg;
+            _mainWindow = arg;
             InitializeComponent();
         }
 
-        Regex Rpath = new Regex(@".+\\(?<fileName>.+(?:\\.*)?)");
+        readonly Regex _rpath = new Regex(@".+\\(?<fileName>.+(?:\\.*)?)");
 
         private void listView1_ItemDrag(object sender, ItemDragEventArgs e)
         {
@@ -45,16 +40,13 @@ namespace RPChecker
             ListViewItem draggedItem = (ListViewItem)e.Data.GetData(typeof(ListViewItem));
             Point ptScreen = new Point(e.X, e.Y);
             Point pt = listView1.PointToClient(ptScreen);
-            ListViewItem TargetItem = listView1.GetItemAt(pt.X, pt.Y);//拖动的项将放置于该项之前  
-            if (TargetItem!= null)
-            {
-                listView1.Items.Insert(TargetItem.Index, (ListViewItem)draggedItem.Clone());
-                listView1.Items.Remove(draggedItem);
-            }  
+            ListViewItem targetItem = listView1.GetItemAt(pt.X, pt.Y);//拖动的项将放置于该项之前
+            if (targetItem == null) return;
+            listView1.Items.Insert(targetItem.Index, (ListViewItem)draggedItem.Clone());
+            listView1.Items.Remove(draggedItem);
         }
 
 
-        /////////////////////
 
         private void listView2_ItemDrag(object sender, ItemDragEventArgs e)
         {
@@ -78,125 +70,110 @@ namespace RPChecker
             ListViewItem draggedItem = (ListViewItem)e.Data.GetData(typeof(ListViewItem));
             Point ptScreen = new Point(e.X, e.Y);
             Point pt = listView2.PointToClient(ptScreen);
-            ListViewItem TargetItem = listView2.GetItemAt(pt.X, pt.Y);//拖动的项将放置于该项之前  
-            if (TargetItem != null)
-            {
-                listView2.Items.Insert(TargetItem.Index, (ListViewItem)draggedItem.Clone());
-                listView2.Items.Remove(draggedItem);
-            }
+            ListViewItem targetItem = listView2.GetItemAt(pt.X, pt.Y);//拖动的项将放置于该项之前
+            if (targetItem == null) return;
+            listView2.Items.Insert(targetItem.Index, (ListViewItem)draggedItem.Clone());
+            listView2.Items.Remove(draggedItem);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
+            foreach (var item in openFileDialog1.FileNames)
             {
-                foreach (var item in openFileDialog1.FileNames)
-                {
-                    listView1.Items.Add(Rpath.Match(item).Groups["fileName"].Value).Tag = item;
-                }
+                listView1.Items.Add(_rpath.Match(item).Groups["fileName"].Value).Tag = item;
             }
         }
+
         private void button2_Click(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
+            foreach (var item in openFileDialog1.FileNames)
             {
-                foreach (var item in openFileDialog1.FileNames)
-                {
-                    listView2.Items.Add(Rpath.Match(item).Groups["fileName"].Value).Tag = item;
-                }
+                listView2.Items.Add(_rpath.Match(item).Groups["fileName"].Value).Tag = item;
             }
         }
+
         private void button3_Click(object sender, EventArgs e)
         {
-            mainWindow.FilePathsPair.Clear();
+            _mainWindow.FilePathsPair.Clear();
             if (listView1.Items.Count == listView2.Items.Count)
             {
                 int i = 0;
                 foreach (ListViewItem item in listView1.Items)
                 {
-                    mainWindow.FilePathsPair.Add(new KeyValuePair<string, string>(item.Tag as string, listView2.Items[i].Tag as string));
+                    _mainWindow.FilePathsPair.Add(new KeyValuePair<string, string>(item.Tag as string, listView2.Items[i].Tag as string));
                     ++i;
                 }
+                Close();
+                return;
             }
-            else
-            {
-                MessageBox.Show("个数都不对应，确定个屁啊");
-            }
-            
-            this.Close();
+            MessageBox.Show(@"个数都不对应，确定个屁啊");
         }
 
         private void button4_MouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            switch (e.Button)
             {
-                listView1.Items.Clear();
-            }
-            else
-            {
-                if (e.Button == MouseButtons.Right)
-                {
+                case MouseButtons.Left:
+                    listView1.Items.Clear();
+                    break;
+                case MouseButtons.Right:
                     listView2.Items.Clear();
-                }
+                    break;
             }
         }
 
         private void textBox1_DragDrop(object sender, DragEventArgs e)
         {
-            foreach (var item in e.Data.GetData(DataFormats.FileDrop) as string[])
+            foreach (var item in (string[]) e.Data.GetData(DataFormats.FileDrop))
             {
-                listView1.Items.Add(Rpath.Match(item).Groups["fileName"].Value).Tag = item; 
+                listView1.Items.Add(_rpath.Match(item).Groups["fileName"].Value).Tag = item;
             }
         }
         private void textBox1_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) { e.Effect = DragDropEffects.Copy; }
-            else { e.Effect = DragDropEffects.None; }
+            e.Effect = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         private void textBox2_DragDrop(object sender, DragEventArgs e)
         {
-            foreach (var item in e.Data.GetData(DataFormats.FileDrop) as string[])
+            foreach (var item in (string[]) e.Data.GetData(DataFormats.FileDrop))
             {
-                listView2.Items.Add(Rpath.Match(item).Groups["fileName"].Value).Tag = item;
+                listView2.Items.Add(_rpath.Match(item).Groups["fileName"].Value).Tag = item;
             }
         }
         private void textBox2_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) { e.Effect = DragDropEffects.Copy; }
-            else { e.Effect = DragDropEffects.None; }
+            e.Effect = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         private void listView1_ItemActivate(object sender, EventArgs e)
         {
-            if (listView1.Items.Count == listView2.Items.Count)
+            if (listView1.Items.Count != listView2.Items.Count) return;
+            foreach (var item in listView1.Items)
             {
-                foreach (var item in listView1.Items)
-                {
-                    (item as ListViewItem).ForeColor = Color.Black;
-                }
-                foreach (var item in listView2.Items)
-                {
-                    (item as ListViewItem).ForeColor = Color.Black;
-                }
-                listView2.Items[(sender as ListView).SelectedItems[0].Index].ForeColor = Color.Red;
+                ((ListViewItem) item).ForeColor = Color.Black;
             }
+            foreach (var item in listView2.Items)
+            {
+                ((ListViewItem) item).ForeColor = Color.Black;
+            }
+            listView2.Items[((ListView) sender).SelectedItems[0].Index].ForeColor = Color.Red;
         }
 
         private void listView2_ItemActivate(object sender, EventArgs e)
         {
-            if (listView1.Items.Count == listView2.Items.Count)
+            if (listView1.Items.Count != listView2.Items.Count) return;
+            foreach (var item in listView1.Items)
             {
-                foreach (var item in listView1.Items)
-                {
-                    (item as ListViewItem).ForeColor = Color.Black;
-                }
-                foreach (var item in listView2.Items)
-                {
-                    (item as ListViewItem).ForeColor = Color.Black;
-                }
-                listView1.Items[(sender as ListView).SelectedItems[0].Index].ForeColor = Color.Red;
+                ((ListViewItem) item).ForeColor = Color.Black;
             }
+            foreach (var item in listView2.Items)
+            {
+                ((ListViewItem) item).ForeColor = Color.Black;
+            }
+            listView1.Items[((ListView) sender).SelectedItems[0].Index].ForeColor = Color.Red;
         }
 
 
