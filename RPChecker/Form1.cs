@@ -195,14 +195,8 @@ namespace RPChecker
             UpdataGridView(_fullData[comboBox1.SelectedIndex], _frameRate[comboBox2.SelectedIndex]);
         }
 
-        private void comboBox1_MouseEnter(object sender, EventArgs e)
-        {
-            toolTip1.Show(comboBox1.SelectedItem?.ToString(), comboBox1);
-        }
+        private void comboBox1_MouseEnter(object sender, EventArgs e) => toolTip1.Show(comboBox1.SelectedItem?.ToString(), comboBox1);
 
-        private void comboBox1_MouseLeave(object sender, EventArgs e)
-        {
-            toolTip1.RemoveAll();
-        }
+        private void comboBox1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
     }
 }
