@@ -15,10 +15,10 @@ namespace RPChecker
         {
             InitializeComponent();
         }
-        public List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
-        readonly List<ReSulT> _fullData = new List<ReSulT>();
+        public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
+        private readonly List<ReSulT> _fullData = new List<ReSulT>();
 
-        class ReSulT
+        private class ReSulT
         {
             public readonly List<KeyValuePair<int, double>> Data;
             public readonly string FileName;
@@ -31,7 +31,7 @@ namespace RPChecker
         }
 
 
-        static void GenerateLog(string arguments, bool value = true)
+        private static void GenerateLog(string arguments, bool value = true)
         {
             using (System.Diagnostics.Process process = new System.Diagnostics.Process())
             {
@@ -48,12 +48,12 @@ namespace RPChecker
             }
         }
 
-        void GenerateAvs(string file1, string file2, string logFile, string outputFile)
+        private void GenerateAvs(string file1, string file2, string logFile, string outputFile)
         {
             string template = "MP_Pipeline(\"\"\"\r\nLWLibavVideoSource(\"%File1%\", stacked=True, format=\"yuv420p8\")\r\n### prefetch: 16, 0\r\n### ###\r\nsrc = last\r\nLWLibavVideoSource(\"%File2%\", stacked=True, format=\"yuv420p8\")\r\n### export clip: src\r\n### prefetch: 16, 0\r\n### ###\r\nCompare(last, src, \"YUV\", \"%LogFile%\")\r\n\"\"\")";
             if (comboBox3.SelectedItem.ToString() != "Default")
             {
-                byte[] btemp = File.ReadAllBytes(comboBox3.SelectedItem.ToString());
+                var btemp = File.ReadAllBytes(comboBox3.SelectedItem.ToString());
                 string temp = ConvertMethod.GetUTF8String(btemp);
                 if (temp.IndexOf("%File1%"  , StringComparison.Ordinal) > 0 &&
                     temp.IndexOf("%File2%"  , StringComparison.Ordinal) > 0 &&
@@ -73,12 +73,12 @@ namespace RPChecker
         }
 
 
-
-        static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b)
+        private static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b)
         {
             return a.Value.CompareTo(b.Value);
         }
-        List<KeyValuePair<int, double>> AnalyseFile(string file1, string file2, string avsFile, string logFile)
+
+        private List<KeyValuePair<int, double>> AnalyseFile(string file1, string file2, string avsFile, string logFile)
         {
             try
             {
@@ -102,9 +102,9 @@ namespace RPChecker
         }
 
 
-        int _threshold = 30;
+        private int _threshold = 30;
 
-        void UpdataGridView(ReSulT info, double frameRate, bool clear = true, bool updataTime = false)
+        private void UpdataGridView(ReSulT info, double frameRate, bool clear = true, bool updataTime = false)
         {
             if (clear) { dataGridView1.Rows.Clear(); }
             int index = 0;
@@ -117,16 +117,16 @@ namespace RPChecker
                     dataGridView1.Rows[index].Cells[0].Value = item.Key;
                     dataGridView1.Rows[index].Cells[1].Value = item.Value;
                     dataGridView1.Rows[index].Cells[2].Value = ConvertMethod.Time2String(temp);
-                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = ((item.Value < _threshold) ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112));
+                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = item.Value < _threshold ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                     if (!clear) { ++index; }
                 }
-                if ((item.Value > _threshold && dataGridView1.RowCount >= 450) && !updataTime) { break; }
+                if (item.Value > _threshold && dataGridView1.RowCount >= 450 && !updataTime) { break; }
             }
 
         }
 
 
-        readonly Regex _rpath = new Regex(@".+\\(?<fileName>.*)");
+        private readonly Regex _rpath = new Regex(@".+\\(?<fileName>.*)");
         private void button1_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
@@ -154,7 +154,7 @@ namespace RPChecker
             flf.Show();
         }
 
-        readonly double[] _frameRate = {24000 / 1001.0, 24000 / 1000.0,
+        private readonly double[] _frameRate = {24000 / 1001.0, 24000 / 1000.0,
                                         25000 / 1000.0, 30000 / 1001.0,
                                         50000 / 1000.0, 60000 / 1001.0 };
         private void comboBox1_SelectionChangeCommitted(object sender, EventArgs e)

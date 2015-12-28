@@ -3,7 +3,7 @@ using System.Text;
 
 namespace RPChecker
 {
-    static class ConvertMethod
+    internal static class ConvertMethod
     {
         public static string GetUTF8String(byte[] buffer)
         {
