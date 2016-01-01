@@ -82,7 +82,7 @@ namespace RPChecker
             string output;
             using (System.Diagnostics.Process process = new System.Diagnostics.Process())
             {
-                process.StartInfo.FileName = "vspipe.exe";
+                process.StartInfo.FileName = "vspipe";
                 process.StartInfo.Arguments = $" -p \"{arguments}\" .";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = !value;
