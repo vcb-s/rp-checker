@@ -179,12 +179,13 @@ namespace RPChecker
         private void FrmLoadFiles_Resize(object sender, EventArgs e)
         {
             var midLine = (Width - textBox1.Width - textBox1.Margin.Left - textBox1.Margin.Right - 27)/2;
-            //MessageBox.Show(midLine.ToString());
             listView1.Width = midLine - 10;
             listView2.Location = new Point(midLine + 10, listView1.Location.Y);
             listView2.Width = listView1.Width;
             button1.Location = new Point(listView1.Location.X + listView1.Width - button1.Width, button1.Location.Y);
             label2.Location = new Point(listView2.Location.X, label2.Location.Y);
+            columnHeader1.Width = listView1.Width - 5;
+            columnHeader2.Width = listView1.Width - 5;
         }
     }
 }
