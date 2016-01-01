@@ -17,37 +17,7 @@ namespace RPChecker
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
 
-        private class ReSulT
-        {
-            public List<KeyValuePair<int, double>> Data { get; set; }
-
-            public string FileName { get; set; }
-        }
-
-
-
         private int _threshold = 30;
-
-        private void UpdataGridView(ReSulT info, double frameRate, bool clear = true, bool updataTime = false)
-        {
-            if (clear) { dataGridView1.Rows.Clear(); }
-            int index = 0;
-            foreach (var item in info.Data)
-            {
-                if ((dataGridView1.RowCount < 450 || item.Value < _threshold || updataTime) && index < dataGridView1.RowCount)
-                {
-                    if (clear) { index = dataGridView1.Rows.Add(); }
-                    TimeSpan temp = ConvertMethod.Second2Time(item.Key / frameRate);
-                    dataGridView1.Rows[index].Cells[0].Value = item.Key;
-                    dataGridView1.Rows[index].Cells[1].Value = $"{item.Value:F4}";
-                    dataGridView1.Rows[index].Cells[2].Value = ConvertMethod.Time2String(temp);
-                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = item.Value < _threshold ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
-                    if (!clear) { ++index; }
-                }
-                if (item.Value > _threshold && dataGridView1.RowCount >= 450 && !updataTime) { break; }
-            }
-        }
-
 
         private readonly Regex _rpath = new Regex(@".+\\(?<fileName>.*)");
 
@@ -74,7 +44,6 @@ namespace RPChecker
                     MessageBox.Show(ex.Message);
                     throw;
                 }
-
             }
             _fullData.ForEach(item => comboBox1.Items.Add(_rpath.Match(item.FileName).Groups["fileName"].Value));
             if (comboBox1.Items.Count <= 0) return;
@@ -125,8 +94,34 @@ namespace RPChecker
             UpdataGridView(_fullData[comboBox1.SelectedIndex], _frameRate[comboBox2.SelectedIndex]);
         }
 
+        private void UpdataGridView(ReSulT info, double frameRate, bool clear = true, bool updataTime = false)
+        {
+            if (clear) { dataGridView1.Rows.Clear(); }
+            int index = 0;
+            foreach (var item in info.Data)
+            {
+                if ((dataGridView1.RowCount < 450 || item.Value < _threshold || updataTime) && index < dataGridView1.RowCount)
+                {
+                    if (clear) { index = dataGridView1.Rows.Add(); }
+                    TimeSpan temp = ConvertMethod.Second2Time(item.Key / frameRate);
+                    dataGridView1.Rows[index].Cells[0].Value = item.Key;
+                    dataGridView1.Rows[index].Cells[1].Value = $"{item.Value:F4}";
+                    dataGridView1.Rows[index].Cells[2].Value = ConvertMethod.Time2String(temp);
+                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = item.Value < _threshold ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
+                    if (!clear) { ++index; }
+                }
+                if (item.Value > _threshold && dataGridView1.RowCount >= 450 && !updataTime) { break; }
+            }
+        }
+
         private void comboBox1_MouseEnter(object sender, EventArgs e) => toolTip1.Show(comboBox1.SelectedItem?.ToString(), comboBox1);
 
         private void comboBox1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
+    }
+
+    public class ReSulT
+    {
+        public List<KeyValuePair<int, double>> Data { get; set; }
+        public string FileName { get; set; }
     }
 }
