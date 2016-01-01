@@ -50,9 +50,10 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(393, 357);
+            this.button1.Location = new System.Drawing.Point(409, 407);
+            this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(164, 30);
+            this.button1.Size = new System.Drawing.Size(148, 36);
             this.button1.TabIndex = 1;
             this.button1.Text = "开始分析";
             this.button1.UseVisualStyleBackColor = true;
@@ -60,6 +61,7 @@
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -69,12 +71,13 @@
             this.frams,
             this.PSNR,
             this.Time});
-            this.dataGridView1.Location = new System.Drawing.Point(12, 12);
+            this.dataGridView1.Location = new System.Drawing.Point(12, 13);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(373, 397);
+            this.dataGridView1.Size = new System.Drawing.Size(388, 459);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.TabStop = false;
             // 
@@ -99,9 +102,10 @@
             // button2
             // 
             this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.Location = new System.Drawing.Point(393, 321);
+            this.button2.Location = new System.Drawing.Point(409, 363);
+            this.button2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(164, 30);
+            this.button2.Size = new System.Drawing.Size(148, 36);
             this.button2.TabIndex = 0;
             this.button2.Text = "载入文件";
             this.button2.UseVisualStyleBackColor = true;
@@ -112,9 +116,10 @@
             this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(391, 12);
+            this.comboBox1.Location = new System.Drawing.Point(406, 13);
+            this.comboBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(164, 20);
+            this.comboBox1.Size = new System.Drawing.Size(151, 25);
             this.comboBox1.TabIndex = 4;
             this.comboBox1.SelectionChangeCommitted += new System.EventHandler(this.comboBox1_SelectionChangeCommitted);
             this.comboBox1.MouseEnter += new System.EventHandler(this.comboBox1_MouseEnter);
@@ -132,9 +137,10 @@
             "30000 / 1001",
             "50000 / 1000",
             "60000 / 1001"});
-            this.comboBox2.Location = new System.Drawing.Point(391, 38);
+            this.comboBox2.Location = new System.Drawing.Point(406, 46);
+            this.comboBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(164, 20);
+            this.comboBox2.Size = new System.Drawing.Size(151, 25);
             this.comboBox2.TabIndex = 5;
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
@@ -142,9 +148,10 @@
             // 
             this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(459, 393);
+            this.checkBox1.Location = new System.Drawing.Point(458, 451);
+            this.checkBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(96, 16);
+            this.checkBox1.Size = new System.Drawing.Size(99, 21);
             this.checkBox1.TabIndex = 3;
             this.checkBox1.Text = "保留中间文件";
             this.checkBox1.UseVisualStyleBackColor = true;
@@ -152,7 +159,8 @@
             // numericUpDown1
             // 
             this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numericUpDown1.Location = new System.Drawing.Point(483, 64);
+            this.numericUpDown1.Location = new System.Drawing.Point(504, 79);
+            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             200,
             0,
@@ -164,7 +172,7 @@
             0,
             0});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(72, 21);
+            this.numericUpDown1.Size = new System.Drawing.Size(53, 23);
             this.numericUpDown1.TabIndex = 6;
             this.numericUpDown1.Value = new decimal(new int[] {
             30,
@@ -177,9 +185,9 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(391, 68);
+            this.label1.Location = new System.Drawing.Point(406, 81);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(89, 12);
+            this.label1.Size = new System.Drawing.Size(92, 17);
             this.label1.TabIndex = 7;
             this.label1.Text = "峰值信噪比阈值";
             // 
@@ -190,16 +198,17 @@
             this.comboBox3.FormattingEnabled = true;
             this.comboBox3.Items.AddRange(new object[] {
             "Default"});
-            this.comboBox3.Location = new System.Drawing.Point(393, 91);
+            this.comboBox3.Location = new System.Drawing.Point(409, 110);
+            this.comboBox3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(164, 20);
+            this.comboBox3.Size = new System.Drawing.Size(151, 25);
             this.comboBox3.TabIndex = 7;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(564, 421);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ClientSize = new System.Drawing.Size(569, 485);
             this.Controls.Add(this.comboBox3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numericUpDown1);
@@ -209,8 +218,10 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.button1);
+            this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(580, 460);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.MinimumSize = new System.Drawing.Size(585, 524);
             this.Name = "Form1";
             this.Text = "RP Checker";
             this.Load += new System.EventHandler(this.Form1_Load);
