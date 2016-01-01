@@ -8,14 +8,14 @@ namespace RPChecker
 {
     public partial class FrmLoadFiles : Form
     {
-        readonly Form1 _mainWindow;
+        private readonly Form1 _mainWindow;
         public FrmLoadFiles(Form1 arg)
         {
             _mainWindow = arg;
             InitializeComponent();
         }
 
-        readonly Regex _rpath = new Regex(@".+\\(?<fileName>.+(?:\\.*)?)");
+        private readonly Regex _rpath = new Regex(@".+\\(?<fileName>.+(?:\\.*)?)");
 
         private void listView1_ItemDrag(object sender, ItemDragEventArgs e)
         {
