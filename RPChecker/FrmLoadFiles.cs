@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
@@ -15,8 +16,6 @@ namespace RPChecker
             InitializeComponent();
         }
 
-        private readonly Regex _rpath = new Regex(@".+\\(?<fileName>.+(?:\\.*)?)");
-
         private void listView1_ItemDrag(object sender, ItemDragEventArgs e)
         {
             listView1.DoDragDrop(e.Item, DragDropEffects.Move);
@@ -26,6 +25,7 @@ namespace RPChecker
         {
             e.Effect = DragDropEffects.Move;
         }
+
         private void listView1_DragOver(object sender, DragEventArgs e)
         {
             Point ptScreen = new Point(e.X, e.Y);
@@ -81,7 +81,7 @@ namespace RPChecker
             if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
             foreach (var item in openFileDialog1.FileNames)
             {
-                listView1.Items.Add(_rpath.Match(item).Groups["fileName"].Value).Tag = item;
+                listView1.Items.Add(Path.GetFileName(item)).Tag = item;
             }
         }
 
@@ -90,7 +90,7 @@ namespace RPChecker
             if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
             foreach (var item in openFileDialog1.FileNames)
             {
-                listView2.Items.Add(_rpath.Match(item).Groups["fileName"].Value).Tag = item;
+                listView2.Items.Add(Path.GetFileName(item)).Tag = item;
             }
         }
 
@@ -128,7 +128,7 @@ namespace RPChecker
         {
             foreach (var item in (string[]) e.Data.GetData(DataFormats.FileDrop))
             {
-                listView1.Items.Add(_rpath.Match(item).Groups["fileName"].Value).Tag = item;
+                listView1.Items.Add(Path.GetFileName(item)).Tag = item;
             }
         }
         private void textBox1_DragEnter(object sender, DragEventArgs e)
@@ -140,7 +140,7 @@ namespace RPChecker
         {
             foreach (var item in (string[]) e.Data.GetData(DataFormats.FileDrop))
             {
-                listView2.Items.Add(_rpath.Match(item).Groups["fileName"].Value).Tag = item;
+                listView2.Items.Add(Path.GetFileName(item)).Tag = item;
             }
         }
         private void textBox2_DragEnter(object sender, DragEventArgs e)
@@ -176,6 +176,15 @@ namespace RPChecker
             listView1.Items[((ListView) sender).SelectedItems[0].Index].ForeColor = Color.Red;
         }
 
-
+        private void FrmLoadFiles_Resize(object sender, EventArgs e)
+        {
+            var midLine = (Width - textBox1.Width - textBox1.Margin.Left - textBox1.Margin.Right - 27)/2;
+            //MessageBox.Show(midLine.ToString());
+            listView1.Width = midLine - 10;
+            listView2.Location = new Point(midLine + 10, listView1.Location.Y);
+            listView2.Width = listView1.Width;
+            button1.Location = new Point(listView1.Location.X + listView1.Width - button1.Width, button1.Location.Y);
+            label2.Location = new Point(listView2.Location.X, label2.Location.Y);
+        }
     }
 }
