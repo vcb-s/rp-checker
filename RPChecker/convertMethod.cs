@@ -3,7 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Channels;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
 
 
 namespace RPChecker
@@ -60,7 +63,7 @@ namespace RPChecker
             }
             template = Regex.Replace(template, "%File1%", file1);
             template = Regex.Replace(template, "%File2%", file2);
-            File.WriteAllText(outputFile, template, Encoding.Default);
+            File.WriteAllText(outputFile, template, Encoding.UTF8);
         }
 
         private static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b)
@@ -71,15 +74,20 @@ namespace RPChecker
         public static List<KeyValuePair<int, double>> AnalyseFile(string file1, string file2, string vsFile, string selectedFile)
         {
             GenerateVpyFile(file1, file2, vsFile, selectedFile);
-            var rawData = Regex.Matches(GenerateLog(vsFile), @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
+            int exitCode;
+            var rawData = Regex.Matches(GenerateLog(vsFile,out exitCode), @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
+            if (exitCode != 0)
+            {
+                throw new Exception("Something wrong happened while executing vpy script,\n please executing vpy script under the Console for the detail");
+            }
             var data = (from Match line in rawData select new KeyValuePair<int, double>(int.Parse(line.Groups["fram"].Value), double.Parse(line.Groups["PSNR"].Value))).ToList();
             data.Sort(Compare);
             return data;
         }
 
-        private static string GenerateLog(string arguments, bool value = true)
+        private static string GenerateLog(string arguments, out int exitCode, bool value = true)
         {
-            string output;
+            string standOutput;
             using (System.Diagnostics.Process process = new System.Diagnostics.Process())
             {
                 process.StartInfo.FileName = "vspipe";
@@ -87,13 +95,15 @@ namespace RPChecker
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = !value;
                 process.StartInfo.RedirectStandardOutput = value;
+                //process.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
 
                 process.Start();
-                output = process.StandardOutput.ReadToEnd();
+                standOutput = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
+                exitCode = process.ExitCode;
                 process.Close();
             }
-            return output;
+            return standOutput;
         }
     }
 }

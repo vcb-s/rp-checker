@@ -40,7 +40,7 @@ namespace RPChecker
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show(ex.Message ,@"PRChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             _fullData.ForEach(item => comboBox1.Items.Add(Path.GetFileName(item.FileName)?? ""));
