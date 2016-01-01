@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -20,86 +19,11 @@ namespace RPChecker
 
         private class ReSulT
         {
-            public readonly List<KeyValuePair<int, double>> Data;
-            public readonly string FileName;
+            public List<KeyValuePair<int, double>> Data { get; set; }
 
-            public ReSulT(string fileName, List<KeyValuePair<int, double>> data)
-            {
-                FileName = fileName;
-                Data     = data;
-            }
+            public string FileName { get; set; }
         }
 
-
-        private static void GenerateLog(string arguments, bool value = true)
-        {
-            using (System.Diagnostics.Process process = new System.Diagnostics.Process())
-            {
-                process.StartInfo.FileName               = "AVSMeter.exe";
-                process.StartInfo.Arguments              = $"\"{arguments}\"";
-                process.StartInfo.UseShellExecute        = false;
-                process.StartInfo.CreateNoWindow         = value;
-                process.StartInfo.RedirectStandardOutput = value;
-
-                process.Start();
-
-                process.WaitForExit();
-                process.Close();
-            }
-        }
-
-        private void GenerateAvs(string file1, string file2, string logFile, string outputFile)
-        {
-            string template = "MP_Pipeline(\"\"\"\r\nLWLibavVideoSource(\"%File1%\", stacked=True, format=\"yuv420p8\")\r\n### prefetch: 16, 0\r\n### ###\r\nsrc = last\r\nLWLibavVideoSource(\"%File2%\", stacked=True, format=\"yuv420p8\")\r\n### export clip: src\r\n### prefetch: 16, 0\r\n### ###\r\nCompare(last, src, \"YUV\", \"%LogFile%\")\r\n\"\"\")";
-            if (comboBox3.SelectedItem.ToString() != "Default")
-            {
-                var btemp = File.ReadAllBytes(comboBox3.SelectedItem.ToString());
-                string temp = ConvertMethod.GetUTF8String(btemp);
-                if (temp.IndexOf("%File1%"  , StringComparison.Ordinal) > 0 &&
-                    temp.IndexOf("%File2%"  , StringComparison.Ordinal) > 0 &&
-                    temp.IndexOf("%LogFile%", StringComparison.Ordinal) > 0)
-                {
-                    template = temp;
-                }
-                else
-                {
-                    throw new ArgumentException("无效的模板文件");
-                }
-            }
-            template = Regex.Replace(template, "%File1%", file1);
-            template = Regex.Replace(template, "%File2%", file2);
-            template = Regex.Replace(template, "%LogFile%", logFile);
-            File.WriteAllText(outputFile, template, Encoding.Default);
-        }
-
-
-        private static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b)
-        {
-            return a.Value.CompareTo(b.Value);
-        }
-
-        private List<KeyValuePair<int, double>> AnalyseFile(string file1, string file2, string avsFile, string logFile)
-        {
-            try
-            {
-                GenerateAvs(file1, file2, logFile, avsFile);
-                GenerateLog(avsFile, false);
-                var data =
-                    File.ReadAllLines(logFile)
-                        .Skip(6)
-                        .TakeWhile(item => !string.IsNullOrEmpty(item))
-                        .Select(item => Regex.Replace(item, @"\s+", @",").Split(','))
-                        .Select(item => new KeyValuePair<int, double>(int.Parse(item[1]), double.Parse(item[6])))
-                        .ToList();
-                data.Sort(Compare);
-                return data;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message);
-            }
-            return null;
-        }
 
 
         private int _threshold = 30;
@@ -115,32 +39,42 @@ namespace RPChecker
                     if (clear) { index = dataGridView1.Rows.Add(); }
                     TimeSpan temp = ConvertMethod.Second2Time(item.Key / frameRate);
                     dataGridView1.Rows[index].Cells[0].Value = item.Key;
-                    dataGridView1.Rows[index].Cells[1].Value = item.Value;
+                    dataGridView1.Rows[index].Cells[1].Value = $"{item.Value:F4}";
                     dataGridView1.Rows[index].Cells[2].Value = ConvertMethod.Time2String(temp);
                     dataGridView1.Rows[index].DefaultCellStyle.BackColor = item.Value < _threshold ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                     if (!clear) { ++index; }
                 }
                 if (item.Value > _threshold && dataGridView1.RowCount >= 450 && !updataTime) { break; }
             }
-
         }
 
 
         private readonly Regex _rpath = new Regex(@".+\\(?<fileName>.*)");
+
         private void button1_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
             foreach (var item in FilePathsPair)
             {
-                string avsFile = item.Value + ".avs";
-                string logFile = item.Value + ".log";
+                string vsFile = $"{item.Value}.vpy";
+                try
+                {
+                    _fullData.Add(new ReSulT
+                    {
+                        FileName = item.Value,
+                        Data = ConvertMethod.AnalyseFile(item.Key, item.Value, vsFile, comboBox3.SelectedItem.ToString())
+                    });
+                    if (checkBox1.Checked) continue;
+                    File.Delete(vsFile);
+                    File.Delete($"{item.Key}.lwi");
+                    File.Delete($"{item.Value}.lwi");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    throw;
+                }
 
-                _fullData.Add(new ReSulT(item.Value, AnalyseFile(item.Key, item.Value, avsFile, logFile)));
-                if (checkBox1.Checked) continue;
-                File.Delete(avsFile);
-                File.Delete(logFile);
-                File.Delete($"{item.Key}.lwi");
-                File.Delete($"{item.Value}.lwi");
             }
             _fullData.ForEach(item => comboBox1.Items.Add(_rpath.Match(item.FileName).Groups["fileName"].Value));
             if (comboBox1.Items.Count <= 0) return;
@@ -159,10 +93,7 @@ namespace RPChecker
                                         50000 / 1000.0, 60000 / 1001.0 };
         private void comboBox1_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            if (comboBox1.SelectedIndex < 0 || comboBox1.SelectedIndex > _fullData.Count)
-            {
-                return;
-            }
+            if (comboBox1.SelectedIndex < 0 || comboBox1.SelectedIndex > _fullData.Count) return;
             UpdataGridView(_fullData[comboBox1.SelectedIndex], _frameRate[comboBox2.SelectedIndex]);
         }
 
@@ -173,11 +104,10 @@ namespace RPChecker
             comboBox3.SelectedIndex = 0;
             DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             current.GetFiles()
-                .Where(item => item.Extension.ToLowerInvariant().EndsWith("avs"))
+                .Where(item => item.Extension.ToLowerInvariant().EndsWith("vpy"))
                 .ToList()
                 .ForEach(item => comboBox3.Items.Add(item));
         }
-
 
 
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
