@@ -14,26 +14,26 @@ namespace RPChecker
         {
             InitializeComponent();
         }
-        public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
+        public  readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
 
         private int _threshold = 30;
 
-        private readonly Regex _rpath = new Regex(@".+\\(?<fileName>.*)");
-
         private void button1_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
+            comboBox1.Items.Clear();
             foreach (var item in FilePathsPair)
             {
                 string vsFile = $"{item.Value}.vpy";
                 try
                 {
-                    _fullData.Add(new ReSulT
+                    var result = new ReSulT
                     {
                         FileName = item.Value,
                         Data = ConvertMethod.AnalyseFile(item.Key, item.Value, vsFile, comboBox3.SelectedItem.ToString())
-                    });
+                    };
+                    _fullData.Add(result);
                     if (checkBox1.Checked) continue;
                     File.Delete(vsFile);
                     File.Delete($"{item.Key}.lwi");
@@ -42,10 +42,9 @@ namespace RPChecker
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
-                    throw;
                 }
             }
-            _fullData.ForEach(item => comboBox1.Items.Add(_rpath.Match(item.FileName).Groups["fileName"].Value));
+            _fullData.ForEach(item => comboBox1.Items.Add(Path.GetFileName(item.FileName)?? ""));
             if (comboBox1.Items.Count <= 0) return;
             comboBox1.SelectedIndex = 0;
             UpdataGridView(_fullData[comboBox1.SelectedIndex], _frameRate[comboBox2.SelectedIndex]);
@@ -57,9 +56,9 @@ namespace RPChecker
             flf.Show();
         }
 
-        private readonly double[] _frameRate = {24000 / 1001.0, 24000 / 1000.0,
-                                        25000 / 1000.0, 30000 / 1001.0,
-                                        50000 / 1000.0, 60000 / 1001.0 };
+        private readonly double[] _frameRate = { 24000 / 1001.0, 24000 / 1000.0,
+                                                 25000 / 1000.0, 30000 / 1001.0,
+                                                 50000 / 1000.0, 60000 / 1001.0 };
         private void comboBox1_SelectionChangeCommitted(object sender, EventArgs e)
         {
             if (comboBox1.SelectedIndex < 0 || comboBox1.SelectedIndex > _fullData.Count) return;
@@ -73,8 +72,7 @@ namespace RPChecker
             comboBox3.SelectedIndex = 0;
             DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             current.GetFiles()
-                .Where(item => item.Extension.ToLowerInvariant().EndsWith("vpy"))
-                .ToList()
+                .Where(item => item.Extension.ToLowerInvariant().EndsWith("vpy")).ToList()
                 .ForEach(item => comboBox3.Items.Add(item));
         }
 

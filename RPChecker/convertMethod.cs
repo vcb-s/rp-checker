@@ -49,14 +49,13 @@ namespace RPChecker
                 var btemp = File.ReadAllBytes(selectedFile);
                 string temp = GetUTF8String(btemp);
                 if (temp.IndexOf("%File1%", StringComparison.Ordinal) > 0 &&
-                    temp.IndexOf("%File2%", StringComparison.Ordinal) > 0 &&
-                    temp.IndexOf("%LogFile%", StringComparison.Ordinal) > 0)
+                    temp.IndexOf("%File2%", StringComparison.Ordinal) > 0 )
                 {
                     template = temp;
                 }
                 else
                 {
-                    throw new ArgumentException("无效的模板文件");
+                    throw new FormatException("无效的模板文件");
                 }
             }
             template = Regex.Replace(template, "%File1%", file1);
