@@ -30,7 +30,7 @@ namespace RPChecker
                     var result = new ReSulT
                     {
                         FileName = item.Value,
-                        Data = ConvertMethod.AnalyseFile(item.Key, item.Value, vsFile, comboBox3.SelectedItem.ToString())
+                        Data = ConvertMethod.AnalyseFile(item.Key, item.Value, vsFile, comboBox3.SelectedItem.ToString(),this)
                     };
                     _fullData.Add(result);
                     if (checkBox1.Checked) continue;
@@ -114,6 +114,11 @@ namespace RPChecker
         private void comboBox1_MouseEnter(object sender, EventArgs e) => toolTip1.Show(comboBox1.SelectedItem?.ToString(), comboBox1);
 
         private void comboBox1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
+
+        public void UpdateError(string data)
+        {
+            lbError.Text = data;
+        }
     }
 
     public class ReSulT

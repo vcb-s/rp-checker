@@ -43,6 +43,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.lbError = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
@@ -204,11 +205,21 @@
             this.comboBox3.Size = new System.Drawing.Size(151, 25);
             this.comboBox3.TabIndex = 7;
             // 
+            // lbError
+            // 
+            this.lbError.AutoSize = true;
+            this.lbError.Location = new System.Drawing.Point(406, 150);
+            this.lbError.Name = "lbError";
+            this.lbError.Size = new System.Drawing.Size(31, 17);
+            this.lbError.TabIndex = 8;
+            this.lbError.Text = "Info";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(569, 485);
+            this.Controls.Add(this.lbError);
             this.Controls.Add(this.comboBox3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numericUpDown1);
@@ -247,6 +258,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox comboBox3;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label lbError;
     }
 }
 

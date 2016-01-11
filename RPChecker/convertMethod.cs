@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.Remoting.Channels;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -71,12 +72,20 @@ namespace RPChecker
             return a.Value.CompareTo(b.Value);
         }
 
-        public static List<KeyValuePair<int, double>> AnalyseFile(string file1, string file2, string vsFile, string selectedFile)
+        public static List<KeyValuePair<int, double>> AnalyseFile(string file1, string file2, string vsFile, string selectedFile,Form1 mainForm)
         {
             GenerateVpyFile(file1, file2, vsFile, selectedFile);
-            int exitCode;
-            var rawData = Regex.Matches(GenerateLog(vsFile,out exitCode), @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
-            if (exitCode != 0)
+            VsPipeProcess.arguments = vsFile;
+            VsPipeProcess.mainForm = mainForm;
+            Thread vsThread = new Thread(VsPipeProcess.GenerateLog);
+            vsThread.Start();
+            while (!VsPipeProcess._exited)
+            {
+                //do nothing
+            }
+            var rawData = Regex.Matches(VsPipeProcess.StandOutput.ToString(), @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
+
+            if (VsPipeProcess.exitCode != 0)
             {
                 throw new Exception("Something wrong happened while executing vpy script,\n please executing vpy script under the Console for the detail");
             }
@@ -85,25 +94,5 @@ namespace RPChecker
             return data;
         }
 
-        private static string GenerateLog(string arguments, out int exitCode, bool value = true)
-        {
-            string standOutput;
-            using (System.Diagnostics.Process process = new System.Diagnostics.Process())
-            {
-                process.StartInfo.FileName = "vspipe";
-                process.StartInfo.Arguments = $" -p \"{arguments}\" .";
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = !value;
-                process.StartInfo.RedirectStandardOutput = value;
-                //process.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
-
-                process.Start();
-                standOutput = process.StandardOutput.ReadToEnd();
-                process.WaitForExit();
-                exitCode = process.ExitCode;
-                process.Close();
-            }
-            return standOutput;
-        }
     }
 }
