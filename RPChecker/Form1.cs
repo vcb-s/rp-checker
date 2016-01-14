@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Drawing;
+using System.Threading;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using ThreadState = System.Threading.ThreadState;
 
 namespace RPChecker
@@ -21,12 +21,14 @@ namespace RPChecker
 
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
-        private StringBuilder _erroeMessageBuilder = new StringBuilder();
+        private readonly StringBuilder _erroeMessageBuilder = new StringBuilder();
+        private bool _beginErrorRecord = false;
         private int _threshold = 30;
 
         private void button1_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
+            _erroeMessageBuilder.Clear();
             comboBox1.Items.Clear();
             foreach (var item in FilePathsPair)
             {
@@ -138,32 +140,38 @@ namespace RPChecker
             }
         }
 
-        private void comboBox1_MouseEnter(object sender, EventArgs e)
-            => toolTip1.Show(comboBox1.SelectedItem?.ToString(), comboBox1);
+        private void comboBox1_MouseEnter(object sender, EventArgs e) => toolTip1.Show(comboBox1.SelectedItem?.ToString(), comboBox1);
 
         private void comboBox1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
 
+        //private int count = 0;
         private void UpdateProgress(string progress)
         {
-            var value = Regex.Match(progress, @"(?<done>\d+)/(?<undo>\d+)");
+            lbError.Text = progress;
+            var value = Regex.Match(progress, @"Frame: (?<done>\d+)/(?<undo>\d+)");
             if (value.Success)
             {
                 progressBar1.Value = (int)Math.Floor(double.Parse(value.Groups["done"].Value) / double.Parse(value.Groups["undo"].Value) * 100);
             }
-            else
-            {
-                //_erroeMessageBuilder.Append(val + Environment.NewLine);
-            }
-            lbError.Text = progress;
             Application.DoEvents();
+
+            if (progress == "Script evaluation failed:")
+            {
+                _beginErrorRecord = true;
+            }
+            if (_beginErrorRecord)
+            {
+                _erroeMessageBuilder.Append(progress + Environment.NewLine);
+                //Debug.WriteLine($"{++count} {progress} [{Thread.CurrentThread.ManagedThreadId}]");
+            }
         }
 
-        private delegate void UpdateProgressDelegate(string val);
+        private delegate void UpdateProgressDelegate(string progress);
 
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress))return;
-            Invoke(new UpdateProgressDelegate(UpdateProgress), new object[] {progress});
+            Invoke(new UpdateProgressDelegate(UpdateProgress), progress);
         }
 
         private List<KeyValuePair<int, double>> _tempData = new List<KeyValuePair<int, double>>();
@@ -183,24 +191,43 @@ namespace RPChecker
             Invoke(new UpdatePsnrDelegate(UpdatePsnr), data);
         }
 
-
-
         private static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b)
         {
             return a.Value.CompareTo(b.Value);
         }
 
+        private bool Enable
+        {
+            set
+            {
+                button1.Enabled        = value;
+                button2.Enabled        = value;
+                button3.Enabled        = value;
+                comboBox1.Enabled      = value;
+                comboBox2.Enabled      = value;
+                comboBox3.Enabled      = value;
+                checkBox1.Enabled      = value;
+                numericUpDown1.Enabled = value;
+                btnAbort.Enabled       = !value;
+            }
+        }
 
         private void AnalyseFile(string file1, string file2, string vsFile, string selectedFile)
         {
             _tempData = new List<KeyValuePair<int, double>>();
             try
             {
-                button1.Enabled = false;
-                button2.Enabled = false;
+                _beginErrorRecord = false;
+
+                Enable = false;
+
+                lbError.Text = @"info";
+                progressBar1.Value = 0;
                 Application.DoEvents();
 
                 ConvertMethod.GenerateVpyFile(file1, file2, vsFile, selectedFile);
+
+                _erroeMessageBuilder.Append("---" + vsFile + "---" + Environment.NewLine);
 
                 var vsThread = new Thread(VsPipeProcess.GenerateLog);
                 VsPipeProcess.ProgressUpdated += ProgressUpdated;
@@ -222,12 +249,16 @@ namespace RPChecker
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                MessageBox.Show(ex.Message);
             }
             finally
             {
-                button1.Enabled = true;
-                button2.Enabled = true;
+
+                VsPipeProcess.ProgressUpdated -= ProgressUpdated;
+                VsPipeProcess.PsnrUpdated -= PsnrUpdated;
+
+
+                Enable = true;
                 Refresh();
                 Application.DoEvents();
             }
@@ -242,6 +273,18 @@ namespace RPChecker
         private void button3_Click(object sender, EventArgs e)
         {
             MessageBox.Show(_erroeMessageBuilder.ToString());
+        }
+
+        private void btnAbort_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                VsPipeProcess.Abort = true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
     }
 }

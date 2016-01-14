@@ -52,6 +52,7 @@ namespace RPChecker
             this.lbError = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.button3 = new System.Windows.Forms.Button();
+            this.btnAbort = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
@@ -59,10 +60,10 @@ namespace RPChecker
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(409, 407);
+            this.button1.Location = new System.Drawing.Point(406, 407);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(148, 36);
+            this.button1.Size = new System.Drawing.Size(92, 36);
             this.button1.TabIndex = 1;
             this.button1.Text = "开始分析";
             this.button1.UseVisualStyleBackColor = true;
@@ -111,7 +112,7 @@ namespace RPChecker
             // button2
             // 
             this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.Location = new System.Drawing.Point(409, 363);
+            this.button2.Location = new System.Drawing.Point(406, 363);
             this.button2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(148, 36);
@@ -207,7 +208,7 @@ namespace RPChecker
             this.comboBox3.FormattingEnabled = true;
             this.comboBox3.Items.AddRange(new object[] {
             "Default"});
-            this.comboBox3.Location = new System.Drawing.Point(409, 110);
+            this.comboBox3.Location = new System.Drawing.Point(406, 110);
             this.comboBox3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(151, 25);
@@ -224,14 +225,14 @@ namespace RPChecker
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(409, 142);
+            this.progressBar1.Location = new System.Drawing.Point(406, 142);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(151, 23);
             this.progressBar1.TabIndex = 9;
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(409, 450);
+            this.button3.Location = new System.Drawing.Point(406, 450);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(43, 23);
             this.button3.TabIndex = 10;
@@ -239,11 +240,23 @@ namespace RPChecker
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // btnAbort
+            // 
+            this.btnAbort.Enabled = false;
+            this.btnAbort.Location = new System.Drawing.Point(504, 406);
+            this.btnAbort.Name = "btnAbort";
+            this.btnAbort.Size = new System.Drawing.Size(53, 37);
+            this.btnAbort.TabIndex = 11;
+            this.btnAbort.Text = "中断";
+            this.btnAbort.UseVisualStyleBackColor = true;
+            this.btnAbort.Click += new System.EventHandler(this.btnAbort_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(569, 485);
+            this.Controls.Add(this.btnAbort);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.lbError);
@@ -288,6 +301,7 @@ namespace RPChecker
         private Label lbError;
         private ProgressBar progressBar1;
         private Button button3;
+        private Button btnAbort;
     }
 }
 
