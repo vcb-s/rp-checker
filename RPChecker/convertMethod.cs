@@ -1,9 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Diagnostics;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 
@@ -15,11 +12,8 @@ namespace RPChecker
         {
             if (buffer == null) return null;
             if (buffer.Length <= 3) return Encoding.UTF8.GetString(buffer);
-            byte[] bomBuffer = { 0xef, 0xbb, 0xbf };
 
-            if (buffer[0] == bomBuffer[0]
-             && buffer[1] == bomBuffer[1]
-             && buffer[2] == bomBuffer[2])
+            if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf)
             {
                 return new UTF8Encoding(false).GetString(buffer, 3, buffer.Length - 3);
             }

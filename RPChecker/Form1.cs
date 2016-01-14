@@ -23,7 +23,7 @@ namespace RPChecker
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
         private readonly StringBuilder _erroeMessageBuilder = new StringBuilder();
-        private bool _beginErrorRecord = false;
+        private bool _beginErrorRecord;
         private int _threshold = 30;
 
         private void button1_Click(object sender, EventArgs e)
@@ -37,6 +37,7 @@ namespace RPChecker
                 try
                 {
                     AnalyseFile(item.Key, item.Value, vsFile, comboBox3.SelectedItem.ToString());
+
                     _tempData.Sort(Compare);
                     var result = new ReSulT
                     {
@@ -150,13 +151,6 @@ namespace RPChecker
         private void UpdateProgress(string progress)
         {
             lbError.Text = progress;
-            var value = Regex.Match(progress, @"Frame: (?<done>\d+)/(?<undo>\d+)");
-            if (value.Success)
-            {
-                progressBar1.Value = (int)Math.Floor(double.Parse(value.Groups["done"].Value) / double.Parse(value.Groups["undo"].Value) * 100);
-            }
-            Application.DoEvents();
-
             if (progress == "Script evaluation failed:")
             {
                 _beginErrorRecord = true;
@@ -166,6 +160,16 @@ namespace RPChecker
                 _erroeMessageBuilder.Append(progress + Environment.NewLine);
                 //Debug.WriteLine($"{++count} {progress} [{Thread.CurrentThread.ManagedThreadId}]");
             }
+
+            var value = Regex.Match(progress, @"Frame: (?<done>\d+)/(?<undo>\d+)");
+            if (!value.Success) return;
+            var done = double.Parse(value.Groups["done"].Value);
+            var undo = double.Parse(value.Groups["undo"].Value);
+            if (value.Success && done < undo)
+            {
+                progressBar1.Value = (int)Math.Floor(done / undo * 100);
+            }
+            Application.DoEvents();
         }
 
         private delegate void UpdateProgressDelegate(string progress);
@@ -219,31 +223,21 @@ namespace RPChecker
             _tempData = new List<KeyValuePair<int, double>>();
             try
             {
-                _beginErrorRecord = false;
-
-                Enable = false;
-
-                lbError.Text = @"          ";
+                _beginErrorRecord  = false;
+                Enable             = false;
+                lbError.Text       = @"生成lwi文件中……";
                 progressBar1.Value = 0;
                 Application.DoEvents();
 
                 ConvertMethod.GenerateVpyFile(file1, file2, vsFile, selectedFile);
 
                 _erroeMessageBuilder.Append("---" + vsFile + "---" + Environment.NewLine);
-
                 var vsThread = new Thread(VsPipeProcess.GenerateLog);
                 VsPipeProcess.ProgressUpdated += ProgressUpdated;
                 VsPipeProcess.PsnrUpdated     += PsnrUpdated;
                 vsThread.Start(vsFile);
 
-
                 while (vsThread.ThreadState != ThreadState.Stopped) Application.DoEvents();
-
-
-                //if (VsPipeProcess.ExitCode != 0)
-                //{
-                //    throw new Exception("Something wrong happened while executing vpy script,\n please executing vpy script under the Console for the detail");
-                //}
             }
             catch (Exception ex)
             {
@@ -252,7 +246,7 @@ namespace RPChecker
             finally
             {
                 VsPipeProcess.ProgressUpdated -= ProgressUpdated;
-                VsPipeProcess.PsnrUpdated -= PsnrUpdated;
+                VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
 
                 Enable = true;
                 Refresh();

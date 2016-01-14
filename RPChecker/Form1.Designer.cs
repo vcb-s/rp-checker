@@ -60,7 +60,7 @@ namespace RPChecker
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(406, 407);
+            this.button1.Location = new System.Drawing.Point(407, 407);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(92, 36);
@@ -112,10 +112,10 @@ namespace RPChecker
             // button2
             // 
             this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.Location = new System.Drawing.Point(406, 363);
+            this.button2.Location = new System.Drawing.Point(407, 363);
             this.button2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(148, 36);
+            this.button2.Size = new System.Drawing.Size(151, 36);
             this.button2.TabIndex = 0;
             this.button2.Text = "载入文件";
             this.button2.UseVisualStyleBackColor = true;
@@ -158,7 +158,7 @@ namespace RPChecker
             // 
             this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(406, 451);
+            this.checkBox1.Location = new System.Drawing.Point(407, 454);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(99, 21);
@@ -218,7 +218,7 @@ namespace RPChecker
             // 
             this.lbError.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbError.AutoSize = true;
-            this.lbError.Location = new System.Drawing.Point(12, 452);
+            this.lbError.Location = new System.Drawing.Point(12, 455);
             this.lbError.Name = "lbError";
             this.lbError.Size = new System.Drawing.Size(48, 17);
             this.lbError.TabIndex = 8;
@@ -235,9 +235,9 @@ namespace RPChecker
             // button3
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(504, 449);
+            this.button3.Location = new System.Drawing.Point(505, 452);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(50, 23);
+            this.button3.Size = new System.Drawing.Size(53, 23);
             this.button3.TabIndex = 10;
             this.button3.Text = "LOG";
             this.button3.UseVisualStyleBackColor = true;
@@ -247,9 +247,9 @@ namespace RPChecker
             // 
             this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAbort.Enabled = false;
-            this.btnAbort.Location = new System.Drawing.Point(504, 406);
+            this.btnAbort.Location = new System.Drawing.Point(505, 406);
             this.btnAbort.Name = "btnAbort";
-            this.btnAbort.Size = new System.Drawing.Size(50, 37);
+            this.btnAbort.Size = new System.Drawing.Size(53, 37);
             this.btnAbort.TabIndex = 11;
             this.btnAbort.Text = "中断";
             this.btnAbort.UseVisualStyleBackColor = true;
