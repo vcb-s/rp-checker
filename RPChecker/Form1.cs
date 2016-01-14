@@ -221,7 +221,7 @@ namespace RPChecker
 
                 Enable = false;
 
-                lbError.Text = @"info";
+                lbError.Text = @"          ";
                 progressBar1.Value = 0;
                 Application.DoEvents();
 

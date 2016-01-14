@@ -87,7 +87,7 @@ namespace RPChecker
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(388, 430);
+            this.dataGridView1.Size = new System.Drawing.Size(388, 429);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.TabStop = false;
             // 
@@ -158,7 +158,7 @@ namespace RPChecker
             // 
             this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(458, 451);
+            this.checkBox1.Location = new System.Drawing.Point(406, 451);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(99, 21);
@@ -216,15 +216,17 @@ namespace RPChecker
             // 
             // lbError
             // 
+            this.lbError.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbError.AutoSize = true;
-            this.lbError.Location = new System.Drawing.Point(12, 455);
+            this.lbError.Location = new System.Drawing.Point(12, 452);
             this.lbError.Name = "lbError";
-            this.lbError.Size = new System.Drawing.Size(31, 17);
+            this.lbError.Size = new System.Drawing.Size(48, 17);
             this.lbError.TabIndex = 8;
-            this.lbError.Text = "Info";
+            this.lbError.Text = "          ";
             // 
             // progressBar1
             // 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBar1.Location = new System.Drawing.Point(406, 142);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(151, 23);
@@ -232,9 +234,10 @@ namespace RPChecker
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(406, 450);
+            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button3.Location = new System.Drawing.Point(504, 449);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(43, 23);
+            this.button3.Size = new System.Drawing.Size(50, 23);
             this.button3.TabIndex = 10;
             this.button3.Text = "LOG";
             this.button3.UseVisualStyleBackColor = true;
@@ -242,10 +245,11 @@ namespace RPChecker
             // 
             // btnAbort
             // 
+            this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAbort.Enabled = false;
             this.btnAbort.Location = new System.Drawing.Point(504, 406);
             this.btnAbort.Name = "btnAbort";
-            this.btnAbort.Size = new System.Drawing.Size(53, 37);
+            this.btnAbort.Size = new System.Drawing.Size(50, 37);
             this.btnAbort.TabIndex = 11;
             this.btnAbort.Text = "中断";
             this.btnAbort.UseVisualStyleBackColor = true;
