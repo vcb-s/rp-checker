@@ -45,7 +45,7 @@ namespace RPChecker
         }
 
 
-        private static void GenerateVpyFile(string file1, string file2, string outputFile, string selectedFile)
+        public static void GenerateVpyFile(string file1, string file2, string outputFile, string selectedFile)
         {
             string template = "import sys\r\nimport vapoursynth as vs \r\nimport mvsfunc as mvf\r\nimport functools\r\ncore = vs.get_core(accept_lowercase = True)\r\ncore.max_cache_size = 5000\r\nsrc = core.lsmas.LWLibavSource(r\"%File1%\", format = \"yuv420p16\")\r\nopt = core.lsmas.LWLibavSource(r\"%File2%\", format = \"yuv420p16\")\r\ncmp = mvf.PlaneCompare(opt, src, mae = False, rmse = False, cov = False, corr = False)\r\ndef callback(n, clip, f):\r\n    print(n, f.props.PlanePSNR)\r\n    return clip\r\ncmp = core.std.FrameEval(cmp, functools.partial(callback, clip = cmp), prop_src =[cmp])\r\ncmp.set_output()\r\n";
             if (selectedFile != "Default")
@@ -66,33 +66,5 @@ namespace RPChecker
             template = Regex.Replace(template, "%File2%", file2);
             File.WriteAllText(outputFile, template, Encoding.UTF8);
         }
-
-        private static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b)
-        {
-            return a.Value.CompareTo(b.Value);
-        }
-
-        public static List<KeyValuePair<int, double>> AnalyseFile(string file1, string file2, string vsFile, string selectedFile,Form1 mainForm)
-        {
-            GenerateVpyFile(file1, file2, vsFile, selectedFile);
-            VsPipeProcess.arguments = vsFile;
-            VsPipeProcess.mainForm = mainForm;
-            Thread vsThread = new Thread(VsPipeProcess.GenerateLog);
-            vsThread.Start();
-            while (!VsPipeProcess._exited)
-            {
-                //do nothing
-            }
-            var rawData = Regex.Matches(VsPipeProcess.StandOutput.ToString(), @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
-
-            if (VsPipeProcess.exitCode != 0)
-            {
-                throw new Exception("Something wrong happened while executing vpy script,\n please executing vpy script under the Console for the detail");
-            }
-            var data = (from Match line in rawData select new KeyValuePair<int, double>(int.Parse(line.Groups["fram"].Value), double.Parse(line.Groups["PSNR"].Value))).ToList();
-            data.Sort(Compare);
-            return data;
-        }
-
     }
 }

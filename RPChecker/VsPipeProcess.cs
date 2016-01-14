@@ -6,70 +6,75 @@ namespace RPChecker
 {
     public static class VsPipeProcess
     {
-        public static Form1 mainForm;
-        public static readonly StringBuilder StandOutput = new StringBuilder();
-        private static Process consoleProcess;
-        public static int exitCode = 0;
-        public static string arguments;
-        public static string currentErrorInfo;
+        private static Process _consoleProcess;
 
-        public volatile static bool _exited = false;
-        public static void GenerateLog()
+        public static void GenerateLog(object scriptFile)
         {
             bool value = true;
 
-            consoleProcess = new System.Diagnostics.Process
+            _consoleProcess = new System.Diagnostics.Process
             {
                 StartInfo =
                 {
                     FileName = "vspipe",
-                    Arguments = $" -p \"{arguments}\" .",
+                    Arguments = $" -p \"{scriptFile}\" .",
                     UseShellExecute = false,
                     CreateNoWindow = value,
                     RedirectStandardOutput = value,
                     RedirectStandardError = value
-                }
+                },
+                EnableRaisingEvents = true
             };
 
-            consoleProcess.EnableRaisingEvents = true;
-            consoleProcess.OutputDataReceived += OutputHandler;
-            consoleProcess.ErrorDataReceived += ErrorOutputHandler;
-            consoleProcess.Exited += VsPipe_Exited;
+            _consoleProcess.OutputDataReceived += OutputHandler;
+            _consoleProcess.ErrorDataReceived += ErrorOutputHandler;
+            _consoleProcess.Exited += VsPipe_Exited;
             //process.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
 
-            consoleProcess.Start();
-            consoleProcess.BeginOutputReadLine();
-            consoleProcess.BeginErrorReadLine();
-            //StandOutput = consoleProcess.StandardOutput.ReadToEnd();
-            //consoleProcess.WaitForExit();
-            //if (exitCode == 0)
-            //{
-            //    consoleProcess.Close();
-            //}
+            _consoleProcess.Start();
+            _consoleProcess.BeginOutputReadLine();
+            _consoleProcess.BeginErrorReadLine();
 
+            _consoleProcess.WaitForExit();
+            //StandOutput = _consoleProcess.StandardOutput.ReadToEnd();
+            //_consoleProcess.WaitForExit();
+            //if (ExitCode == 0)
+            //{
+            //    _consoleProcess.Close();
+            //}
 
             //return string.Empty; //StandOutput;
         }
 
+        public delegate void ProgressUpdatedEventHandler(string progress);
+
+        public static event ProgressUpdatedEventHandler ProgressUpdated;
+
+        public delegate void PsnrDataUpdateEventHandler(string data);
+
+        public static event PsnrDataUpdateEventHandler PsnrUpdated;
+
+
+
         private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             //Console.WriteLine(outLine.Data);
-            StandOutput.Append(outLine.Data + Environment.NewLine);
+            //StandOutput.Append(outLine.Data + Environment.NewLine);
+            PsnrUpdated?.Invoke(outLine.Data);
         }
 
         private static void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            Console.WriteLine(outLine.Data);
-            currentErrorInfo = outLine.Data;
-            mainForm.Invoke(new Action<string>(mainForm.UpdateError), currentErrorInfo);
+            Debug.WriteLine(outLine.Data);
+            ProgressUpdated?.Invoke(outLine.Data);
+            //MainForm.Invoke(new Action<string>(MainForm.UpdateError), CurrentErrorInfo);
         }
 
         private static void VsPipe_Exited(object sender, EventArgs e)
         {
-            exitCode = consoleProcess.ExitCode;
-            consoleProcess.Close();
-            consoleProcess.Dispose();
-            _exited = true;
+            _consoleProcess.Close();
+            _consoleProcess.Dispose();
         }
+
     }
 }

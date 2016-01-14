@@ -1,11 +1,17 @@
-﻿namespace RPChecker
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace RPChecker
 {
     partial class Form1
     {
         /// <summary>
         /// 必需的设计器变量。
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// 清理所有正在使用的资源。
@@ -44,6 +50,8 @@
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.lbError = new System.Windows.Forms.Label();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.button3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
@@ -78,7 +86,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(388, 459);
+            this.dataGridView1.Size = new System.Drawing.Size(388, 430);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.TabStop = false;
             // 
@@ -208,17 +216,36 @@
             // lbError
             // 
             this.lbError.AutoSize = true;
-            this.lbError.Location = new System.Drawing.Point(406, 150);
+            this.lbError.Location = new System.Drawing.Point(12, 455);
             this.lbError.Name = "lbError";
             this.lbError.Size = new System.Drawing.Size(31, 17);
             this.lbError.TabIndex = 8;
             this.lbError.Text = "Info";
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(409, 142);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(151, 23);
+            this.progressBar1.TabIndex = 9;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(409, 450);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(43, 23);
+            this.button3.TabIndex = 10;
+            this.button3.Text = "LOG";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(569, 485);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.lbError);
             this.Controls.Add(this.comboBox3);
             this.Controls.Add(this.label1);
@@ -245,20 +272,22 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frams;
-        private System.Windows.Forms.DataGridViewTextBoxColumn PSNR;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox comboBox3;
-        private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.Label lbError;
+        private Button button1;
+        private DataGridView dataGridView1;
+        private DataGridViewTextBoxColumn frams;
+        private DataGridViewTextBoxColumn PSNR;
+        private DataGridViewTextBoxColumn Time;
+        private Button button2;
+        private ComboBox comboBox1;
+        private ComboBox comboBox2;
+        private CheckBox checkBox1;
+        private NumericUpDown numericUpDown1;
+        private Label label1;
+        private ComboBox comboBox3;
+        private ToolTip toolTip1;
+        private Label lbError;
+        private ProgressBar progressBar1;
+        private Button button3;
     }
 }
 
