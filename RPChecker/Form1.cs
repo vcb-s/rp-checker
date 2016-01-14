@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Threading;
+using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -81,6 +82,7 @@ namespace RPChecker
         private void Form1_Load(object sender, EventArgs e)
         {
             //for (int index = 0; index <= 450; index = dataGridView1.Rows.Add());
+            Text = $"RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
             comboBox2.SelectedIndex = 0;
             comboBox3.SelectedIndex = 0;
             DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
@@ -242,10 +244,6 @@ namespace RPChecker
                 //{
                 //    throw new Exception("Something wrong happened while executing vpy script,\n please executing vpy script under the Console for the detail");
                 //}
-
-                //VsPipeProcess.ProgressUpdated -= ProgressUpdated;
-                //VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
-
             }
             catch (Exception ex)
             {
@@ -253,10 +251,8 @@ namespace RPChecker
             }
             finally
             {
-
                 VsPipeProcess.ProgressUpdated -= ProgressUpdated;
                 VsPipeProcess.PsnrUpdated -= PsnrUpdated;
-
 
                 Enable = true;
                 Refresh();
@@ -272,7 +268,10 @@ namespace RPChecker
 
         private void button3_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(_erroeMessageBuilder.ToString());
+            if (!string.IsNullOrEmpty(_erroeMessageBuilder.ToString()))
+            {
+                MessageBox.Show(_erroeMessageBuilder.ToString(), @"Message");
+            }
         }
 
         private void btnAbort_Click(object sender, EventArgs e)
