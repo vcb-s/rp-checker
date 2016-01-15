@@ -1,11 +1,17 @@
-﻿namespace RPChecker
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace RPChecker
 {
     partial class Form1
     {
         /// <summary>
         /// 必需的设计器变量。
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// 清理所有正在使用的资源。
@@ -30,34 +36,39 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnAnalyze = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.frams = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PSNR = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.button2 = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.btnLoad = new System.Windows.Forms.Button();
+            this.cbFileList = new System.Windows.Forms.ComboBox();
+            this.cbFPS = new System.Windows.Forms.ComboBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
+            this.cbVpyFile = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.lbError = new System.Windows.Forms.Label();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.btnLog = new System.Windows.Forms.Button();
+            this.btnAbort = new System.Windows.Forms.Button();
+            this.btnChart = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
-            // button1
+            // btnAnalyze
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(409, 407);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(148, 36);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "开始分析";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnAnalyze.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAnalyze.Location = new System.Drawing.Point(408, 380);
+            this.btnAnalyze.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnAnalyze.Name = "btnAnalyze";
+            this.btnAnalyze.Size = new System.Drawing.Size(34, 63);
+            this.btnAnalyze.TabIndex = 1;
+            this.btnAnalyze.Text = "分析";
+            this.btnAnalyze.UseVisualStyleBackColor = true;
+            this.btnAnalyze.Click += new System.EventHandler(this.btnAnalyze_Click);
             // 
             // dataGridView1
             // 
@@ -77,7 +88,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(388, 459);
+            this.dataGridView1.Size = new System.Drawing.Size(388, 429);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.TabStop = false;
             // 
@@ -99,56 +110,56 @@
             this.Time.Name = "Time";
             this.Time.ReadOnly = true;
             // 
-            // button2
+            // btnLoad
             // 
-            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.Location = new System.Drawing.Point(409, 363);
-            this.button2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(148, 36);
-            this.button2.TabIndex = 0;
-            this.button2.Text = "载入文件";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLoad.Location = new System.Drawing.Point(408, 338);
+            this.btnLoad.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnLoad.Name = "btnLoad";
+            this.btnLoad.Size = new System.Drawing.Size(152, 35);
+            this.btnLoad.TabIndex = 0;
+            this.btnLoad.Text = "载入";
+            this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
-            // comboBox1
+            // cbFileList
             // 
-            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(406, 13);
-            this.comboBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(151, 25);
-            this.comboBox1.TabIndex = 4;
-            this.comboBox1.SelectionChangeCommitted += new System.EventHandler(this.comboBox1_SelectionChangeCommitted);
-            this.comboBox1.MouseEnter += new System.EventHandler(this.comboBox1_MouseEnter);
-            this.comboBox1.MouseLeave += new System.EventHandler(this.comboBox1_MouseLeave);
+            this.cbFileList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbFileList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbFileList.FormattingEnabled = true;
+            this.cbFileList.Location = new System.Drawing.Point(409, 13);
+            this.cbFileList.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cbFileList.Name = "cbFileList";
+            this.cbFileList.Size = new System.Drawing.Size(150, 25);
+            this.cbFileList.TabIndex = 4;
+            this.cbFileList.SelectionChangeCommitted += new System.EventHandler(this.cbFileList_SelectionChangeCommitted);
+            this.cbFileList.MouseEnter += new System.EventHandler(this.cbFileList_MouseEnter);
+            this.cbFileList.MouseLeave += new System.EventHandler(this.cbFileList_MouseLeave);
             // 
-            // comboBox2
+            // cbFPS
             // 
-            this.comboBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Items.AddRange(new object[] {
+            this.cbFPS.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbFPS.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbFPS.FormattingEnabled = true;
+            this.cbFPS.Items.AddRange(new object[] {
             "24000 / 1001",
             "24000 / 1000",
             "25000 / 1000",
             "30000 / 1001",
             "50000 / 1000",
             "60000 / 1001"});
-            this.comboBox2.Location = new System.Drawing.Point(406, 46);
-            this.comboBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(151, 25);
-            this.comboBox2.TabIndex = 5;
-            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
+            this.cbFPS.Location = new System.Drawing.Point(409, 46);
+            this.cbFPS.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cbFPS.Name = "cbFPS";
+            this.cbFPS.Size = new System.Drawing.Size(150, 25);
+            this.cbFPS.TabIndex = 5;
+            this.cbFPS.SelectedIndexChanged += new System.EventHandler(this.cbFPS_SelectedIndexChanged);
             // 
             // checkBox1
             // 
             this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(458, 451);
+            this.checkBox1.Location = new System.Drawing.Point(410, 454);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(99, 21);
@@ -159,7 +170,7 @@
             // numericUpDown1
             // 
             this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numericUpDown1.Location = new System.Drawing.Point(504, 79);
+            this.numericUpDown1.Location = new System.Drawing.Point(506, 79);
             this.numericUpDown1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             200,
@@ -185,39 +196,98 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(406, 81);
+            this.label1.Location = new System.Drawing.Point(409, 81);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(92, 17);
             this.label1.TabIndex = 7;
             this.label1.Text = "峰值信噪比阈值";
             // 
-            // comboBox3
+            // cbVpyFile
             // 
-            this.comboBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Items.AddRange(new object[] {
+            this.cbVpyFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbVpyFile.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbVpyFile.FormattingEnabled = true;
+            this.cbVpyFile.Items.AddRange(new object[] {
             "Default"});
-            this.comboBox3.Location = new System.Drawing.Point(409, 110);
-            this.comboBox3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(151, 25);
-            this.comboBox3.TabIndex = 7;
+            this.cbVpyFile.Location = new System.Drawing.Point(409, 110);
+            this.cbVpyFile.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cbVpyFile.Name = "cbVpyFile";
+            this.cbVpyFile.Size = new System.Drawing.Size(150, 25);
+            this.cbVpyFile.TabIndex = 7;
+            // 
+            // lbError
+            // 
+            this.lbError.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lbError.AutoSize = true;
+            this.lbError.Location = new System.Drawing.Point(12, 455);
+            this.lbError.Name = "lbError";
+            this.lbError.Size = new System.Drawing.Size(48, 17);
+            this.lbError.TabIndex = 8;
+            this.lbError.Text = "          ";
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar1.Location = new System.Drawing.Point(409, 142);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(150, 23);
+            this.progressBar1.TabIndex = 9;
+            // 
+            // btnLog
+            // 
+            this.btnLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLog.Enabled = false;
+            this.btnLog.Location = new System.Drawing.Point(490, 413);
+            this.btnLog.Name = "btnLog";
+            this.btnLog.Size = new System.Drawing.Size(70, 30);
+            this.btnLog.TabIndex = 10;
+            this.btnLog.Text = "LOG";
+            this.btnLog.UseVisualStyleBackColor = true;
+            this.btnLog.Click += new System.EventHandler(this.btnLog_Click);
+            // 
+            // btnAbort
+            // 
+            this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAbort.Enabled = false;
+            this.btnAbort.Location = new System.Drawing.Point(449, 380);
+            this.btnAbort.Name = "btnAbort";
+            this.btnAbort.Size = new System.Drawing.Size(34, 63);
+            this.btnAbort.TabIndex = 11;
+            this.btnAbort.Text = "中断";
+            this.btnAbort.UseVisualStyleBackColor = true;
+            this.btnAbort.Click += new System.EventHandler(this.btnAbort_Click);
+            // 
+            // btnChart
+            // 
+            this.btnChart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnChart.Enabled = false;
+            this.btnChart.Location = new System.Drawing.Point(490, 380);
+            this.btnChart.Name = "btnChart";
+            this.btnChart.Size = new System.Drawing.Size(70, 30);
+            this.btnChart.TabIndex = 12;
+            this.btnChart.Text = "图表";
+            this.btnChart.UseVisualStyleBackColor = true;
+            this.btnChart.Click += new System.EventHandler(this.btnChart_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(569, 485);
-            this.Controls.Add(this.comboBox3);
+            this.Controls.Add(this.btnChart);
+            this.Controls.Add(this.btnAbort);
+            this.Controls.Add(this.btnLog);
+            this.Controls.Add(this.progressBar1);
+            this.Controls.Add(this.lbError);
+            this.Controls.Add(this.cbVpyFile);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.comboBox2);
-            this.Controls.Add(this.comboBox1);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.cbFPS);
+            this.Controls.Add(this.cbFileList);
+            this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.dataGridView1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnAnalyze);
             this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -234,19 +304,24 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn frams;
-        private System.Windows.Forms.DataGridViewTextBoxColumn PSNR;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox comboBox3;
-        private System.Windows.Forms.ToolTip toolTip1;
+        private Button btnAnalyze;
+        private DataGridView dataGridView1;
+        private DataGridViewTextBoxColumn frams;
+        private DataGridViewTextBoxColumn PSNR;
+        private DataGridViewTextBoxColumn Time;
+        private Button btnLoad;
+        private ComboBox cbFileList;
+        private ComboBox cbFPS;
+        private CheckBox checkBox1;
+        private NumericUpDown numericUpDown1;
+        private Label label1;
+        private ComboBox cbVpyFile;
+        private ToolTip toolTip1;
+        private Label lbError;
+        private ProgressBar progressBar1;
+        private Button btnLog;
+        private Button btnAbort;
+        private Button btnChart;
     }
 }
 
