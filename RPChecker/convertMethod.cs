@@ -22,19 +22,12 @@ namespace RPChecker
 
         public static TimeSpan Second2Time(double second)
         {
-            double secondPart = Math.Floor(second);
+            double secondPart      = Math.Floor(second);
             double millisecondPart = Math.Round((second - secondPart) * 1000);
             return new TimeSpan(0, 0, 0, (int)secondPart, (int)millisecondPart);
         }
 
-        public static string Time2String(TimeSpan temp)
-        {
-            return temp.Hours.ToString("00") + ":" +
-                 temp.Minutes.ToString("00") + ":" +
-                 temp.Seconds.ToString("00") + "." +
-            temp.Milliseconds.ToString("000");
-        }
-
+        public static string Time2String(TimeSpan temp) => $"{temp.Hours:D2}:{temp.Minutes:D2}:{temp.Seconds:D2}.{temp.Milliseconds:D3}";
 
         public static void GenerateVpyFile(string file1, string file2, string outputFile, string selectedFile)
         {
