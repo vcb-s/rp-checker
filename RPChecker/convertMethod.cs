@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
+using Microsoft.Win32;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
-
 
 namespace RPChecker
 {
@@ -49,6 +51,73 @@ namespace RPChecker
             template = Regex.Replace(template, "%File1%", file1);
             template = Regex.Replace(template, "%File2%", file2);
             File.WriteAllText(outputFile, template, Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Returns the path from VapourSynth.
+        /// It tries to find it via the registry keys.
+        /// If it doesn't find it, it throws an exception.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetVapourSynthPathViaRegistry()
+        {
+            RegistryKey regVapourSynth = null;
+            string valuePath           = string.Empty;
+            bool subKeyFound           = false;
+            bool valueFound            = false;
+            // First check Win32 registry
+            using (RegistryKey regUninstall32 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+            {
+                if (regUninstall32 == null) throw new Exception("Failed to create a RegistryKey variable");
+                if (regUninstall32.GetSubKeyNames().Any(subKeyName => subKeyName.ToLower().Equals("VapourSynth_is1".ToLower())))
+                {
+                    subKeyFound = true;
+                    regVapourSynth = regUninstall32.OpenSubKey("VapourSynth_is1");
+                    Debug.Assert(regVapourSynth != null);
+                }
+                // if sub key was found, try to get the executable path
+                if (subKeyFound)
+                {
+                    foreach (string valueName in regVapourSynth.GetValueNames().Where(valueName => valueName.ToLower().Equals("InstallLocation".ToLower())))
+                    {
+                        valueFound = true;
+                        valuePath = (string)regVapourSynth.GetValue(valueName);
+                        break;
+                    }
+                }
+            }
+            // if value was not found, let's Win64 registry
+            if (!valueFound)
+            {
+                subKeyFound = false;
+                using (RegistryKey regUninstall64 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"))
+                {
+                    if (regUninstall64 == null) throw new Exception("Failed to create a RegistryKey variable");
+                    if (regUninstall64.GetSubKeyNames().Any(subKeyName => subKeyName.ToLower().Equals("VapourSynth_is1".ToLower())))
+                    {
+                        subKeyFound = true;
+                        regVapourSynth = regUninstall64.OpenSubKey("VapourSynth_is1");
+                        Debug.Assert(regVapourSynth != null);
+                    }
+                    // if sub key was found, try to get the executable path
+                    if (subKeyFound)
+                    {
+                        foreach (string valueName in regVapourSynth.GetValueNames().Where(valueName => valueName.ToLower().Equals("InstallLocation".ToLower())))
+                        {
+                            valueFound = true;
+                            valuePath = (string)regVapourSynth.GetValue(valueName);
+                            break;
+                        }
+                    }
+                    if (!valueFound) throw new Exception("Found VapourSynth in your system but not the registry value InstallLocation!");
+                }
+            }
+            valuePath = valuePath ?? "";
+            if (!File.Exists(valuePath+@"core64\vspipe.exe"))
+            {
+                throw new Exception($"Found a registry value ({valuePath}) for VapourSynth in your system but it is not valid!");
+            }
+            return valuePath + @"core64\";
         }
     }
 }

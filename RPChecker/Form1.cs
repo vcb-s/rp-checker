@@ -17,10 +17,6 @@ namespace RPChecker
         public Form1()
         {
             InitializeComponent();
-            var paths = Environment.GetEnvironmentVariable("Path")?.Split(';');
-            Debug.Assert(paths != null);
-            var vspipePath = paths.Where(item => item.IndexOf("VapourSynth\\core64", StringComparison.Ordinal) > 0).ToList();
-            Debug.WriteLine(!vspipePath.Any() ? "vspipeはありません" : vspipePath.First());
         }
 
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();

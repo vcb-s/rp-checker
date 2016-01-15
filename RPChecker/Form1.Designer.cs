@@ -61,7 +61,7 @@ namespace RPChecker
             // btnAnalyze
             // 
             this.btnAnalyze.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAnalyze.Location = new System.Drawing.Point(408, 379);
+            this.btnAnalyze.Location = new System.Drawing.Point(408, 380);
             this.btnAnalyze.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnAnalyze.Name = "btnAnalyze";
             this.btnAnalyze.Size = new System.Drawing.Size(34, 63);
@@ -113,7 +113,7 @@ namespace RPChecker
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(408, 337);
+            this.btnLoad.Location = new System.Drawing.Point(408, 338);
             this.btnLoad.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(152, 35);
@@ -170,7 +170,7 @@ namespace RPChecker
             // numericUpDown1
             // 
             this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numericUpDown1.Location = new System.Drawing.Point(507, 79);
+            this.numericUpDown1.Location = new System.Drawing.Point(506, 79);
             this.numericUpDown1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             200,
@@ -236,7 +236,8 @@ namespace RPChecker
             // btnLog
             // 
             this.btnLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLog.Location = new System.Drawing.Point(490, 412);
+            this.btnLog.Enabled = false;
+            this.btnLog.Location = new System.Drawing.Point(490, 413);
             this.btnLog.Name = "btnLog";
             this.btnLog.Size = new System.Drawing.Size(70, 30);
             this.btnLog.TabIndex = 10;
@@ -248,7 +249,7 @@ namespace RPChecker
             // 
             this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAbort.Enabled = false;
-            this.btnAbort.Location = new System.Drawing.Point(449, 379);
+            this.btnAbort.Location = new System.Drawing.Point(449, 380);
             this.btnAbort.Name = "btnAbort";
             this.btnAbort.Size = new System.Drawing.Size(34, 63);
             this.btnAbort.TabIndex = 11;
@@ -259,7 +260,8 @@ namespace RPChecker
             // btnChart
             // 
             this.btnChart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnChart.Location = new System.Drawing.Point(490, 379);
+            this.btnChart.Enabled = false;
+            this.btnChart.Location = new System.Drawing.Point(490, 380);
             this.btnChart.Name = "btnChart";
             this.btnChart.Size = new System.Drawing.Size(70, 30);
             this.btnChart.TabIndex = 12;

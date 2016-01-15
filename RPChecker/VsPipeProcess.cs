@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Diagnostics;
 
 namespace RPChecker
@@ -23,18 +24,31 @@ namespace RPChecker
         public static void GenerateLog(object scriptFile)
         {
             const bool value = true;
+            string vspipePath = string.Empty;
+            try
+            {
+                 vspipePath = ConvertMethod.GetVapourSynthPathViaRegistry();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                if (File.Exists("vspipe.exe"))
+                {
+                    throw new Exception("无有效的vspipe");
+                }
+            }
              _consoleProcess = new Process
             {
                 StartInfo =
                 {
-                    FileName               = "vspipe",
+                    FileName               = $"{vspipePath}vspipe",
                     Arguments              = $" -p \"{scriptFile}\" .",
                     UseShellExecute        = false,
                     CreateNoWindow         = value,
                     RedirectStandardOutput = value,
                     RedirectStandardError  = value
                 },
-                 EnableRaisingEvents = true
+                 EnableRaisingEvents       = true
             };
 
             _consoleProcess.OutputDataReceived += OutputHandler;
