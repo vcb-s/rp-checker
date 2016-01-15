@@ -237,10 +237,15 @@ namespace RPChecker
                 vsThread.Start(vsFile);
 
                 while (vsThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
+                if (VsPipeProcess.VsPipeNotFind)
+                {
+                    lbError.Text = @"无可用vspipe";
+                    throw new Exception(lbError.Text);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             finally
             {

@@ -104,12 +104,11 @@ namespace RPChecker
                     {
                         foreach (string valueName in regVapourSynth.GetValueNames().Where(valueName => valueName.ToLower().Equals("InstallLocation".ToLower())))
                         {
-                            valueFound = true;
                             valuePath = (string)regVapourSynth.GetValue(valueName);
                             break;
                         }
                     }
-                    if (!valueFound) throw new Exception("Found VapourSynth in your system but not the registry value InstallLocation!");
+                    if (!subKeyFound) throw new Exception("Found VapourSynth in your system but not the registry value InstallLocation!");
                 }
             }
             valuePath = valuePath ?? "";

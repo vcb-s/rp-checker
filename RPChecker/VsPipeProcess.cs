@@ -12,6 +12,8 @@ namespace RPChecker
 
         private static int ExitCode { get; set; }
 
+        public static bool VsPipeNotFind { get; set; }
+
         public delegate void ProgressUpdatedEventHandler(string progress);
 
         public static  event ProgressUpdatedEventHandler ProgressUpdated;
@@ -32,12 +34,14 @@ namespace RPChecker
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                if (File.Exists("vspipe.exe"))
+                if (!File.Exists("vspipe.exe"))
                 {
-                    throw new Exception("无有效的vspipe");
+                    VsPipeNotFind = true;
+                    return;
                 }
             }
-             _consoleProcess = new Process
+            VsPipeNotFind = false;
+            _consoleProcess = new Process
             {
                 StartInfo =
                 {
