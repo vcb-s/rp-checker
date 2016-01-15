@@ -61,12 +61,12 @@ namespace RPChecker
             // btnAnalyze
             // 
             this.btnAnalyze.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAnalyze.Location = new System.Drawing.Point(407, 407);
+            this.btnAnalyze.Location = new System.Drawing.Point(408, 379);
             this.btnAnalyze.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnAnalyze.Name = "btnAnalyze";
-            this.btnAnalyze.Size = new System.Drawing.Size(92, 36);
+            this.btnAnalyze.Size = new System.Drawing.Size(34, 63);
             this.btnAnalyze.TabIndex = 1;
-            this.btnAnalyze.Text = "开始分析";
+            this.btnAnalyze.Text = "分析";
             this.btnAnalyze.UseVisualStyleBackColor = true;
             this.btnAnalyze.Click += new System.EventHandler(this.btnAnalyze_Click);
             // 
@@ -113,12 +113,12 @@ namespace RPChecker
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(407, 363);
+            this.btnLoad.Location = new System.Drawing.Point(408, 337);
             this.btnLoad.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(92, 36);
+            this.btnLoad.Size = new System.Drawing.Size(152, 35);
             this.btnLoad.TabIndex = 0;
-            this.btnLoad.Text = "载入文件";
+            this.btnLoad.Text = "载入";
             this.btnLoad.UseVisualStyleBackColor = true;
             this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
@@ -127,10 +127,10 @@ namespace RPChecker
             this.cbFileList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbFileList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbFileList.FormattingEnabled = true;
-            this.cbFileList.Location = new System.Drawing.Point(406, 13);
+            this.cbFileList.Location = new System.Drawing.Point(409, 13);
             this.cbFileList.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.cbFileList.Name = "cbFileList";
-            this.cbFileList.Size = new System.Drawing.Size(151, 25);
+            this.cbFileList.Size = new System.Drawing.Size(150, 25);
             this.cbFileList.TabIndex = 4;
             this.cbFileList.SelectionChangeCommitted += new System.EventHandler(this.cbFileList_SelectionChangeCommitted);
             this.cbFileList.MouseEnter += new System.EventHandler(this.cbFileList_MouseEnter);
@@ -148,10 +148,10 @@ namespace RPChecker
             "30000 / 1001",
             "50000 / 1000",
             "60000 / 1001"});
-            this.cbFPS.Location = new System.Drawing.Point(406, 46);
+            this.cbFPS.Location = new System.Drawing.Point(409, 46);
             this.cbFPS.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.cbFPS.Name = "cbFPS";
-            this.cbFPS.Size = new System.Drawing.Size(151, 25);
+            this.cbFPS.Size = new System.Drawing.Size(150, 25);
             this.cbFPS.TabIndex = 5;
             this.cbFPS.SelectedIndexChanged += new System.EventHandler(this.cbFPS_SelectedIndexChanged);
             // 
@@ -159,7 +159,7 @@ namespace RPChecker
             // 
             this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(407, 454);
+            this.checkBox1.Location = new System.Drawing.Point(410, 454);
             this.checkBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(99, 21);
@@ -170,7 +170,7 @@ namespace RPChecker
             // numericUpDown1
             // 
             this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numericUpDown1.Location = new System.Drawing.Point(504, 79);
+            this.numericUpDown1.Location = new System.Drawing.Point(507, 79);
             this.numericUpDown1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             200,
@@ -196,7 +196,7 @@ namespace RPChecker
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(406, 81);
+            this.label1.Location = new System.Drawing.Point(409, 81);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(92, 17);
             this.label1.TabIndex = 7;
@@ -209,10 +209,10 @@ namespace RPChecker
             this.cbVpyFile.FormattingEnabled = true;
             this.cbVpyFile.Items.AddRange(new object[] {
             "Default"});
-            this.cbVpyFile.Location = new System.Drawing.Point(406, 110);
+            this.cbVpyFile.Location = new System.Drawing.Point(409, 110);
             this.cbVpyFile.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.cbVpyFile.Name = "cbVpyFile";
-            this.cbVpyFile.Size = new System.Drawing.Size(151, 25);
+            this.cbVpyFile.Size = new System.Drawing.Size(150, 25);
             this.cbVpyFile.TabIndex = 7;
             // 
             // lbError
@@ -228,17 +228,17 @@ namespace RPChecker
             // progressBar1
             // 
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(406, 142);
+            this.progressBar1.Location = new System.Drawing.Point(409, 142);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(151, 23);
+            this.progressBar1.Size = new System.Drawing.Size(150, 23);
             this.progressBar1.TabIndex = 9;
             // 
             // btnLog
             // 
             this.btnLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLog.Location = new System.Drawing.Point(505, 452);
+            this.btnLog.Location = new System.Drawing.Point(490, 412);
             this.btnLog.Name = "btnLog";
-            this.btnLog.Size = new System.Drawing.Size(53, 23);
+            this.btnLog.Size = new System.Drawing.Size(70, 30);
             this.btnLog.TabIndex = 10;
             this.btnLog.Text = "LOG";
             this.btnLog.UseVisualStyleBackColor = true;
@@ -248,9 +248,9 @@ namespace RPChecker
             // 
             this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAbort.Enabled = false;
-            this.btnAbort.Location = new System.Drawing.Point(505, 406);
+            this.btnAbort.Location = new System.Drawing.Point(449, 379);
             this.btnAbort.Name = "btnAbort";
-            this.btnAbort.Size = new System.Drawing.Size(53, 37);
+            this.btnAbort.Size = new System.Drawing.Size(34, 63);
             this.btnAbort.TabIndex = 11;
             this.btnAbort.Text = "中断";
             this.btnAbort.UseVisualStyleBackColor = true;
@@ -258,11 +258,12 @@ namespace RPChecker
             // 
             // btnChart
             // 
-            this.btnChart.Location = new System.Drawing.Point(505, 363);
+            this.btnChart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnChart.Location = new System.Drawing.Point(490, 379);
             this.btnChart.Name = "btnChart";
-            this.btnChart.Size = new System.Drawing.Size(53, 36);
+            this.btnChart.Size = new System.Drawing.Size(70, 30);
             this.btnChart.TabIndex = 12;
-            this.btnChart.Text = "Chart";
+            this.btnChart.Text = "图表";
             this.btnChart.UseVisualStyleBackColor = true;
             this.btnChart.Click += new System.EventHandler(this.btnChart_Click);
             // 

@@ -211,6 +211,7 @@ namespace RPChecker
                 btnAnalyze.Enabled     = value;
                 btnLoad.Enabled        = value;
                 btnLog.Enabled         = value;
+                btnChart.Enabled       = value;
                 cbFileList.Enabled     = value;
                 cbFPS.Enabled          = value;
                 cbVpyFile.Enabled      = value;
