@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace RPChecker
 {
@@ -12,7 +13,7 @@ namespace RPChecker
 
         private static int ExitCode { get; set; }
 
-        public static bool VsPipeNotFind { get; set; }
+        public static bool VsPipeNotFind { get; private set; }
 
         public delegate void ProgressUpdatedEventHandler(string progress);
 
@@ -41,9 +42,11 @@ namespace RPChecker
                 }
             }
             VsPipeNotFind = false;
-            _consoleProcess = new Process
+            try
             {
-                StartInfo =
+                _consoleProcess = new Process
+                {
+                    StartInfo =
                 {
                     FileName               = $"{vspipePath}vspipe",
                     Arguments              = $" -p \"{scriptFile}\" .",
@@ -52,20 +55,26 @@ namespace RPChecker
                     RedirectStandardOutput = value,
                     RedirectStandardError  = value
                 },
-                 EnableRaisingEvents       = true
-            };
+                    EnableRaisingEvents = true
+                };
 
-            _consoleProcess.OutputDataReceived += OutputHandler;
-            _consoleProcess.ErrorDataReceived  += ErrorOutputHandler;
-            _consoleProcess.Exited             += VsPipe_Exited;
+                _consoleProcess.OutputDataReceived += OutputHandler;
+                _consoleProcess.ErrorDataReceived += ErrorOutputHandler;
+                _consoleProcess.Exited += VsPipe_Exited;
 
-            _consoleProcess.Start();
-            _consoleProcess.BeginOutputReadLine();
-            _consoleProcess.BeginErrorReadLine();
-            _consoleProcess.WaitForExit();
+                _consoleProcess.Start();
+                _consoleProcess.BeginOutputReadLine();
+                _consoleProcess.BeginErrorReadLine();
+                _consoleProcess.WaitForExit();
 
-            _consoleProcess.OutputDataReceived -= OutputHandler;
-            _consoleProcess.ErrorDataReceived  -= ErrorOutputHandler;
+                _consoleProcess.OutputDataReceived -= OutputHandler;
+                _consoleProcess.ErrorDataReceived -= ErrorOutputHandler;
+            }
+            catch (Exception ex)
+            {
+                _consoleProcess = null;
+                MessageBox.Show(ex.Message, @"vspipe Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
 
