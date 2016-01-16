@@ -9,9 +9,9 @@ namespace RPChecker
     {
         private static Process _consoleProcess;
 
-        public static bool Abort { private get; set; }
+        public static bool Abort         { private get; set; }
 
-        private static int ExitCode { get; set; }
+        private static int ExitCode      { get; set; }
 
         public static bool VsPipeNotFind { get; private set; }
 
@@ -30,7 +30,12 @@ namespace RPChecker
             string vspipePath = string.Empty;
             try
             {
-                 vspipePath = ConvertMethod.GetVapourSynthPathViaRegistry();
+                vspipePath = RegistryStorage.Load();
+                if (!File.Exists(vspipePath + "vspipe.exe"))
+                {
+                    vspipePath = ConvertMethod.GetVapourSynthPathViaRegistry();
+                    RegistryStorage.Save(vspipePath);
+                }
             }
             catch (Exception ex)
             {
@@ -47,28 +52,28 @@ namespace RPChecker
                 _consoleProcess = new Process
                 {
                     StartInfo =
-                {
+                    {
                     FileName               = $"{vspipePath}vspipe",
                     Arguments              = $" -p \"{scriptFile}\" .",
                     UseShellExecute        = false,
                     CreateNoWindow         = value,
                     RedirectStandardOutput = value,
                     RedirectStandardError  = value
-                },
-                    EnableRaisingEvents = true
+                    },
+                    //EnableRaisingEvents    = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
-                _consoleProcess.ErrorDataReceived += ErrorOutputHandler;
-                _consoleProcess.Exited += VsPipe_Exited;
+                _consoleProcess.ErrorDataReceived  += ErrorOutputHandler;
+                _consoleProcess.Exited             += VsPipe_Exited;
 
                 _consoleProcess.Start();
                 _consoleProcess.BeginOutputReadLine();
                 _consoleProcess.BeginErrorReadLine();
                 _consoleProcess.WaitForExit();
 
+                _consoleProcess.ErrorDataReceived  -= ErrorOutputHandler;
                 _consoleProcess.OutputDataReceived -= OutputHandler;
-                _consoleProcess.ErrorDataReceived -= ErrorOutputHandler;
             }
             catch (Exception ex)
             {
@@ -80,6 +85,7 @@ namespace RPChecker
 
         private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
+            //Debug.WriteLine(outLine.Data);
             PsnrUpdated?.Invoke(outLine.Data);
         }
 

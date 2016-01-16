@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Win32;
 using System.Diagnostics;
+using System.Drawing;
 using System.Text.RegularExpressions;
 
 namespace RPChecker
@@ -51,6 +52,16 @@ namespace RPChecker
             template = Regex.Replace(template, "%File1%", file1);
             template = Regex.Replace(template, "%File2%", file2);
             File.WriteAllText(outputFile, template, Encoding.UTF8);
+        }
+
+        public static Point String2Point(string input)
+        {
+            var rpos = new Regex(@"{X=(?<x>.+),Y=(?<y>.+)}");
+            if (string.IsNullOrEmpty(input)) { return new Point(-32000, -32000); }
+            var temp = rpos.Match(input);
+            int x = int.Parse(temp.Groups["x"].Value);
+            int y = int.Parse(temp.Groups["y"].Value);
+            return new Point(x, y);
         }
 
         /// <summary>

@@ -29,6 +29,12 @@ namespace RPChecker
         {
             //for (int index = 0; index <= 450; index = dataGridView1.Rows.Add());
             Text = $"RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
+
+            Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
+            if (saved != new Point(-32000, -32000)) Location = saved;
+
+            RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
+
             cbFPS.SelectedIndex = 0;
             cbVpyFile.SelectedIndex = 0;
             DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
@@ -36,6 +42,10 @@ namespace RPChecker
                 .Where(item => item.Extension.ToLowerInvariant().EndsWith("vpy")).ToList()
                 .ForEach(item => cbVpyFile.Items.Add(item));
         }
+
+
+
+
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
@@ -126,6 +136,7 @@ namespace RPChecker
                 try
                 {
                     AnalyseFile(item.Key, item.Value, vsFile, cbVpyFile.SelectedItem.ToString());
+                    //foreach (var psnr in _rawPsnrData.Select(GetPsnr).Where(psnr => psnr != null)) { _tempData.Add((KeyValuePair<int,double>)psnr); }
 
                     _tempData.Sort((a, b) => a.Value.CompareTo(b.Value));
                     var result = new ReSulT
@@ -134,10 +145,18 @@ namespace RPChecker
                         Data     = _tempData
                     };
                     _fullData.Add(result);
+                    RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
                     if (checkBox1.Checked) continue;
-                    File.Delete(vsFile);
-                    File.Delete($"{item.Key}.lwi");
-                    File.Delete($"{item.Value}.lwi");
+                    try
+                    {
+                        File.Delete(vsFile);
+                        File.Delete($"{item.Key}.lwi");
+                        File.Delete($"{item.Value}.lwi");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, @"PRChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -185,11 +204,22 @@ namespace RPChecker
 
         private volatile List<KeyValuePair<int, double>> _tempData = new List<KeyValuePair<int, double>>();
 
+        //private volatile List<string> _rawPsnrData;
+
         private void UpdatePsnr(string data)
         {
+            //_rawPsnrData.Add(data);
             var rawData = Regex.Match(data, @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
             if (!rawData.Success) return;
             _tempData.Add(new KeyValuePair<int, double>(int.Parse(rawData.Groups["fram"].Value), double.Parse(rawData.Groups["PSNR"].Value)));
+        }
+
+        private KeyValuePair<int, double>? GetPsnr(string data)
+        {
+            var rawData = Regex.Match(data, @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
+            if (!rawData.Success) return null;
+            return new KeyValuePair<int, double>(int.Parse(rawData.Groups["fram"].Value),
+                double.Parse(rawData.Groups["PSNR"].Value));
         }
 
         private delegate void UpdatePsnrDelegate(string data);
@@ -220,6 +250,7 @@ namespace RPChecker
         private void AnalyseFile(string file1, string file2, string vsFile, string selectedFile)
         {
             _tempData = new List<KeyValuePair<int, double>>();
+            //_rawPsnrData = new List<string>();
             try
             {
                 _beginErrorRecord  = false;
@@ -263,6 +294,11 @@ namespace RPChecker
             if (cbFileList.SelectedIndex == -1) return;
             FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold);
             chart.Show();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "Location");
         }
     }
     public class ReSulT

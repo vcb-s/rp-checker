@@ -294,6 +294,7 @@ namespace RPChecker
             this.MinimumSize = new System.Drawing.Size(585, 524);
             this.Name = "Form1";
             this.Text = "RP Checker";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();

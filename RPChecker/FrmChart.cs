@@ -11,7 +11,7 @@ namespace RPChecker
     public partial class FrmChart : Form
     {
         private readonly ReSulT _info = new ReSulT();
-        private readonly int _threshold = 30;
+        private readonly int _threshold;
         public FrmChart(ReSulT info, int threshold)
         {
             InitializeComponent();
@@ -23,6 +23,8 @@ namespace RPChecker
         private void FrmChart_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+            Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
+            if (saved != new Point(-32000, -32000)) Location = saved;
             chart1.Series.Clear();
             Series series1 = new Series("PSNR")
             {
@@ -50,6 +52,11 @@ namespace RPChecker
             });
             chart1.Series.Add(series1);
             chart1.Series.Add(series2);
+        }
+
+        private void FrmChart_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "ChartLocation");
         }
     }
 }

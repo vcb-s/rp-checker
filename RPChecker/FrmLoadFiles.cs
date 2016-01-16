@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
+using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace RPChecker
 {
@@ -13,6 +15,7 @@ namespace RPChecker
         public FrmLoadFiles(Form1 arg)
         {
             _mainWindow = arg;
+            Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
             InitializeComponent();
         }
 
@@ -103,6 +106,7 @@ namespace RPChecker
                 foreach (ListViewItem item in listView1.Items)
                 {
                     _mainWindow.FilePathsPair.Add(new KeyValuePair<string, string>(item.Tag as string, listView2.Items[i].Tag as string));
+                    Debug.WriteLine(_mainWindow.FilePathsPair.Last());
                     ++i;
                 }
                 Close();
@@ -186,6 +190,17 @@ namespace RPChecker
             label2.Location = new Point(listView2.Location.X, label2.Location.Y);
             columnHeader1.Width = listView1.Width - 5;
             columnHeader2.Width = listView1.Width - 5;
+        }
+
+        private void FrmLoadFiles_Load(object sender, EventArgs e)
+        {
+            Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "LoadLocation"));
+            if (saved != new Point(-32000, -32000)) Location = saved;
+        }
+
+        private void FrmLoadFiles_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "LoadLocation");
         }
     }
 }
