@@ -1,4 +1,4 @@
-﻿namespace RPChecker.Form
+﻿namespace RPChecker.Forms
 {
     partial class FrmLoadFiles
     {

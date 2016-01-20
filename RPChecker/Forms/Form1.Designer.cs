@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace RPChecker.Form
+namespace RPChecker.Forms
 {
     partial class Form1
     {

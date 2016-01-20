@@ -6,8 +6,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Windows.Forms.DataVisualization.Charting;
 
-
-namespace RPChecker.Form
+namespace RPChecker.Forms
 {
     public partial class FrmChart : System.Windows.Forms.Form
     {

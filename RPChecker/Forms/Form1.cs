@@ -2,18 +2,18 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Drawing;
 using RPChecker.Util;
+using System.Drawing;
 using System.Threading;
+using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace RPChecker.Form
+namespace RPChecker.Forms
 {
-    public partial class Form1 : System.Windows.Forms.Form
+    public partial class Form1 : Form
     {
         public Form1()
         {

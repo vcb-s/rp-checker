@@ -1,16 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Drawing;
 using RPChecker.Util;
+using System.Drawing;
 using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Generic;
 
-namespace RPChecker.Form
+
+namespace RPChecker.Forms
 {
-    public partial class FrmLoadFiles : System.Windows.Forms.Form
+    public partial class FrmLoadFiles : Form
     {
         private readonly Form1 _mainWindow;
         public FrmLoadFiles(Form1 arg)

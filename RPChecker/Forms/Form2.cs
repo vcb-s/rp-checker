@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace RPChecker.Form
+namespace RPChecker.Forms
 {
-    public partial class Form2 : System.Windows.Forms.Form
+    public partial class Form2 : Form
     {
         private readonly int _poi;
         public Form2()

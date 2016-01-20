@@ -1,4 +1,4 @@
-﻿namespace RPChecker.Form
+﻿namespace RPChecker.Forms
 {
     partial class FrmChart
     {
@@ -34,11 +34,11 @@
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // chart1
-            // 
-            this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             chartArea1.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea1);
@@ -50,9 +50,9 @@
             this.chart1.Size = new System.Drawing.Size(589, 350);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "PSNR";
-            // 
+            //
             // FrmChart
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(593, 354);
