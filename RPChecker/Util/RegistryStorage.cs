@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 
-namespace RPChecker
+namespace RPChecker.Util
 {
     public static class RegistryStorage
     {
@@ -25,9 +25,9 @@ namespace RPChecker
 
         public static void RegistryAddCount(string subKey, string name)
         {
-            var countS = RegistryStorage.Load(subKey, name);
+            var countS = Load(subKey, name);
             int count = string.IsNullOrEmpty(countS) ? 0 : int.Parse(countS);
-            RegistryStorage.Save($"{++count}", subKey, name);
+            Save($"{++count}", subKey, name);
         }
     }
 }

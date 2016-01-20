@@ -1,21 +1,21 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Drawing;
+using RPChecker.Util;
 using System.Reflection;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
-namespace RPChecker
+namespace RPChecker.Form
 {
-    public partial class FrmLoadFiles : Form
+    public partial class FrmLoadFiles : System.Windows.Forms.Form
     {
         private readonly Form1 _mainWindow;
         public FrmLoadFiles(Form1 arg)
         {
             _mainWindow = arg;
-            Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
             InitializeComponent();
         }
 
@@ -182,18 +182,18 @@ namespace RPChecker
 
         private void FrmLoadFiles_Resize(object sender, EventArgs e)
         {
-            var midLine = (Width - textBox1.Width - textBox1.Margin.Left - textBox1.Margin.Right - 27)/2;
-            listView1.Width = midLine - 10;
-            listView2.Location = new Point(midLine + 10, listView1.Location.Y);
-            listView2.Width = listView1.Width;
-            button1.Location = new Point(listView1.Location.X + listView1.Width - button1.Width, button1.Location.Y);
-            label2.Location = new Point(listView2.Location.X, label2.Location.Y);
-            columnHeader1.Width = listView1.Width - 5;
-            columnHeader2.Width = listView1.Width - 5;
+            var midLine         = (textBox1.Location.X - textBox1.Margin.Left - listView1.Margin.Left) / 2;
+            listView2.Width     = listView1.Width = midLine - 12;
+            listView2.Location  = new Point(button2.Location.X   + button2.Width   - listView2.Width, listView2.Location.Y);
+            button1.Location    = new Point(listView1.Location.X + listView1.Width - button1.Width + 1, button1.Location.Y);
+            label2.Location     = new Point(listView2.Location.X, label2.Location.Y);
+            columnHeader1.Width = listView1.Width - 4;
+            columnHeader2.Width = listView1.Width - 4;
         }
 
         private void FrmLoadFiles_Load(object sender, EventArgs e)
         {
+            Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
             Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "LoadLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
         }

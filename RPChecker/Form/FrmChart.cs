@@ -1,14 +1,15 @@
 ﻿using System;
+using RPChecker.Util;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Reflection;
+using System.Windows.Forms;
 using System.Collections.Generic;
-
 using System.Windows.Forms.DataVisualization.Charting;
 
-namespace RPChecker
+
+namespace RPChecker.Form
 {
-    public partial class FrmChart : Form
+    public partial class FrmChart : System.Windows.Forms.Form
     {
         private readonly ReSulT _info = new ReSulT();
         private readonly int _threshold;

@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.Win32;
-using System.Diagnostics;
-using System.Drawing;
 using System.Text.RegularExpressions;
+using Microsoft.Win32;
 
-namespace RPChecker
+namespace RPChecker.Util
 {
     internal static class ConvertMethod
     {

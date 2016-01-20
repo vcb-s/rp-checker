@@ -3,16 +3,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using RPChecker.Util;
 using System.Threading;
-using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace RPChecker
+namespace RPChecker.Form
 {
-    public partial class Form1 : Form
+    public partial class Form1 : System.Windows.Forms.Form
     {
         public Form1()
         {
@@ -27,25 +28,20 @@ namespace RPChecker
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //for (int index = 0; index <= 450; index = dataGridView1.Rows.Add());
-            Text = $"RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
+            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
 
             Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
             if (saved != new Point(-32000, -32000)) Location = saved;
-
             RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
 
-            cbFPS.SelectedIndex = 0;
+            cbFPS.SelectedIndex     = 0;
             cbVpyFile.SelectedIndex = 0;
             DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            current.GetFiles()
-                .Where(item => item.Extension.ToLowerInvariant().EndsWith("vpy")).ToList()
-                .ForEach(item => cbVpyFile.Items.Add(item));
+            foreach (var item in current.GetFiles().Where(item => item.Extension.ToLowerInvariant() == ".vpy"))
+            {
+                cbVpyFile.Items.Add(item);
+            }
         }
-
-
-
-
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
@@ -282,8 +278,8 @@ namespace RPChecker
             {
                 VsPipeProcess.ProgressUpdated -= ProgressUpdated;
                 VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
-                progressBar1.Value = 100;
-                Enable = true;
+                progressBar1.Value             = 100;
+                Enable                         = true;
                 Refresh();
                 Application.DoEvents();
             }
@@ -299,6 +295,24 @@ namespace RPChecker
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "Location");
+        }
+
+        private readonly int[] _poi = { 0, 10 };
+
+        private void progressBar1_Click(object sender, EventArgs e)
+        {
+            ++_poi[0];
+            if (_poi[0] >= _poi[1])
+            {
+                Form2 version = new Form2();
+                version.Show();
+                _poi[0] = 00;
+                _poi[1] += 10;
+            }
+            if (_poi[0] < 3 && _poi[1] == 10)
+            {
+                MessageBox.Show(@"Something happened", @"Something happened");
+            }
         }
     }
     public class ReSulT

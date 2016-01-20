@@ -1,4 +1,4 @@
-﻿namespace RPChecker
+﻿namespace RPChecker.Form
 {
     partial class FrmChart
     {
@@ -44,10 +44,10 @@
             this.chart1.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(9, 9);
+            this.chart1.Location = new System.Drawing.Point(2, 2);
             this.chart1.Margin = new System.Windows.Forms.Padding(0);
             this.chart1.Name = "chart1";
-            this.chart1.Size = new System.Drawing.Size(575, 336);
+            this.chart1.Size = new System.Drawing.Size(589, 350);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "PSNR";
             // 
