@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using RPChecker.Form;
+using RPChecker.Forms;
 
 namespace RPChecker
 {

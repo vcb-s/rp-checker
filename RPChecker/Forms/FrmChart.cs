@@ -8,7 +8,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace RPChecker.Forms
 {
-    public partial class FrmChart : System.Windows.Forms.Form
+    public partial class FrmChart : Form
     {
         private readonly ReSulT _info = new ReSulT();
         private readonly int _threshold;
