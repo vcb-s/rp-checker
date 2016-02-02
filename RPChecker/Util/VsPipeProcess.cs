@@ -27,7 +27,7 @@ namespace RPChecker.Util
         public static void GenerateLog(object scriptFile)
         {
             const bool value = true;
-            string vspipePath = string.Empty;
+            string vspipePath;
             try
             {
                 vspipePath = RegistryStorage.Load();
@@ -40,6 +40,7 @@ namespace RPChecker.Util
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                vspipePath = string.Empty;
                 if (!File.Exists("vspipe.exe"))
                 {
                     VsPipeNotFind = true;
