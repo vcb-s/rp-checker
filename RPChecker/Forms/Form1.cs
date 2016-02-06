@@ -143,6 +143,13 @@ namespace RPChecker.Forms
                     _fullData.Add(result);
                     RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
                     if (checkBox1.Checked || _beginErrorRecord) continue;
+
+                    var resultRegex = Regex.Match(lbError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
+                    var timespam = ConvertMethod.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
+                    RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
+                    var frame = int.Parse(resultRegex.Groups["frame"].Value);
+                    RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"fram", frame);
+
                     try
                     {
                         File.Delete(vsFile);

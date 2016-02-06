@@ -23,6 +23,8 @@ namespace RPChecker.Util
             return Encoding.UTF8.GetString(buffer);
         }
 
+        private static readonly Regex RTimeFormat = new Regex(@"(?<Hour>\d+):(?<Minute>\d+):(?<Second>\d+)\.(?<Millisecond>\d{3})");
+
         public static TimeSpan Second2Time(double second)
         {
             double secondPart      = Math.Floor(second);
@@ -30,7 +32,18 @@ namespace RPChecker.Util
             return new TimeSpan(0, 0, 0, (int)secondPart, (int)millisecondPart);
         }
 
-        public static string Time2String(TimeSpan temp) => $"{temp.Hours:D2}:{temp.Minutes:D2}:{temp.Seconds:D2}.{temp.Milliseconds:D3}";
+        public static string Time2String(this TimeSpan temp) => $"{temp.Hours:D2}:{temp.Minutes:D2}:{temp.Seconds:D2}.{temp.Milliseconds:D3}";
+
+        public static TimeSpan ToTimeSpan(this string input)
+        {
+            if (string.IsNullOrEmpty(input)) { return TimeSpan.Zero; }
+            var temp = RTimeFormat.Match(input);
+            int hour = int.Parse(temp.Groups["Hour"].Value);
+            int minute = int.Parse(temp.Groups["Minute"].Value);
+            int second = int.Parse(temp.Groups["Second"].Value);
+            int millisecond = int.Parse(temp.Groups["Millisecond"].Value);
+            return new TimeSpan(0, hour, minute, second, millisecond);
+        }
 
         public static void GenerateVpyFile(string file1, string file2, string outputFile, string selectedFile)
         {
