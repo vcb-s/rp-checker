@@ -177,6 +177,11 @@ namespace RPChecker.Forms
             {
                 _erroeMessageBuilder.Append(progress + Environment.NewLine);
                 //Debug.WriteLine($"{++count} {progress} [{Thread.CurrentThread.ManagedThreadId}]");
+                if (progress == "ImportError: No module named 'mvsfunc'")
+                {
+                    MessageBox.Show(caption: @"PRChecker ERROR", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK,
+                        text: $"尚未正确放置mawen菊苣的滤镜库‘mvsfunc’{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
+                }
             }
 
             var value = Regex.Match(progress, @"Frame: (?<done>\d+)/(?<undo>\d+)");
