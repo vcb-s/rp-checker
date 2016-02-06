@@ -148,7 +148,7 @@ namespace RPChecker.Forms
                     var timespam = ConvertMethod.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
                     RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
                     var frame = int.Parse(resultRegex.Groups["frame"].Value);
-                    RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"fram", frame);
+                    RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Frame", frame);
 
                     try
                     {
@@ -325,6 +325,14 @@ namespace RPChecker.Forms
             {
                 MessageBox.Show(@"Something happened", @"Something happened");
             }
+            if (_poi[1] != 20 || _poi[0] <= 5 || _poi[0] >= 8) return;
+            var frame = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Frame");
+            var time  = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Time");
+            MessageBox.Show(caption:@"你竟然这么无聊!",
+                text:$"那我就告诉你些无聊的统计数据吧{Environment.NewLine}" +
+                     $"你一共计算了这么多帧的PSNR值->[{frame}]<-{Environment.NewLine}"+
+                     $"并耗费了这么多时间->[{time}]<-{Environment.NewLine}" +
+                     $"但是！！！平均速率仅仅{int.Parse(frame)/time.ToTimeSpan().TotalSeconds:F3}fps……");
         }
     }
     public class ReSulT
