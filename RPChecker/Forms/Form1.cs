@@ -143,15 +143,18 @@ namespace RPChecker.Forms
                     _fullData.Add(result);
                     RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
                     if (checkBox1.Checked) continue;
-                    try
+                    if (!_beginErrorRecord)
                     {
-                        File.Delete(vsFile);
-                        File.Delete($"{item.Key}.lwi");
-                        File.Delete($"{item.Value}.lwi");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, @"PRChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        try
+                        {
+                            File.Delete(vsFile);
+                            File.Delete($"{item.Key}.lwi");
+                            File.Delete($"{item.Value}.lwi");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, @"PRChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
                     }
                 }
                 catch (Exception ex)
