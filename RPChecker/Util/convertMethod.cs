@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
@@ -47,23 +48,19 @@ namespace RPChecker.Util
 
         public static void GenerateVpyFile(string file1, string file2, string outputFile, string selectedFile)
         {
-            string template = "import sys\r\nimport vapoursynth as vs \r\nimport mvsfunc as mvf\r\nimport functools\r\ncore = vs.get_core(accept_lowercase = True)\r\ncore.max_cache_size = 5000\r\nsrc = core.lsmas.LWLibavSource(r\"%File1%\", format = \"yuv420p16\")\r\nopt = core.lsmas.LWLibavSource(r\"%File2%\", format = \"yuv420p16\")\r\ncmp = mvf.PlaneCompare(opt, src, mae = False, rmse = False, cov = False, corr = False)\r\ndef callback(n, clip, f):\r\n    print(n, f.props.PlanePSNR)\r\n    return clip\r\ncmp = core.std.FrameEval(cmp, functools.partial(callback, clip = cmp), prop_src =[cmp])\r\ncmp.set_output()\r\n";
+            //"import sys\r\nimport vapoursynth as vs \r\nimport mvsfunc as mvf\r\nimport functools\r\ncore = vs.get_core(accept_lowercase = True)\r\ncore.max_cache_size = 5000\r\nsrc = core.lsmas.LWLibavSource(r\"%File1%\", format = \"yuv420p16\")\r\nopt = core.lsmas.LWLibavSource(r\"%File2%\", format = \"yuv420p16\")\r\ncmp = mvf.PlaneCompare(opt, src, mae = False, rmse = False, cov = False, corr = False)\r\ndef callback(n, clip, f):\r\n    print(n, f.props.PlanePSNR)\r\n    return clip\r\ncmp = core.std.FrameEval(cmp, functools.partial(callback, clip = cmp), prop_src =[cmp])\r\ncmp.set_output()\r\n";
+            string template = Properties.Resources.vpyTemplate;
             if (selectedFile != "Default")
             {
-                var btemp = File.ReadAllBytes(selectedFile);
-                string temp = GetUTF8String(btemp);
-                if (temp.IndexOf("%File1%", StringComparison.Ordinal) > 0 &&
-                    temp.IndexOf("%File2%", StringComparison.Ordinal) > 0 )
-                {
-                    template = temp;
-                }
-                else
+                string temp = GetUTF8String(File.ReadAllBytes(selectedFile));
+                if (!temp.Contains(@"%File1%") || !temp.Contains(@"%File2%"))
                 {
                     throw new FormatException("无效的模板文件");
                 }
+                template = temp;
             }
-            template = Regex.Replace(template, "%File1%", file1);
-            template = Regex.Replace(template, "%File2%", file2);
+            template = template.Replace(@"%File1%", file1);
+            template = template.Replace(@"%File2%", file2);
             File.WriteAllText(outputFile, template, Encoding.UTF8);
         }
 

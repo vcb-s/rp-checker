@@ -59,5 +59,14 @@ namespace RPChecker.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   查找默认vpy模板内容的字符串。
+        /// </summary>
+        internal static string vpyTemplate {
+            get {
+                return ResourceManager.GetString("vpyTemplate", resourceCulture);
+            }
+        }
     }
 }
