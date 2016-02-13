@@ -46,10 +46,14 @@ namespace RPChecker.Forms
             VsPipeProcess.PsnrUpdated     += PsnrUpdated;
         }
 
+        private bool _loadFormOpened;
         private void btnLoad_Click(object sender, EventArgs e)
         {
+            if (_loadFormOpened) return;
             FrmLoadFiles flf = new FrmLoadFiles(this);
+            flf.Load   += (o, args) => _loadFormOpened = true;
             flf.Closed += (o, args) => btnAnalyze.Enabled = FilePathsPair.Count > 0;
+            flf.Closed += (o, args) => _loadFormOpened = false;
             flf.Show();
         }
 
