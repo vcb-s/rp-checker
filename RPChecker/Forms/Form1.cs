@@ -141,7 +141,9 @@ namespace RPChecker.Forms
                     AnalyseClip(item.Key, item.Value);
                     //foreach (var psnr in _rawPsnrData.Select(GetPsnr).Where(psnr => psnr != null)) { _tempData.Add((KeyValuePair<int,double>)psnr); }
 
-                    _tempData.Sort((a, b) => a.Value.CompareTo(b.Value));
+                    _tempData.Sort((a, b) => a.Key.CompareTo(b.Key));
+                    _tempData = _tempData.OrderBy(a => a.Value).ToList();
+
                     var result = new ReSulT
                     {
                         FileName = item.Value,
