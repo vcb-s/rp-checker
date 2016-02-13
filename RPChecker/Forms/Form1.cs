@@ -87,9 +87,12 @@ namespace RPChecker.Forms
 
         private void cbFPS_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbFileList.SelectedIndex > 0)
+            if (cbFileList.SelectedIndex <= 0) return;
+            double frameRate = _frameRate[cbFPS.SelectedIndex];
+            foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                UpdataGridView(_fullData[cbFileList.SelectedIndex], _frameRate[cbFPS.SelectedIndex], false, true);
+                TimeSpan temp = ConvertMethod.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
+                row.Cells[2].Value = temp.Time2String();
             }
         }
 
@@ -105,27 +108,21 @@ namespace RPChecker.Forms
         private void cbFileList_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
 
 
-        private void UpdataGridView(ReSulT info, double frameRate, bool clear = true, bool updataTime = false)
+        private void UpdataGridView(ReSulT info, double frameRate)
         {
-            if (clear) { dataGridView1.Rows.Clear(); }
-            int index = 0;
+            dataGridView1.Rows.Clear();
             foreach (var item in info.Data)
             {
-                if ((dataGridView1.RowCount < 450 || item.Value < _threshold || updataTime) && index < dataGridView1.RowCount)
-                {
-                    if (clear) { index = dataGridView1.Rows.Add(); }
-                    TimeSpan temp = ConvertMethod.Second2Time(item.Key/frameRate);
-                    dataGridView1.Rows[index].Cells[0].Value = item.Key;
-                    dataGridView1.Rows[index].Cells[1].Value = $"{item.Value:F4}";
-                    dataGridView1.Rows[index].Cells[2].Value = ConvertMethod.Time2String(temp);
-                    dataGridView1.Rows[index].DefaultCellStyle.BackColor = item.Value < _threshold
-                        ? Color.FromArgb(233, 76, 60)
-                        : Color.FromArgb(46, 205, 112);
-                    if (!clear) { ++index; }
-                }
-                if (item.Value > _threshold && dataGridView1.RowCount >= 450 && !updataTime) { break; }
+                DataGridViewRow newRow = new DataGridViewRow {Tag = item};
+                TimeSpan temp = ConvertMethod.Second2Time(item.Key / frameRate);
+                newRow.CreateCells(dataGridView1, item.Key, $"{item.Value:F4}", temp.Time2String());
+                newRow.DefaultCellStyle.BackColor = item.Value < _threshold
+                    ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
+                dataGridView1.Rows.Add(newRow);
+
+                if (item.Value > _threshold && dataGridView1.RowCount > 450) break;
             }
-            Debug.WriteLine($"DataGridView with {index} lines");
+            Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines");
         }
 
         //private static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b) => a.Value.CompareTo(b.Value);
