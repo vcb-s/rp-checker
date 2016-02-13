@@ -42,6 +42,8 @@ namespace RPChecker.Forms
                 cbVpyFile.Items.Add(item);
             }
             btnAnalyze.Enabled = false;
+            VsPipeProcess.ProgressUpdated += ProgressUpdated;
+            VsPipeProcess.PsnrUpdated     += PsnrUpdated;
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -111,16 +113,18 @@ namespace RPChecker.Forms
         private void UpdataGridView(ReSulT info, double frameRate)
         {
             dataGridView1.Rows.Clear();
+
             foreach (var item in info.Data)
             {
+                if (item.Value > _threshold && dataGridView1.RowCount > 450) break;
+
                 DataGridViewRow newRow = new DataGridViewRow {Tag = item};
                 TimeSpan temp = ConvertMethod.Second2Time(item.Key / frameRate);
                 newRow.CreateCells(dataGridView1, item.Key, $"{item.Value:F4}", temp.Time2String());
                 newRow.DefaultCellStyle.BackColor = item.Value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
-
-                if (item.Value > _threshold && dataGridView1.RowCount > 450) break;
+                Application.DoEvents();
             }
             Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines");
         }
@@ -230,14 +234,6 @@ namespace RPChecker.Forms
             _tempData.Add(new KeyValuePair<int, double>(int.Parse(rawData.Groups["fram"].Value), double.Parse(rawData.Groups["PSNR"].Value)));
         }
 
-        private KeyValuePair<int, double>? GetPsnr(string data)
-        {
-            var rawData = Regex.Match(data, @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
-            if (!rawData.Success) return null;
-            return new KeyValuePair<int, double>(int.Parse(rawData.Groups["fram"].Value),
-                double.Parse(rawData.Groups["PSNR"].Value));
-        }
-
         private delegate void UpdatePsnrDelegate(string data);
 
         private void PsnrUpdated(string data)
@@ -265,22 +261,19 @@ namespace RPChecker.Forms
 
         private void AnalyseClip(string file1, string file2)
         {
-            _tempData = new List<KeyValuePair<int, double>>();
-            string vsFile = $"{file2}.vpy";
-            //_rawPsnrData = new List<string>();
+            _tempData          = new List<KeyValuePair<int, double>>();
+            string vsFile      = $"{file2}.vpy";
+            _beginErrorRecord  = false;
+            Enable             = false;
+            lbError.Text       = @"生成lwi文件中……";
+            progressBar1.Value = 0;
             try
             {
-                _beginErrorRecord  = false;
-                Enable             = false;
-                lbError.Text       = @"生成lwi文件中……";
-                progressBar1.Value = 0;
-                Application.DoEvents();
-
                 ConvertMethod.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
                 _erroeMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
+
+
                 var vsThread = new Thread(VsPipeProcess.GenerateLog);
-                VsPipeProcess.ProgressUpdated += ProgressUpdated;
-                VsPipeProcess.PsnrUpdated     += PsnrUpdated;
                 vsThread.Start(vsFile);
 
                 while (vsThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
@@ -296,8 +289,8 @@ namespace RPChecker.Forms
             }
             finally
             {
-                VsPipeProcess.ProgressUpdated -= ProgressUpdated;
-                VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
+                //VsPipeProcess.ProgressUpdated -= ProgressUpdated;
+                //VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
                 progressBar1.Value             = 100;
                 Enable                         = true;
                 Refresh();
@@ -351,5 +344,11 @@ namespace RPChecker.Forms
     {
         public List<KeyValuePair<int, double>> Data { get; set; }
         public string FileName { get; set; }
+
+        public KeyValuePair<int, double> this[int index]
+        {
+            get { return Data[index]; }
+            set { Data[index] = value; }
+        }
     }
 }
