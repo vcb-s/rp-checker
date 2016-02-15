@@ -61,7 +61,7 @@ namespace RPChecker.Util
                     RedirectStandardOutput = value,
                     RedirectStandardError  = value
                     },
-                    //EnableRaisingEvents    = true
+                    EnableRaisingEvents    = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
@@ -69,8 +69,8 @@ namespace RPChecker.Util
                 _consoleProcess.Exited             += VsPipe_Exited;
 
                 _consoleProcess.Start();
-                _consoleProcess.BeginOutputReadLine();
                 _consoleProcess.BeginErrorReadLine();
+                _consoleProcess.BeginOutputReadLine();
                 _consoleProcess.WaitForExit();
 
                 _consoleProcess.ErrorDataReceived  -= ErrorOutputHandler;
@@ -83,32 +83,30 @@ namespace RPChecker.Util
             }
         }
 
-
         private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            //Debug.WriteLine(outLine.Data);
             PsnrUpdated?.Invoke(outLine.Data);
+            //Debug.WriteLine(outLine.Data);
         }
 
         private static void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
+            ProgressUpdated?.Invoke(outLine.Data);
+            Debug.WriteLine(outLine.Data);
             if (Abort)
             {
                 ((Process)sendingProcess).Kill();
                 Abort = false;
-                return;
             }
-            Debug.WriteLine(outLine.Data);
-            ProgressUpdated?.Invoke(outLine.Data);
         }
 
         private static void VsPipe_Exited(object sender, EventArgs e)
         {
-             ExitCode = _consoleProcess.ExitCode;
-             Debug.WriteLine("Exit code: {0}", ExitCode);
-             _consoleProcess.Close();
-             _consoleProcess.Dispose();
-             _consoleProcess.Exited -= VsPipe_Exited;
+            ExitCode = _consoleProcess.ExitCode;
+            Debug.WriteLine("Exit code: {0}", ExitCode);
+
+            _consoleProcess.Close();
+            _consoleProcess.Exited -= VsPipe_Exited;
         }
     }
 }
