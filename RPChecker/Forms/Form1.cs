@@ -52,8 +52,10 @@ namespace RPChecker.Forms
             if (_loadFormOpened) return;
             FrmLoadFiles flf = new FrmLoadFiles(this);
             flf.Load   += (o, args) => _loadFormOpened = true;
-            flf.Closed += (o, args) => btnAnalyze.Enabled = FilePathsPair.Count > 0;
-            flf.Closed += (o, args) => _loadFormOpened = false;
+            flf.Closed += (o, args) =>  {
+                btnAnalyze.Enabled = FilePathsPair.Count > 0;
+                _loadFormOpened = false;
+            };
             flf.Show();
         }
 
@@ -73,7 +75,7 @@ namespace RPChecker.Forms
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine(ex.Message);
             }
         }
 
@@ -302,10 +304,14 @@ namespace RPChecker.Forms
             }
         }
 
+        private bool _chartFormOpened;
+
         private void btnChart_Click(object sender, EventArgs e)
         {
-            if (cbFileList.SelectedIndex < 0) return;
+            if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
             FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold);
+            chart.Load   += (o, args) => _chartFormOpened = true;
+            chart.Closed += (o, args) => _chartFormOpened = false;
             chart.Show();
         }
 

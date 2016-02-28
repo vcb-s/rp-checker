@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms.DataVisualization.Charting;
 
 namespace RPChecker.Forms
@@ -57,6 +58,13 @@ namespace RPChecker.Forms
         private void FrmChart_FormClosing(object sender, FormClosingEventArgs e)
         {
             RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "ChartLocation");
+        }
+
+        private void btnSaveAsImage_Click(object sender, EventArgs e)
+        {
+            var rnd = Path.GetRandomFileName().Substring(0, 8).ToUpper();
+            var fileName = Path.GetDirectoryName(_info.FileName) + "\\" + rnd + ".png";
+            chart1.SaveImage(fileName, ChartImageFormat.Png);
         }
     }
 }
