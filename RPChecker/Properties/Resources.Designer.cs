@@ -61,7 +61,44 @@ namespace RPChecker.Properties {
         }
         
         /// <summary>
-        ///   查找默认vpy模板内容的字符串。
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Checked {
+            get {
+                object obj = ResourceManager.GetObject("Checked", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Unchecked {
+            get {
+                object obj = ResourceManager.GetObject("Unchecked", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 import sys
+        ///import vapoursynth as vs
+        ///import mvsfunc as mvf
+        ///import functools
+        ///
+        ///core = vs.get_core(accept_lowercase=True)
+        ///core.max_cache_size = 5000
+        ///
+        ///src = core.lsmas.LWLibavSource(r&quot;%File1%&quot;, format=&quot;yuv420p16&quot;)
+        ///opt = core.lsmas.LWLibavSource(r&quot;%File2%&quot;, format=&quot;yuv420p16&quot;)
+        ///
+        ///cmp = mvf.PlaneCompare(opt, src, mae=False, rmse=False, cov=False, corr=False)
+        ///
+        ///def callback(n, clip, f):
+        ///   print(n, f.props.PlanePSNR)
+        ///   return clip
+        ///
+        ///cmp = core.std.FrameEval(cmp, functools.partial(callback, clip=cmp),  [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string vpyTemplate {
             get {

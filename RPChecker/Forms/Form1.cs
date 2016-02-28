@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using RPChecker.Properties;
 
 namespace RPChecker.Forms
 {
@@ -42,6 +43,7 @@ namespace RPChecker.Forms
                 cbVpyFile.Items.Add(item);
             }
             btnAnalyze.Enabled = false;
+            toolStripSplitButton1.Image = Resources.Unchecked;
             VsPipeProcess.ProgressUpdated += ProgressUpdated;
             VsPipeProcess.PsnrUpdated     += PsnrUpdated;
         }
@@ -111,7 +113,7 @@ namespace RPChecker.Forms
             UpdataGridView(_fullData[cbFileList.SelectedIndex], _frameRate[cbFPS.SelectedIndex]);
         }
 
-        private void cbFileList_MouseEnter(object sender, EventArgs e) => toolTip1.Show(cbFileList.SelectedItem?.ToString(), cbFileList);
+        private void cbFileList_MouseEnter(object sender, EventArgs e) => toolTip1.Show(cbFileList.SelectedItem?.ToString(), (IWin32Window)sender);
 
         private void cbFileList_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
 
@@ -158,9 +160,9 @@ namespace RPChecker.Forms
                     };
                     _fullData.Add(result);
                     RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
-                    if (checkBox1.Checked || _beginErrorRecord) continue;
+                    if (_remainFile || _beginErrorRecord) continue;
 
-                    var resultRegex = Regex.Match(lbError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
+                    var resultRegex = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
                     var timespam = ConvertMethod.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
                     RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
                     var frame = int.Parse(resultRegex.Groups["frame"].Value);
@@ -193,7 +195,7 @@ namespace RPChecker.Forms
         private readonly Regex _progressRegex = new Regex(@"Frame: (?<done>\d+)/(?<undo>\d+)");
         private void UpdateProgress(string progress)
         {
-            lbError.Text = progress;
+            toolStripStatusStdError.Text = progress;
             if (progress == "Script evaluation failed:")
             {
                 _beginErrorRecord = true;
@@ -215,7 +217,7 @@ namespace RPChecker.Forms
             var undo = double.Parse(value.Groups["undo"].Value);
             if (done < undo)
             {
-                progressBar1.Value = (int)Math.Floor(done / undo * 100);
+                toolStripProgressBar1.Value = (int)Math.Floor(done / undo * 100);
             }
             Application.DoEvents();
         }
@@ -259,7 +261,7 @@ namespace RPChecker.Forms
                 cbFileList.Enabled     = value;
                 cbFPS.Enabled          = value;
                 cbVpyFile.Enabled      = value;
-                checkBox1.Enabled      = value;
+                //checkBox1.Enabled      = value;
                 numericUpDown1.Enabled = value;
                 btnAbort.Enabled       = !value;
             }
@@ -271,8 +273,8 @@ namespace RPChecker.Forms
             string vsFile      = $"{file2}.vpy";
             _beginErrorRecord  = false;
             Enable             = false;
-            lbError.Text       = @"生成lwi文件中……";
-            progressBar1.Value = 0;
+            toolStripStatusStdError.Text       = @"生成lwi文件中……";
+            toolStripProgressBar1.Value = 0;
             try
             {
                 ConvertMethod.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
@@ -285,8 +287,8 @@ namespace RPChecker.Forms
                 while (vsThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
                 if (VsPipeProcess.VsPipeNotFind)
                 {
-                    lbError.Text = @"无可用vspipe";
-                    throw new Exception(lbError.Text);
+                    toolStripStatusStdError.Text = @"无可用vspipe";
+                    throw new Exception(toolStripStatusStdError.Text);
                 }
             }
             catch (Exception ex)
@@ -297,7 +299,7 @@ namespace RPChecker.Forms
             {
                 //VsPipeProcess.ProgressUpdated -= ProgressUpdated;
                 //VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
-                progressBar1.Value             = 100;
+                toolStripProgressBar1.Value             = 100;
                 Enable                         = true;
                 Refresh();
                 Application.DoEvents();
@@ -322,7 +324,19 @@ namespace RPChecker.Forms
 
         private readonly int[] _poi = { 0, 10 };
 
-        private void progressBar1_Click(object sender, EventArgs e)
+        private bool _remainFile;
+
+        private void toolStripSplitButton1_ButtonClick(object sender, EventArgs e)
+        {
+            _remainFile = !_remainFile;
+            toolStripSplitButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
+        }
+
+        private void toolStripSplitButton1_MouseEnter(object sender, EventArgs e) => toolTip1.Show("保留中间文件", statusStrip1);
+
+        private void toolStripSplitButton1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
+
+        private void toolStripProgressBar1_Click(object sender, EventArgs e)
         {
             ++_poi[0];
             if (_poi[0] >= _poi[1])

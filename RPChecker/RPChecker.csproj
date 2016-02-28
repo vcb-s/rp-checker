@@ -165,6 +165,11 @@
   <ItemGroup>
     <Content Include="Icon\Blank.ico" />
     <Content Include="Icon\Rp.ico" />
+    <None Include="Resources\ic_check_box_outline_blank_black_24dp.png" />
+    <None Include="Resources\ic_check_box_black_24dp.png" />
+    <None Include="Image\ic_check_box_outline_blank_black_24dp.png" />
+    <None Include="Image\ic_check_box_black_24dp.png" />
+    <None Include="Resources\Checked.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
