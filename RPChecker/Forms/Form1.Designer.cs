@@ -243,6 +243,7 @@ namespace RPChecker.Forms
             // 
             // statusStrip1
             // 
+            this.statusStrip1.Font = new System.Drawing.Font("Consolas", 9F);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusStdError,
             this.toolStripProgressBar1,
@@ -256,7 +257,7 @@ namespace RPChecker.Forms
             // toolStripStatusStdError
             // 
             this.toolStripStatusStdError.Name = "toolStripStatusStdError";
-            this.toolStripStatusStdError.Size = new System.Drawing.Size(389, 17);
+            this.toolStripStatusStdError.Size = new System.Drawing.Size(420, 17);
             this.toolStripStatusStdError.Spring = true;
             this.toolStripStatusStdError.Text = "   ";
             this.toolStripStatusStdError.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
