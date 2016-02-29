@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using RPChecker.Properties;
 
@@ -19,6 +20,7 @@ namespace RPChecker.Forms
         public Form1()
         {
             InitializeComponent();
+            AddCommand();
         }
 
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
@@ -26,6 +28,25 @@ namespace RPChecker.Forms
         private readonly StringBuilder _erroeMessageBuilder = new StringBuilder();
         private bool _beginErrorRecord;
         private int _threshold = 30;
+
+        #region Update
+        private SystemMenu _systemMenu;
+
+        private void AddCommand()
+        {
+            _systemMenu = new SystemMenu(this);
+            _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
+        }
+
+        protected override void WndProc(ref Message msg)
+        {
+            base.WndProc(ref msg);
+
+            // Let it know all messages so it can handle WM_SYSCOMMAND
+            // (This method is inlined)
+            _systemMenu.HandleMessage(ref msg);
+        }
+        #endregion
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -46,6 +67,7 @@ namespace RPChecker.Forms
             toolStripSplitButton1.Image = Resources.Unchecked;
             VsPipeProcess.ProgressUpdated += ProgressUpdated;
             VsPipeProcess.PsnrUpdated     += PsnrUpdated;
+            Updater.CheckUpdateWeekly("RPChecker");
         }
 
         private bool _loadFormOpened;
