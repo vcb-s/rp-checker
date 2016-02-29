@@ -7,11 +7,10 @@ using System.Drawing;
 using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
+using RPChecker.Properties;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text.RegularExpressions;
-using RPChecker.Properties;
 
 namespace RPChecker.Forms
 {
