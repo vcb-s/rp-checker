@@ -1,4 +1,4 @@
-﻿namespace RPChecker
+﻿namespace RPChecker.Forms
 {
     partial class FrmLoadFiles
     {
@@ -51,6 +51,7 @@
             | System.Windows.Forms.AnchorStyles.Left)));
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
+            this.listView1.Cursor = System.Windows.Forms.Cursors.SizeAll;
             this.listView1.Location = new System.Drawing.Point(12, 54);
             this.listView1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.listView1.MultiSelect = false;
@@ -79,7 +80,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-            this.listView2.Location = new System.Drawing.Point(300, 54);
+            this.listView2.Cursor = System.Windows.Forms.Cursors.SizeAll;
+            this.listView2.Location = new System.Drawing.Point(301, 54);
             this.listView2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.listView2.MultiSelect = false;
             this.listView2.Name = "listView2";
@@ -103,7 +105,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(194, 13);
+            this.button1.Location = new System.Drawing.Point(206, 13);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(87, 33);
@@ -127,7 +129,7 @@
             // button3
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(586, 416);
+            this.button3.Location = new System.Drawing.Point(589, 416);
             this.button3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(87, 33);
@@ -154,7 +156,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(287, 21);
+            this.label2.Location = new System.Drawing.Point(299, 21);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(56, 17);
             this.label2.TabIndex = 6;
@@ -163,7 +165,7 @@
             // button4
             // 
             this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button4.Location = new System.Drawing.Point(585, 13);
+            this.button4.Location = new System.Drawing.Point(589, 13);
             this.button4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(87, 33);
@@ -177,11 +179,13 @@
             // 
             this.textBox1.AllowDrop = true;
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(586, 54);
+            this.textBox1.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.textBox1.Location = new System.Drawing.Point(590, 54);
             this.textBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
+            this.textBox1.ShortcutsEnabled = false;
             this.textBox1.Size = new System.Drawing.Size(85, 85);
             this.textBox1.TabIndex = 8;
             this.textBox1.TabStop = false;
@@ -193,11 +197,13 @@
             // 
             this.textBox2.AllowDrop = true;
             this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(586, 148);
+            this.textBox2.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.textBox2.Location = new System.Drawing.Point(589, 148);
             this.textBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.textBox2.Multiline = true;
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
+            this.textBox2.ShortcutsEnabled = false;
             this.textBox2.Size = new System.Drawing.Size(85, 85);
             this.textBox2.TabIndex = 9;
             this.textBox2.TabStop = false;
@@ -226,6 +232,8 @@
             this.MinimumSize = new System.Drawing.Size(700, 500);
             this.Name = "FrmLoadFiles";
             this.Text = "载入文件";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmLoadFiles_FormClosing);
+            this.Load += new System.EventHandler(this.FrmLoadFiles_Load);
             this.Resize += new System.EventHandler(this.FrmLoadFiles_Resize);
             this.ResumeLayout(false);
             this.PerformLayout();

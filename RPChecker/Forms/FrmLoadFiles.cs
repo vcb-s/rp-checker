@@ -1,11 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
+using System.Linq;
+using RPChecker.Util;
+using System.Drawing;
+using System.Reflection;
+using System.Diagnostics;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
-namespace RPChecker
+
+namespace RPChecker.Forms
 {
     public partial class FrmLoadFiles : Form
     {
@@ -103,6 +107,7 @@ namespace RPChecker
                 foreach (ListViewItem item in listView1.Items)
                 {
                     _mainWindow.FilePathsPair.Add(new KeyValuePair<string, string>(item.Tag as string, listView2.Items[i].Tag as string));
+                    Debug.WriteLine(_mainWindow.FilePathsPair.Last());
                     ++i;
                 }
                 Close();
@@ -178,14 +183,25 @@ namespace RPChecker
 
         private void FrmLoadFiles_Resize(object sender, EventArgs e)
         {
-            var midLine = (Width - textBox1.Width - textBox1.Margin.Left - textBox1.Margin.Right - 27)/2;
-            listView1.Width = midLine - 10;
-            listView2.Location = new Point(midLine + 10, listView1.Location.Y);
-            listView2.Width = listView1.Width;
-            button1.Location = new Point(listView1.Location.X + listView1.Width - button1.Width, button1.Location.Y);
-            label2.Location = new Point(listView2.Location.X, label2.Location.Y);
-            columnHeader1.Width = listView1.Width - 5;
-            columnHeader2.Width = listView1.Width - 5;
+            var midLine         = (textBox1.Location.X - textBox1.Margin.Left - listView1.Margin.Left) / 2;
+            listView2.Width     = listView1.Width = midLine - 12;
+            listView2.Location  = new Point(button2.Location.X   + button2.Width   - listView2.Width, listView2.Location.Y);
+            button1.Location    = new Point(listView1.Location.X + listView1.Width - button1.Width + 1, button1.Location.Y);
+            label2.Location     = new Point(listView2.Location.X, label2.Location.Y);
+            columnHeader1.Width = listView1.Width - 4;
+            columnHeader2.Width = listView1.Width - 4;
+        }
+
+        private void FrmLoadFiles_Load(object sender, EventArgs e)
+        {
+            Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+            Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "LoadLocation"));
+            if (saved != new Point(-32000, -32000)) Location = saved;
+        }
+
+        private void FrmLoadFiles_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "LoadLocation");
         }
     }
 }

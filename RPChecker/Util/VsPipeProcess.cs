@@ -1,17 +1,17 @@
 ﻿using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 
-namespace RPChecker
+namespace RPChecker.Util
 {
     public static class VsPipeProcess
     {
         private static Process _consoleProcess;
 
-        public static bool Abort { private get; set; }
+        public static bool Abort         { private get; set; }
 
-        private static int ExitCode { get; set; }
+        private static int ExitCode      { get; set; }
 
         public static bool VsPipeNotFind { get; private set; }
 
@@ -27,14 +27,20 @@ namespace RPChecker
         public static void GenerateLog(object scriptFile)
         {
             const bool value = true;
-            string vspipePath = string.Empty;
+            string vspipePath;
             try
             {
-                 vspipePath = ConvertMethod.GetVapourSynthPathViaRegistry();
+                vspipePath = RegistryStorage.Load();
+                if (!File.Exists(vspipePath + "vspipe.exe"))
+                {
+                    vspipePath = ConvertMethod.GetVapourSynthPathViaRegistry();
+                    RegistryStorage.Save(vspipePath);
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                vspipePath = string.Empty;
                 if (!File.Exists("vspipe.exe"))
                 {
                     VsPipeNotFind = true;
@@ -47,28 +53,28 @@ namespace RPChecker
                 _consoleProcess = new Process
                 {
                     StartInfo =
-                {
+                    {
                     FileName               = $"{vspipePath}vspipe",
                     Arguments              = $" -p \"{scriptFile}\" .",
                     UseShellExecute        = false,
                     CreateNoWindow         = value,
                     RedirectStandardOutput = value,
                     RedirectStandardError  = value
-                },
-                    EnableRaisingEvents = true
+                    },
+                    EnableRaisingEvents    = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
-                _consoleProcess.ErrorDataReceived += ErrorOutputHandler;
-                _consoleProcess.Exited += VsPipe_Exited;
+                _consoleProcess.ErrorDataReceived  += ErrorOutputHandler;
+                _consoleProcess.Exited             += VsPipe_Exited;
 
                 _consoleProcess.Start();
-                _consoleProcess.BeginOutputReadLine();
                 _consoleProcess.BeginErrorReadLine();
+                _consoleProcess.BeginOutputReadLine();
                 _consoleProcess.WaitForExit();
 
+                _consoleProcess.ErrorDataReceived  -= ErrorOutputHandler;
                 _consoleProcess.OutputDataReceived -= OutputHandler;
-                _consoleProcess.ErrorDataReceived -= ErrorOutputHandler;
             }
             catch (Exception ex)
             {
@@ -77,31 +83,30 @@ namespace RPChecker
             }
         }
 
-
         private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             PsnrUpdated?.Invoke(outLine.Data);
+            //Debug.WriteLine(outLine.Data);
         }
 
         private static void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
+            ProgressUpdated?.Invoke(outLine.Data);
+            Debug.WriteLine(outLine.Data);
             if (Abort)
             {
                 ((Process)sendingProcess).Kill();
                 Abort = false;
-                return;
             }
-            Debug.WriteLine(outLine.Data);
-            ProgressUpdated?.Invoke(outLine.Data);
         }
 
         private static void VsPipe_Exited(object sender, EventArgs e)
         {
-             ExitCode = _consoleProcess.ExitCode;
-             Debug.WriteLine("Exit code: {0}", ExitCode);
-             _consoleProcess.Close();
-             _consoleProcess.Dispose();
-             _consoleProcess.Exited -= VsPipe_Exited;
+            ExitCode = _consoleProcess.ExitCode;
+            Debug.WriteLine("Exit code: {0}", ExitCode);
+
+            _consoleProcess.Close();
+            _consoleProcess.Exited -= VsPipe_Exited;
         }
     }
 }

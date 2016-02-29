@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
+﻿using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace RPChecker
+namespace RPChecker.Forms
 {
     partial class Form1
     {
@@ -44,24 +41,26 @@ namespace RPChecker
             this.btnLoad = new System.Windows.Forms.Button();
             this.cbFileList = new System.Windows.Forms.ComboBox();
             this.cbFPS = new System.Windows.Forms.ComboBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.cbVpyFile = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.lbError = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.btnLog = new System.Windows.Forms.Button();
             this.btnAbort = new System.Windows.Forms.Button();
             this.btnChart = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusStdError = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripSplitButton();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnAnalyze
             // 
             this.btnAnalyze.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAnalyze.Location = new System.Drawing.Point(408, 380);
+            this.btnAnalyze.Location = new System.Drawing.Point(408, 391);
             this.btnAnalyze.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnAnalyze.Name = "btnAnalyze";
             this.btnAnalyze.Size = new System.Drawing.Size(34, 63);
@@ -77,18 +76,21 @@ namespace RPChecker
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.ControlLight;
+            this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.frams,
             this.PSNR,
             this.Time});
+            this.dataGridView1.GridColor = System.Drawing.SystemColors.Highlight;
             this.dataGridView1.Location = new System.Drawing.Point(12, 13);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(388, 429);
+            this.dataGridView1.Size = new System.Drawing.Size(388, 440);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.TabStop = false;
             // 
@@ -113,7 +115,7 @@ namespace RPChecker
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(408, 338);
+            this.btnLoad.Location = new System.Drawing.Point(408, 349);
             this.btnLoad.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(152, 35);
@@ -154,18 +156,6 @@ namespace RPChecker
             this.cbFPS.Size = new System.Drawing.Size(150, 25);
             this.cbFPS.TabIndex = 5;
             this.cbFPS.SelectedIndexChanged += new System.EventHandler(this.cbFPS_SelectedIndexChanged);
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(410, 454);
-            this.checkBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(99, 21);
-            this.checkBox1.TabIndex = 3;
-            this.checkBox1.Text = "保留中间文件";
-            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // numericUpDown1
             // 
@@ -215,29 +205,11 @@ namespace RPChecker
             this.cbVpyFile.Size = new System.Drawing.Size(150, 25);
             this.cbVpyFile.TabIndex = 7;
             // 
-            // lbError
-            // 
-            this.lbError.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lbError.AutoSize = true;
-            this.lbError.Location = new System.Drawing.Point(12, 455);
-            this.lbError.Name = "lbError";
-            this.lbError.Size = new System.Drawing.Size(48, 17);
-            this.lbError.TabIndex = 8;
-            this.lbError.Text = "          ";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(409, 142);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(150, 23);
-            this.progressBar1.TabIndex = 9;
-            // 
             // btnLog
             // 
             this.btnLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLog.Enabled = false;
-            this.btnLog.Location = new System.Drawing.Point(490, 413);
+            this.btnLog.Location = new System.Drawing.Point(490, 424);
             this.btnLog.Name = "btnLog";
             this.btnLog.Size = new System.Drawing.Size(70, 30);
             this.btnLog.TabIndex = 10;
@@ -249,7 +221,7 @@ namespace RPChecker
             // 
             this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAbort.Enabled = false;
-            this.btnAbort.Location = new System.Drawing.Point(449, 380);
+            this.btnAbort.Location = new System.Drawing.Point(449, 391);
             this.btnAbort.Name = "btnAbort";
             this.btnAbort.Size = new System.Drawing.Size(34, 63);
             this.btnAbort.TabIndex = 11;
@@ -261,7 +233,7 @@ namespace RPChecker
             // 
             this.btnChart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnChart.Enabled = false;
-            this.btnChart.Location = new System.Drawing.Point(490, 380);
+            this.btnChart.Location = new System.Drawing.Point(490, 391);
             this.btnChart.Name = "btnChart";
             this.btnChart.Size = new System.Drawing.Size(70, 30);
             this.btnChart.TabIndex = 12;
@@ -269,20 +241,58 @@ namespace RPChecker
             this.btnChart.UseVisualStyleBackColor = true;
             this.btnChart.Click += new System.EventHandler(this.btnChart_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Font = new System.Drawing.Font("Consolas", 9F);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusStdError,
+            this.toolStripProgressBar1,
+            this.toolStripSplitButton1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 463);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(569, 22);
+            this.statusStrip1.TabIndex = 13;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusStdError
+            // 
+            this.toolStripStatusStdError.Name = "toolStripStatusStdError";
+            this.toolStripStatusStdError.Size = new System.Drawing.Size(420, 17);
+            this.toolStripStatusStdError.Spring = true;
+            this.toolStripStatusStdError.Text = "   ";
+            this.toolStripStatusStdError.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // toolStripProgressBar1
+            // 
+            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
+            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
+            this.toolStripProgressBar1.Step = 1;
+            this.toolStripProgressBar1.Click += new System.EventHandler(this.toolStripProgressBar1_Click);
+            // 
+            // toolStripSplitButton1
+            // 
+            this.toolStripSplitButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripSplitButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButton1.Image")));
+            this.toolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSplitButton1.Name = "toolStripSplitButton1";
+            this.toolStripSplitButton1.Size = new System.Drawing.Size(32, 20);
+            this.toolStripSplitButton1.Text = "toolStripSplitButton1";
+            this.toolStripSplitButton1.ButtonClick += new System.EventHandler(this.toolStripSplitButton1_ButtonClick);
+            this.toolStripSplitButton1.MouseEnter += new System.EventHandler(this.toolStripSplitButton1_MouseEnter);
+            this.toolStripSplitButton1.MouseLeave += new System.EventHandler(this.toolStripSplitButton1_MouseLeave);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(569, 485);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnChart);
             this.Controls.Add(this.btnAbort);
             this.Controls.Add(this.btnLog);
-            this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.lbError);
             this.Controls.Add(this.cbVpyFile);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numericUpDown1);
-            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.cbFPS);
             this.Controls.Add(this.cbFileList);
             this.Controls.Add(this.btnLoad);
@@ -294,9 +304,12 @@ namespace RPChecker
             this.MinimumSize = new System.Drawing.Size(585, 524);
             this.Name = "Form1";
             this.Text = "RP Checker";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -312,16 +325,17 @@ namespace RPChecker
         private Button btnLoad;
         private ComboBox cbFileList;
         private ComboBox cbFPS;
-        private CheckBox checkBox1;
         private NumericUpDown numericUpDown1;
         private Label label1;
         private ComboBox cbVpyFile;
         private ToolTip toolTip1;
-        private Label lbError;
-        private ProgressBar progressBar1;
         private Button btnLog;
         private Button btnAbort;
         private Button btnChart;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusStdError;
+        private ToolStripProgressBar toolStripProgressBar1;
+        private ToolStripSplitButton toolStripSplitButton1;
     }
 }
 

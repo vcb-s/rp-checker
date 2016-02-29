@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Text;
-using Microsoft.Win32;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Microsoft.Win32;
 
-namespace RPChecker
+namespace RPChecker.Util
 {
     internal static class ConvertMethod
     {
@@ -22,6 +24,8 @@ namespace RPChecker
             return Encoding.UTF8.GetString(buffer);
         }
 
+        private static readonly Regex RTimeFormat = new Regex(@"(?<Hour>\d+):(?<Minute>\d+):(?<Second>\d+)\.(?<Millisecond>\d{3})");
+
         public static TimeSpan Second2Time(double second)
         {
             double secondPart      = Math.Floor(second);
@@ -29,28 +33,45 @@ namespace RPChecker
             return new TimeSpan(0, 0, 0, (int)secondPart, (int)millisecondPart);
         }
 
-        public static string Time2String(TimeSpan temp) => $"{temp.Hours:D2}:{temp.Minutes:D2}:{temp.Seconds:D2}.{temp.Milliseconds:D3}";
+        public static string Time2String(this TimeSpan temp) => $"{temp.Hours:D2}:{temp.Minutes:D2}:{temp.Seconds:D2}.{temp.Milliseconds:D3}";
+
+        public static TimeSpan ToTimeSpan(this string input)
+        {
+            if (string.IsNullOrEmpty(input)) { return TimeSpan.Zero; }
+            var temp = RTimeFormat.Match(input);
+            int hour = int.Parse(temp.Groups["Hour"].Value);
+            int minute = int.Parse(temp.Groups["Minute"].Value);
+            int second = int.Parse(temp.Groups["Second"].Value);
+            int millisecond = int.Parse(temp.Groups["Millisecond"].Value);
+            return new TimeSpan(0, hour, minute, second, millisecond);
+        }
 
         public static void GenerateVpyFile(string file1, string file2, string outputFile, string selectedFile)
         {
-            string template = "import sys\r\nimport vapoursynth as vs \r\nimport mvsfunc as mvf\r\nimport functools\r\ncore = vs.get_core(accept_lowercase = True)\r\ncore.max_cache_size = 5000\r\nsrc = core.lsmas.LWLibavSource(r\"%File1%\", format = \"yuv420p16\")\r\nopt = core.lsmas.LWLibavSource(r\"%File2%\", format = \"yuv420p16\")\r\ncmp = mvf.PlaneCompare(opt, src, mae = False, rmse = False, cov = False, corr = False)\r\ndef callback(n, clip, f):\r\n    print(n, f.props.PlanePSNR)\r\n    return clip\r\ncmp = core.std.FrameEval(cmp, functools.partial(callback, clip = cmp), prop_src =[cmp])\r\ncmp.set_output()\r\n";
+            //"import sys\r\nimport vapoursynth as vs \r\nimport mvsfunc as mvf\r\nimport functools\r\ncore = vs.get_core(accept_lowercase = True)\r\ncore.max_cache_size = 5000\r\nsrc = core.lsmas.LWLibavSource(r\"%File1%\", format = \"yuv420p16\")\r\nopt = core.lsmas.LWLibavSource(r\"%File2%\", format = \"yuv420p16\")\r\ncmp = mvf.PlaneCompare(opt, src, mae = False, rmse = False, cov = False, corr = False)\r\ndef callback(n, clip, f):\r\n    print(n, f.props.PlanePSNR)\r\n    return clip\r\ncmp = core.std.FrameEval(cmp, functools.partial(callback, clip = cmp), prop_src =[cmp])\r\ncmp.set_output()\r\n";
+            string template = Properties.Resources.vpyTemplate;
             if (selectedFile != "Default")
             {
-                var btemp = File.ReadAllBytes(selectedFile);
-                string temp = GetUTF8String(btemp);
-                if (temp.IndexOf("%File1%", StringComparison.Ordinal) > 0 &&
-                    temp.IndexOf("%File2%", StringComparison.Ordinal) > 0 )
-                {
-                    template = temp;
-                }
-                else
+                string temp = GetUTF8String(File.ReadAllBytes(selectedFile));
+                if (!temp.Contains(@"%File1%") || !temp.Contains(@"%File2%"))
                 {
                     throw new FormatException("无效的模板文件");
                 }
+                template = temp;
             }
-            template = Regex.Replace(template, "%File1%", file1);
-            template = Regex.Replace(template, "%File2%", file2);
+            template = template.Replace(@"%File1%", file1);
+            template = template.Replace(@"%File2%", file2);
             File.WriteAllText(outputFile, template, Encoding.UTF8);
+        }
+
+        public static Point String2Point(string input)
+        {
+            var rpos = new Regex(@"{X=(?<x>.+),Y=(?<y>.+)}");
+            if (string.IsNullOrEmpty(input)) { return new Point(-32000, -32000); }
+            var temp = rpos.Match(input);
+            int x = int.Parse(temp.Groups["x"].Value);
+            int y = int.Parse(temp.Groups["y"].Value);
+            return new Point(x, y);
         }
 
         /// <summary>
