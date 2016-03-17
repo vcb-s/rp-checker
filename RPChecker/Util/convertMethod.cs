@@ -71,11 +71,12 @@ namespace RPChecker.Util
 
         public static Point String2Point(string input)
         {
+            if (string.IsNullOrWhiteSpace(input)) return new Point(-32000, -32000);
             var rpos = new Regex(@"{X=(?<x>.+),Y=(?<y>.+)}");
-            if (string.IsNullOrEmpty(input)) { return new Point(-32000, -32000); }
-            var temp = rpos.Match(input);
-            int x = int.Parse(temp.Groups["x"].Value);
-            int y = int.Parse(temp.Groups["y"].Value);
+            var result = rpos.Match(input);
+            if (!result.Success) return new Point(-32000, -32000);
+            int x = int.Parse(result.Groups["x"].Value);
+            int y = int.Parse(result.Groups["y"].Value);
             return new Point(x, y);
         }
 
