@@ -59,6 +59,11 @@ namespace RPChecker.Util
                 }
                 template = temp;
             }
+            if (Path.GetDirectoryName(file1) == Path.GetDirectoryName(file2))
+            {
+                file1 = Path.GetFileName(file1);
+                file2 = Path.GetFileName(file2);
+            }
             template = template.Replace(@"%File1%", file1);
             template = template.Replace(@"%File2%", file2);
             File.WriteAllText(outputFile, template, Encoding.UTF8);
