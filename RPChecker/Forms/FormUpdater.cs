@@ -18,7 +18,11 @@ namespace RPChecker.Forms
 
         private WebClient _client;
 
-        public FormUpdater(string currentProgram, Version version)
+        private readonly string _baseUrl;
+
+        private readonly Version _version;
+
+        public FormUpdater(string currentProgram, Version version, string baseUrl)
         {
             InitializeComponent();
             Icon              = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
@@ -26,6 +30,8 @@ namespace RPChecker.Forms
             _exePath          = currentProgram;
             _backupPath       = currentProgram + ".bak";
             labelVersion.Text = version.ToString();
+            _baseUrl = baseUrl;
+            _version = version;
         }
 
         private void FormUpdater_Load(object sender, EventArgs e)
@@ -33,7 +39,7 @@ namespace RPChecker.Forms
             _client = new WebClient();
             _client.DownloadFileCompleted   += client_DownloadFileCompleted;
             _client.DownloadProgressChanged += client_DownloadProgressChanged;
-            _client.DownloadFileAsync(new Uri("http://tcupdate.applinzi.com/RPChecker.exe"), _newPath);
+            _client.DownloadFileAsync(new Uri($"http://{_baseUrl}/bin/RPChecker.v{_version}.exe"), _newPath);
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
