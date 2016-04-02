@@ -14,22 +14,30 @@ namespace RPChecker.Util
     {
         private static void OnResponse(IAsyncResult ar)
         {
-            Regex versionRegex = new Regex(@"RPChecker (\d+)\.(\d+)\.(\d+)\.(\d+)");
+            Regex versionRegex = new Regex(@"<meta\s+name\s*=\s*'RPChecker'\s+content\s*=\s*'(\d+\.\d+\.\d+\.\d+)'\s*>");
+            Regex baseUrlRegex = new Regex(@"<meta\s+name\s*=\s*'BaseUrl'\s+content\s*=\s*'(.+)'\s*>");
             WebRequest webRequest = (WebRequest)ar.AsyncState;
-            Stream responseStream = webRequest.EndGetResponse(ar).GetResponseStream();
+            Stream responseStream;
+            try
+            {
+                responseStream = webRequest.EndGetResponse(ar).GetResponseStream();
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(string.Format("检查更新失败, 错误信息:{0}{1}{0}请联系TC以了解详情",
+                    Environment.NewLine, exception.Message), @"Update Check Fail");
+                responseStream = null;
+            }
             if (responseStream == null) return;
 
             StreamReader streamReader = new StreamReader(responseStream);
             string context = streamReader.ReadToEnd();
             var result = versionRegex.Match(context);
-            if (!result.Success) return;
+            var urlResult = baseUrlRegex.Match(context);
+            if (!result.Success || !result.Success) return;
 
             var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            var major = int.Parse(result.Groups[1].Value);
-            var minor = int.Parse(result.Groups[2].Value);
-            var bulid = int.Parse(result.Groups[3].Value);
-            var reversion = int.Parse(result.Groups[4].Value);
-            Version remoteVersion = new Version(major, minor, bulid, reversion);
+            Version remoteVersion = Version.Parse(result.Groups[1].Value);
             if (currentVersion >= remoteVersion)
             {
                 MessageBox.Show($"v{currentVersion} 已是最新版", @"As Expected");
@@ -38,16 +46,20 @@ namespace RPChecker.Util
             var dialogResult = MessageBox.Show(caption: @"Wow! Such Impressive", text: $"新车已发车 v{remoteVersion}，上车!",
                                                buttons: MessageBoxButtons.YesNo, icon: MessageBoxIcon.Asterisk);
             if (dialogResult != DialogResult.Yes) return;
-            FormUpdater formUpdater = new FormUpdater(Application.ExecutablePath, remoteVersion);
+            FormUpdater formUpdater = new FormUpdater(Application.ExecutablePath, remoteVersion, urlResult.Groups[1].Value);
             formUpdater.ShowDialog();
         }
 
         public static void CheckUpdate()
         {
-            bool connected = IsConnectInternet();
-            if (!connected) return;
-            WebRequest webRequest = WebRequest.Create("http://tcupdate.applinzi.com/index.php");
-            webRequest.Credentials = CredentialCache.DefaultCredentials;
+            if (!IsConnectInternet()) return;
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create("http://tautcony.github.io/tcupdate");
+            #if DEBUG
+            webRequest = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:4000/tcupdate");
+            #endif
+            webRequest.UserAgent      = $"{Environment.UserName}({Environment.OSVersion}) / {Assembly.GetExecutingAssembly().GetName().FullName}";
+            webRequest.Method = "GET";
+            webRequest.Credentials    = CredentialCache.DefaultCredentials;
             webRequest.BeginGetResponse(OnResponse, webRequest);
         }
 
