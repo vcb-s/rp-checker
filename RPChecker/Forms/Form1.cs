@@ -181,13 +181,20 @@ namespace RPChecker.Forms
                     };
                     _fullData.Add(result);
                     RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
-                    if (_remainFile || _beginErrorRecord) continue;
-
-                    var resultRegex = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
-                    var timespam = ConvertMethod.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
-                    RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
-                    var frame = int.Parse(resultRegex.Groups["frame"].Value);
-                    RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Frame", frame);
+                    if (_beginErrorRecord) continue;
+                    try
+                    {
+                        var resultRegex = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
+                        var timespam    = ConvertMethod.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
+                        var frame       = int.Parse(resultRegex.Groups["frame"].Value);
+                        RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
+                        RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Frame", frame);
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                    if (_remainFile) continue;
 
                     try
                     {
@@ -197,12 +204,12 @@ namespace RPChecker.Forms
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.Message, @"PRChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, @"PRChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(ex.Message, @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileName) ?? ""));
@@ -227,7 +234,7 @@ namespace RPChecker.Forms
                 //Debug.WriteLine($"{++count} {progress} [{Thread.CurrentThread.ManagedThreadId}]");
                 if (progress == "ImportError: No module named 'mvsfunc'")
                 {
-                    MessageBox.Show(caption: @"PRChecker ERROR", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK,
+                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK,
                         text: $"尚未正确放置mawen菊苣的滤镜库‘mvsfunc’{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
                 }
             }

@@ -38,10 +38,10 @@ namespace RPChecker.Util
         public static TimeSpan ToTimeSpan(this string input)
         {
             if (string.IsNullOrEmpty(input)) { return TimeSpan.Zero; }
-            var temp = RTimeFormat.Match(input);
-            int hour = int.Parse(temp.Groups["Hour"].Value);
-            int minute = int.Parse(temp.Groups["Minute"].Value);
-            int second = int.Parse(temp.Groups["Second"].Value);
+            var temp        = RTimeFormat.Match(input);
+            int hour        = int.Parse(temp.Groups["Hour"].Value);
+            int minute      = int.Parse(temp.Groups["Minute"].Value);
+            int second      = int.Parse(temp.Groups["Second"].Value);
             int millisecond = int.Parse(temp.Groups["Millisecond"].Value);
             return new TimeSpan(0, hour, minute, second, millisecond);
         }
