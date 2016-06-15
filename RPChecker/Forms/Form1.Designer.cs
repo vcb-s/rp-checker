@@ -51,7 +51,7 @@ namespace RPChecker.Forms
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusStdError = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
-            this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripSplitButton();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -247,7 +247,7 @@ namespace RPChecker.Forms
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusStdError,
             this.toolStripProgressBar1,
-            this.toolStripSplitButton1});
+            this.toolStripDropDownButton1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 463);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(569, 22);
@@ -257,7 +257,7 @@ namespace RPChecker.Forms
             // toolStripStatusStdError
             // 
             this.toolStripStatusStdError.Name = "toolStripStatusStdError";
-            this.toolStripStatusStdError.Size = new System.Drawing.Size(420, 17);
+            this.toolStripStatusStdError.Size = new System.Drawing.Size(432, 17);
             this.toolStripStatusStdError.Spring = true;
             this.toolStripStatusStdError.Text = "   ";
             this.toolStripStatusStdError.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -269,17 +269,18 @@ namespace RPChecker.Forms
             this.toolStripProgressBar1.Step = 1;
             this.toolStripProgressBar1.Click += new System.EventHandler(this.toolStripProgressBar1_Click);
             // 
-            // toolStripSplitButton1
+            // toolStripDropDownButton1
             // 
-            this.toolStripSplitButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripSplitButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButton1.Image")));
-            this.toolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripSplitButton1.Name = "toolStripSplitButton1";
-            this.toolStripSplitButton1.Size = new System.Drawing.Size(32, 20);
-            this.toolStripSplitButton1.Text = "toolStripSplitButton1";
-            this.toolStripSplitButton1.ButtonClick += new System.EventHandler(this.toolStripSplitButton1_ButtonClick);
-            this.toolStripSplitButton1.MouseEnter += new System.EventHandler(this.toolStripSplitButton1_MouseEnter);
-            this.toolStripSplitButton1.MouseLeave += new System.EventHandler(this.toolStripSplitButton1_MouseLeave);
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDropDownButton1.Image = global::RPChecker.Properties.Resources.Unchecked;
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.ShowDropDownArrow = false;
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(20, 20);
+            this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Click += new System.EventHandler(this.toolStripDropDownButton1_Click);
+            this.toolStripDropDownButton1.MouseEnter += new System.EventHandler(this.toolStripDropDownButton1_MouseEnter);
+            this.toolStripDropDownButton1.MouseLeave += new System.EventHandler(this.toolStripDropDownButton1_MouseLeave);
             // 
             // Form1
             // 
@@ -335,7 +336,7 @@ namespace RPChecker.Forms
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel toolStripStatusStdError;
         private ToolStripProgressBar toolStripProgressBar1;
-        private ToolStripSplitButton toolStripSplitButton1;
+        private ToolStripDropDownButton toolStripDropDownButton1;
     }
 }
 

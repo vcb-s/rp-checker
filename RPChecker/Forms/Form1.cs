@@ -63,7 +63,6 @@ namespace RPChecker.Forms
                 cbVpyFile.Items.Add(item);
             }
             btnAnalyze.Enabled = false;
-            toolStripSplitButton1.Image = Resources.Unchecked;
             VsPipeProcess.ProgressUpdated += ProgressUpdated;
             VsPipeProcess.PsnrUpdated     += PsnrUpdated;
             Updater.CheckUpdateWeekly("RPChecker");
@@ -170,14 +169,11 @@ namespace RPChecker.Forms
                 {
                     AnalyseClip(item.Key, item.Value);
                     //foreach (var psnr in _rawPsnrData.Select(GetPsnr).Where(psnr => psnr != null)) { _tempData.Add((KeyValuePair<int,double>)psnr); }
-
-                    _tempData.Sort((a, b) => a.Key.CompareTo(b.Key));
-                    _tempData = _tempData.OrderBy(a => a.Value).ToList();
-
+                    var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     var result = new ReSulT
                     {
                         FileName = item.Value,
-                        Data     = _tempData
+                        Data     = data
                     };
                     _fullData.Add(result);
                     RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
@@ -258,7 +254,7 @@ namespace RPChecker.Forms
             Invoke(new UpdateProgressDelegate(UpdateProgress), progress);
         }
 
-        private volatile List<KeyValuePair<int, double>> _tempData = new List<KeyValuePair<int, double>>();
+        private volatile Dictionary<int, double> _tempData = new Dictionary<int, double>();
 
         //private volatile List<string> _rawPsnrData;
 
@@ -267,7 +263,7 @@ namespace RPChecker.Forms
             //_rawPsnrData.Add(data);
             var rawData = Regex.Match(data, @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
             if (!rawData.Success) return;
-            _tempData.Add(new KeyValuePair<int, double>(int.Parse(rawData.Groups["fram"].Value), double.Parse(rawData.Groups["PSNR"].Value)));
+            _tempData[int.Parse(rawData.Groups["fram"].Value)] = double.Parse(rawData.Groups["PSNR"].Value);
         }
 
         private delegate void UpdatePsnrDelegate(string data);
@@ -297,7 +293,7 @@ namespace RPChecker.Forms
 
         private void AnalyseClip(string file1, string file2)
         {
-            _tempData          = new List<KeyValuePair<int, double>>();
+            _tempData          = new Dictionary<int, double>();
             string vsFile      = $"{file2}.vpy";
             _beginErrorRecord  = false;
             Enable             = false;
@@ -327,7 +323,7 @@ namespace RPChecker.Forms
             {
                 //VsPipeProcess.ProgressUpdated -= ProgressUpdated;
                 //VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
-                toolStripProgressBar1.Value             = 100;
+                toolStripProgressBar1.Value    = 100;
                 Enable                         = true;
                 Refresh();
                 Application.DoEvents();
@@ -354,15 +350,21 @@ namespace RPChecker.Forms
 
         private bool _remainFile;
 
-        private void toolStripSplitButton1_ButtonClick(object sender, EventArgs e)
+        private void toolStripDropDownButton1_Click(object sender, EventArgs e)
         {
             _remainFile = !_remainFile;
-            toolStripSplitButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
+            toolStripDropDownButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
         }
 
-        private void toolStripSplitButton1_MouseEnter(object sender, EventArgs e) => toolTip1.Show("保留中间文件", statusStrip1);
+        private void toolStripDropDownButton1_MouseEnter(object sender, EventArgs e)
+        {
+            toolTip1.Show("保留中间文件", statusStrip1);
+        }
 
-        private void toolStripSplitButton1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
+        private void toolStripDropDownButton1_MouseLeave(object sender, EventArgs e)
+        {
+            toolTip1.RemoveAll();
+        }
 
         private void toolStripProgressBar1_Click(object sender, EventArgs e)
         {
@@ -383,7 +385,7 @@ namespace RPChecker.Forms
                               $"并耗费了这么多时间->[{time}]<-{Environment.NewLine}" +
                               $"但是！！！平均速率仅仅{int.Parse(frame) / time.ToTimeSpan().TotalSeconds:F3}fps……");
                 }
-                _poi[0] = 00;
+                _poi[0]  = 00;
                 _poi[1] += 10;
             }
             if (_poi[0] < 3 && _poi[1] == 10)
@@ -396,11 +398,5 @@ namespace RPChecker.Forms
     {
         public List<KeyValuePair<int, double>> Data { get; set; }
         public string FileName { get; set; }
-
-        public KeyValuePair<int, double> this[int index]
-        {
-            get { return Data[index]; }
-            set { Data[index] = value; }
-        }
     }
 }
