@@ -18,7 +18,8 @@ namespace RPChecker.Forms
         {
             InitializeComponent();
             _info.FileName = info.FileName;
-            _info.Data = new List<KeyValuePair<int, double>>(info.Data);
+            _info.Data = info.Data;
+            //_info.PropertyChanged += (sender, args) => DrawChart();
             _threshold = threshold;
         }
 
@@ -27,6 +28,11 @@ namespace RPChecker.Forms
             Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
             Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
+            DrawChart();
+        }
+
+        private void DrawChart()
+        {
             chart1.Series.Clear();
             Series series1 = new Series("PSNR")
             {
@@ -53,8 +59,11 @@ namespace RPChecker.Forms
                         series2.Points.AddXY(frame.Key, frame.Value);
                     }
                 });
-                chart1.Series.Add(series1);
-                chart1.Series.Add(series2);
+            });
+            task.ContinueWith(t =>
+            {
+                Invoke(new Action(() => chart1.Series.Add(series1)));
+                Invoke(new Action(() => chart1.Series.Add(series2)));
             });
             task.Start();
         }

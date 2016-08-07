@@ -10,6 +10,8 @@ using System.Diagnostics;
 using RPChecker.Properties;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace RPChecker.Forms
@@ -395,9 +397,24 @@ namespace RPChecker.Forms
             }
         }
     }
-    public class ReSulT
+
+    public class ReSulT: INotifyPropertyChanged
     {
-        public List<KeyValuePair<int, double>> Data { get; set; }
+        private List<KeyValuePair<int, double>> _data;
+        public List<KeyValuePair<int, double>> Data {
+            get { return _data; }
+            set {
+                _data = value;
+                NotifyPropertyChanged();
+            }
+        }
         public string FileName { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
