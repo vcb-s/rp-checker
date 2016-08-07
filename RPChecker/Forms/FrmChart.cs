@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms.DataVisualization.Charting;
 
 namespace RPChecker.Forms
@@ -17,7 +18,7 @@ namespace RPChecker.Forms
         {
             InitializeComponent();
             _info.FileName = info.FileName;
-            _info.Data = new List<KeyValuePair<int, double>>(info.Data.ToArray());
+            _info.Data = new List<KeyValuePair<int, double>>(info.Data);
             _threshold = threshold;
         }
 
@@ -40,24 +41,34 @@ namespace RPChecker.Forms
                 ChartType = SeriesChartType.Point,
                 IsValueShownAsLabel = false
             };
-
-            _info.Data.Sort((a,b) => a.Key.CompareTo(b.Key));
-
-            _info.Data.ForEach(frame =>
+            var task = new Task(() =>
             {
-                series1.Points.AddXY(frame.Key, frame.Value);
-                if (frame.Value < _threshold)
+                _info.Data.Sort((a, b) => a.Key.CompareTo(b.Key));
+
+                _info.Data.ForEach(frame =>
                 {
-                    series2.Points.AddXY(frame.Key, frame.Value);
-                }
+                    series1.Points.AddXY(frame.Key, frame.Value);
+                    if (frame.Value < _threshold)
+                    {
+                        series2.Points.AddXY(frame.Key, frame.Value);
+                    }
+                });
+                chart1.Series.Add(series1);
+                chart1.Series.Add(series2);
             });
-            chart1.Series.Add(series1);
-            chart1.Series.Add(series2);
+            task.Start();
         }
 
         private void FrmChart_FormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "ChartLocation");
+            try
+            {
+                RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "ChartLocation");
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
         private void btnSaveAsImage_Click(object sender, EventArgs e)

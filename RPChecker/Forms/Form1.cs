@@ -117,10 +117,11 @@ namespace RPChecker.Forms
 
         private void cbFPS_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbFileList.SelectedIndex <= 0) return;
+            if (cbFileList.SelectedIndex < 0) return;
             double frameRate = _frameRate[cbFPS.SelectedIndex];
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
+                if(row.Tag == null) continue;
                 TimeSpan temp = ConvertMethod.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
                 row.Cells[2].Value = temp.Time2String();
             }
@@ -129,7 +130,7 @@ namespace RPChecker.Forms
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             _threshold = Convert.ToInt32(numericUpDown1.Value);
-            if (_fullData == null) return;
+            if (_fullData == null || _fullData.Count == 0) return;
             UpdataGridView(_fullData[cbFileList.SelectedIndex], _frameRate[cbFPS.SelectedIndex]);
         }
 
