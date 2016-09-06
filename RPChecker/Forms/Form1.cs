@@ -223,7 +223,8 @@ namespace RPChecker.Forms
         private void UpdateProgress(string progress)
         {
             toolStripStatusStdError.Text = progress;
-            if (progress == "Script evaluation failed:")
+            if (progress == "Script evaluation failed:" ||
+                progress == "Failed to evaluate the script:")
             {
                 _beginErrorRecord = true;
             }
@@ -234,7 +235,12 @@ namespace RPChecker.Forms
                 if (progress == "ImportError: No module named 'mvsfunc'")
                 {
                     MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK,
-                        text: $"尚未正确放置mawen菊苣的滤镜库‘mvsfunc’{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
+                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc' {Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
+                }
+                else if (progress == "AttributeError: There is no function named PlaneAverage")
+                {
+                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK,
+                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
                 }
             }
 
