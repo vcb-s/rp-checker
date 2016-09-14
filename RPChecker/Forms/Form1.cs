@@ -9,10 +9,10 @@ using System.Reflection;
 using System.Diagnostics;
 using RPChecker.Properties;
 using System.Windows.Forms;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 namespace RPChecker.Forms
 {
@@ -234,25 +234,29 @@ namespace RPChecker.Forms
                 //Debug.WriteLine($"{++count} {progress} [{Thread.CurrentThread.ManagedThreadId}]");
                 if (progress == "ImportError: No module named 'mvsfunc'")
                 {
-                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK,
+                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                        buttons: MessageBoxButtons.OK,
                         text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc' {Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
                 }
                 else if (progress == "AttributeError: There is no function named PlaneAverage")
                 {
-                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK,
+                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                        buttons: MessageBoxButtons.OK,
                         text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
                 }
             }
-
-            var value = _progressRegex.Match(progress);
-            if (!value.Success) return;
-            var done = double.Parse(value.Groups["done"].Value);
-            var undo = double.Parse(value.Groups["undo"].Value);
-            if (done < undo)
+            else
             {
-                toolStripProgressBar1.Value = (int)Math.Floor(done / undo * 100);
+                var value = _progressRegex.Match(progress);
+                if (!value.Success) return;
+                var done = double.Parse(value.Groups["done"].Value);
+                var undo = double.Parse(value.Groups["undo"].Value);
+                if (done < undo)
+                {
+                    toolStripProgressBar1.Value = (int) Math.Floor(done/undo*100);
+                }
+                Application.DoEvents();
             }
-            Application.DoEvents();
         }
 
         private delegate void UpdateProgressDelegate(string progress);
