@@ -47,9 +47,16 @@ namespace RPChecker.Forms
             _client.CancelAsync();
         }
 
+        private delegate void UpdateProgressValue(int value);
+
+        private void UpdateProgress(int value)
+        {
+            progressBarDownload.Value = value;
+        }
+
         private void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            progressBarDownload.Value = e.ProgressPercentage;
+            Invoke(new UpdateProgressValue(UpdateProgress), e.ProgressPercentage);
         }
 
         private void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)

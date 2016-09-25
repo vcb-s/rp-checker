@@ -9,8 +9,10 @@ using System.Reflection;
 using System.Diagnostics;
 using RPChecker.Properties;
 using System.Windows.Forms;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 namespace RPChecker.Forms
 {
@@ -63,7 +65,6 @@ namespace RPChecker.Forms
                 cbVpyFile.Items.Add(item);
             }
             btnAnalyze.Enabled = false;
-            toolStripSplitButton1.Image = Resources.Unchecked;
             VsPipeProcess.ProgressUpdated += ProgressUpdated;
             VsPipeProcess.PsnrUpdated     += PsnrUpdated;
             Updater.CheckUpdateWeekly("RPChecker");
@@ -118,10 +119,11 @@ namespace RPChecker.Forms
 
         private void cbFPS_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbFileList.SelectedIndex <= 0) return;
+            if (cbFileList.SelectedIndex < 0) return;
             double frameRate = _frameRate[cbFPS.SelectedIndex];
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
+                if(row.Tag == null) continue;
                 TimeSpan temp = ConvertMethod.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
                 row.Cells[2].Value = temp.Time2String();
             }
@@ -130,7 +132,7 @@ namespace RPChecker.Forms
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             _threshold = Convert.ToInt32(numericUpDown1.Value);
-            if (_fullData == null) return;
+            if (_fullData == null || _fullData.Count == 0) return;
             UpdataGridView(_fullData[cbFileList.SelectedIndex], _frameRate[cbFPS.SelectedIndex]);
         }
 
@@ -158,7 +160,37 @@ namespace RPChecker.Forms
             Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines");
         }
 
-        //private static int Compare(KeyValuePair<int, double> a, KeyValuePair<int, double> b) => a.Value.CompareTo(b.Value);
+        private void AddStatic()
+        {
+            try
+            {
+                RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
+                var resultRegex = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
+                var timespam    = ConvertMethod.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
+                var frame       = int.Parse(resultRegex.Groups["frame"].Value);
+                RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
+                RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Frame", frame);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        private static void RemoveScript(KeyValuePair<string, string> item)
+        {
+            try
+            {
+                File.Delete($"{item.Key}.lwi");
+                File.Delete($"{item.Value}.lwi");
+                File.Delete($"{item.Value}.vpy");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
@@ -169,40 +201,14 @@ namespace RPChecker.Forms
                 try
                 {
                     AnalyseClip(item.Key, item.Value);
-                    //foreach (var psnr in _rawPsnrData.Select(GetPsnr).Where(psnr => psnr != null)) { _tempData.Add((KeyValuePair<int,double>)psnr); }
-
-                    _tempData.Sort((a, b) => a.Key.CompareTo(b.Key));
-                    _tempData = _tempData.OrderBy(a => a.Value).ToList();
-
-                    var result = new ReSulT
-                    {
-                        FileName = item.Value,
-                        Data     = _tempData
-                    };
-                    _fullData.Add(result);
-                    RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
-                    if (_remainFile || _beginErrorRecord) continue;
-
-                    var resultRegex = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
-                    var timespam = ConvertMethod.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
-                    RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
-                    var frame = int.Parse(resultRegex.Groups["frame"].Value);
-                    RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Frame", frame);
-
-                    try
-                    {
-                        File.Delete($"{item.Key}.lwi");
-                        File.Delete($"{item.Value}.lwi");
-                        File.Delete($"{item.Value}.vpy");
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, @"PRChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
+                    _fullData.Add(new ReSulT {FileName = item.Value, Data = data});
+                    if (_beginErrorRecord) continue; AddStatic();
+                    if (_remainFile) continue; RemoveScript(item);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, @"PRChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(ex.Message, @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileName) ?? ""));
@@ -212,33 +218,41 @@ namespace RPChecker.Forms
             ChangeClipDisplay(cbFileList.SelectedIndex);
         }
 
-        //private int count = 0;
-        private readonly Regex _progressRegex = new Regex(@"Frame: (?<done>\d+)/(?<undo>\d+)");
+        private static readonly Regex ProgressRegex = new Regex(@"Frame: (?<done>\d+)/(?<undo>\d+)", RegexOptions.Compiled);
+
         private void UpdateProgress(string progress)
         {
             toolStripStatusStdError.Text = progress;
-            if (progress == "Script evaluation failed:")
+            if (progress == "Script evaluation failed:" ||
+                progress == "Failed to evaluate the script:")
             {
                 _beginErrorRecord = true;
             }
             if (_beginErrorRecord)
             {
                 _erroeMessageBuilder.Append(progress + Environment.NewLine);
-                //Debug.WriteLine($"{++count} {progress} [{Thread.CurrentThread.ManagedThreadId}]");
                 if (progress == "ImportError: No module named 'mvsfunc'")
                 {
-                    MessageBox.Show(caption: @"PRChecker ERROR", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK,
-                        text: $"尚未正确放置mawen菊苣的滤镜库‘mvsfunc’{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
+                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                        buttons: MessageBoxButtons.OK,
+                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc' {Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
                 }
+                else if (progress == "AttributeError: There is no function named PlaneAverage")
+                {
+                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                        buttons: MessageBoxButtons.OK,
+                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
+                }
+                return;
             }
 
-            var value = _progressRegex.Match(progress);
+            var value = ProgressRegex.Match(progress);
             if (!value.Success) return;
             var done = double.Parse(value.Groups["done"].Value);
             var undo = double.Parse(value.Groups["undo"].Value);
-            if (done < undo)
+            if (done <= undo)
             {
-                toolStripProgressBar1.Value = (int)Math.Floor(done / undo * 100);
+                toolStripProgressBar1.Value = (int) Math.Floor(done/undo*100);
             }
             Application.DoEvents();
         }
@@ -251,16 +265,15 @@ namespace RPChecker.Forms
             Invoke(new UpdateProgressDelegate(UpdateProgress), progress);
         }
 
-        private volatile List<KeyValuePair<int, double>> _tempData = new List<KeyValuePair<int, double>>();
+        private volatile Dictionary<int, double> _tempData = new Dictionary<int, double>();
 
-        //private volatile List<string> _rawPsnrData;
+        private static readonly Regex DataFormatRegex = new Regex(@"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
 
         private void UpdatePsnr(string data)
         {
-            //_rawPsnrData.Add(data);
-            var rawData = Regex.Match(data, @"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)");
+            var rawData = DataFormatRegex.Match(data);
             if (!rawData.Success) return;
-            _tempData.Add(new KeyValuePair<int, double>(int.Parse(rawData.Groups["fram"].Value), double.Parse(rawData.Groups["PSNR"].Value)));
+            _tempData[int.Parse(rawData.Groups["fram"].Value)] = double.Parse(rawData.Groups["PSNR"].Value);
         }
 
         private delegate void UpdatePsnrDelegate(string data);
@@ -282,7 +295,6 @@ namespace RPChecker.Forms
                 cbFileList.Enabled     = value;
                 cbFPS.Enabled          = value;
                 cbVpyFile.Enabled      = value;
-                //checkBox1.Enabled      = value;
                 numericUpDown1.Enabled = value;
                 btnAbort.Enabled       = !value;
             }
@@ -290,17 +302,16 @@ namespace RPChecker.Forms
 
         private void AnalyseClip(string file1, string file2)
         {
-            _tempData          = new List<KeyValuePair<int, double>>();
+            _tempData          = new Dictionary<int, double>();
             string vsFile      = $"{file2}.vpy";
             _beginErrorRecord  = false;
             Enable             = false;
-            toolStripStatusStdError.Text       = @"生成lwi文件中……";
+            toolStripStatusStdError.Text = @"生成lwi文件中……";
             toolStripProgressBar1.Value = 0;
             try
             {
                 ConvertMethod.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
                 _erroeMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
-
 
                 var vsThread = new Thread(VsPipeProcess.GenerateLog);
                 vsThread.Start(vsFile);
@@ -320,7 +331,7 @@ namespace RPChecker.Forms
             {
                 //VsPipeProcess.ProgressUpdated -= ProgressUpdated;
                 //VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
-                toolStripProgressBar1.Value             = 100;
+                toolStripProgressBar1.Value    = 100;
                 Enable                         = true;
                 Refresh();
                 Application.DoEvents();
@@ -347,53 +358,66 @@ namespace RPChecker.Forms
 
         private bool _remainFile;
 
-        private void toolStripSplitButton1_ButtonClick(object sender, EventArgs e)
+        private void toolStripDropDownButton1_Click(object sender, EventArgs e)
         {
             _remainFile = !_remainFile;
-            toolStripSplitButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
+            toolStripDropDownButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
         }
 
-        private void toolStripSplitButton1_MouseEnter(object sender, EventArgs e) => toolTip1.Show("保留中间文件", statusStrip1);
+        private void toolStripDropDownButton1_MouseEnter(object sender, EventArgs e)
+        {
+            toolTip1.Show("保留中间文件", statusStrip1);
+        }
 
-        private void toolStripSplitButton1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
+        private void toolStripDropDownButton1_MouseLeave(object sender, EventArgs e)
+        {
+            toolTip1.RemoveAll();
+        }
 
         private void toolStripProgressBar1_Click(object sender, EventArgs e)
         {
             ++_poi[0];
-            if (_poi[0] >= _poi[1])
-            {
-                if (MessageBox.Show(@"是否打开关于界面", @"RPCheckerについて", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                {
-                    Form2 version = new Form2();
-                    version.Show();
-                }
-                else
-                {
-                    var frame = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Frame");
-                    var time = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Time");
-                    MessageBox.Show(caption: @"Statistics",
-                        text: $"你一共计算了这么多帧的PSNR值->[{frame}]<-{Environment.NewLine}" +
-                              $"并耗费了这么多时间->[{time}]<-{Environment.NewLine}" +
-                              $"但是！！！平均速率仅仅{int.Parse(frame) / time.ToTimeSpan().TotalSeconds:F3}fps……");
-                }
-                _poi[0] = 00;
-                _poi[1] += 10;
-            }
             if (_poi[0] < 3 && _poi[1] == 10)
             {
                 MessageBox.Show(@"Something happened", @"Something happened");
             }
+            if (_poi[0] < _poi[1]) return;
+            if (MessageBox.Show(@"是否打开关于界面", @"RPCheckerについて", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                Form2 version = new Form2();
+                version.Show();
+            }
+            else
+            {
+                var frame = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Frame");
+                var time  = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Time");
+                MessageBox.Show(caption: @"Statistics",
+                    text: $"总计帧数->[{frame}]<-{Environment.NewLine}" +
+                          $"总计时间->[{time}]<-{Environment.NewLine}" +
+                          $"平均帧率->{int.Parse(frame) / time.ToTimeSpan().TotalSeconds:F3}fps<-");
+            }
+            _poi[0]  = 00;
+            _poi[1] += 10;
         }
     }
-    public class ReSulT
+
+    public class ReSulT: INotifyPropertyChanged
     {
-        public List<KeyValuePair<int, double>> Data { get; set; }
+        private List<KeyValuePair<int, double>> _data;
+        public List<KeyValuePair<int, double>> Data {
+            get { return _data; }
+            set {
+                _data = value;
+                NotifyPropertyChanged();
+            }
+        }
         public string FileName { get; set; }
 
-        public KeyValuePair<int, double> this[int index]
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            get { return Data[index]; }
-            set { Data[index] = value; }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
