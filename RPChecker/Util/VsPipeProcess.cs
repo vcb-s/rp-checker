@@ -29,7 +29,7 @@ namespace RPChecker.Util
                 vspipePath = RegistryStorage.Load();
                 if (!File.Exists(vspipePath + "vspipe.exe"))
                 {
-                    vspipePath = ConvertMethod.GetVapourSynthPathViaRegistry();
+                    vspipePath = ToolKits.GetVapourSynthPathViaRegistry();
                     RegistryStorage.Save(vspipePath);
                 }
             }

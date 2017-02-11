@@ -28,7 +28,7 @@ namespace RPChecker.Util
                 ffmpegPath = RegistryStorage.Load(name : "FFmpeg");
                 if (!File.Exists(ffmpegPath + "FFmpeg.exe"))
                 {
-                    //ffmpegPath = ConvertMethod.GetVapourSynthPathViaRegistry();
+                    //ffmpegPath = ToolKits.GetVapourSynthPathViaRegistry();
                     //todo: show dialog to get the ffmpeg path
                     RegistryStorage.Save(ffmpegPath,name: "FFmpeg");
                 }

@@ -1,9 +1,7 @@
 ﻿using System;
 using RPChecker.Util;
 using System.Drawing;
-using System.Reflection;
 using System.Windows.Forms;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -25,8 +23,8 @@ namespace RPChecker.Forms
 
         private void FrmChart_Load(object sender, EventArgs e)
         {
-            Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-            Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
             DrawChart();
         }

@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using RPChecker.Util;
 using System.Drawing;
-using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -194,8 +193,8 @@ namespace RPChecker.Forms
 
         private void FrmLoadFiles_Load(object sender, EventArgs e)
         {
-            Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-            Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "LoadLocation"));
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "LoadLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
         }
 

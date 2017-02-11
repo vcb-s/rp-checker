@@ -53,7 +53,7 @@ namespace RPChecker.Forms
         {
             Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
 
-            Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
+            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
             if (saved != new Point(-32000, -32000)) Location = saved;
             RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
 
@@ -124,7 +124,7 @@ namespace RPChecker.Forms
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 if(row.Tag == null) continue;
-                TimeSpan temp = ConvertMethod.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
+                TimeSpan temp = ToolKits.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
                 row.Cells[2].Value = temp.Time2String();
             }
         }
@@ -150,7 +150,7 @@ namespace RPChecker.Forms
                 if (item.Value > _threshold && dataGridView1.RowCount > 450) break;
 
                 DataGridViewRow newRow = new DataGridViewRow {Tag = item};
-                TimeSpan temp = ConvertMethod.Second2Time(item.Key / frameRate);
+                TimeSpan temp = ToolKits.Second2Time(item.Key / frameRate);
                 newRow.CreateCells(dataGridView1, item.Key, $"{item.Value:F4}", temp.Time2String());
                 newRow.DefaultCellStyle.BackColor = item.Value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
@@ -166,7 +166,7 @@ namespace RPChecker.Forms
             {
                 RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
                 var resultRegex = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
-                var timespam    = ConvertMethod.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
+                var timespam    = ToolKits.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
                 var frame       = int.Parse(resultRegex.Groups["frame"].Value);
                 RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
                 RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Frame", frame);
@@ -311,7 +311,7 @@ namespace RPChecker.Forms
             toolStripProgressBar1.Value = 0;
             try
             {
-                ConvertMethod.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
+                ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
                 _errorMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
 
                 var vsThread = new Thread(VsPipeProcess.GenerateLog);
