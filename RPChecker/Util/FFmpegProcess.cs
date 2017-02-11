@@ -6,27 +6,22 @@ using System.Collections.Generic;
 
 namespace RPChecker.Util
 {
-    public class FFmpegProcess
+    public class FFmpegProcess: IProcess
     {
-        private static Process _consoleProcess;
+        private Process _consoleProcess;
 
-        public static bool Abort { private get; set; }
+        public bool Abort { get; set; }
 
-        private static int ExitCode { get; set; }
+        public int ExitCode { get; set; }
 
-        public static bool FFmpegNotFind { get; private set; }
+        public bool ProcessNotFind { get; set; }
 
-        public delegate void ProgressUpdatedEventHandler(string progress);
+        public event Action<string> ProgressUpdated;
 
-        public static event ProgressUpdatedEventHandler ProgressUpdated;
+        public event Action<string> ValueUpdated;
 
-        public delegate void SSIMDataUpdateEventHandler(string data);
-
-        public static event SSIMDataUpdateEventHandler PsnrUpdated;
-
-        public static void GenerateLog(object inputFileList)
+        public void GenerateLog(object inputFileList)
         {
-            const bool value = true;
             string ffmpegPath;
             try
             {
@@ -44,11 +39,11 @@ namespace RPChecker.Util
                 ffmpegPath = string.Empty;
                 if (!File.Exists("FFmpeg.exe"))
                 {
-                    FFmpegNotFind = true;
+                    ProcessNotFind = true;
                     return;
                 }
             }
-            FFmpegNotFind = false;
+            ProcessNotFind = false;
             var inputFile = inputFileList as List<string>;
             Debug.Assert(inputFile != null);
             try
@@ -60,16 +55,16 @@ namespace RPChecker.Util
                     FileName               = $"{ffmpegPath}FFmpeg",
                     Arguments              = $"-i \"{inputFile[0]}\" -i \"{inputFile[1]}\" -filter_complex ssim=\"stats_file=-\" -an -f null -",
                     UseShellExecute        = false,
-                    CreateNoWindow         = value,
-                    RedirectStandardOutput = value,
-                    RedirectStandardError  = value
+                    CreateNoWindow         = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError  = true
                     },
                     EnableRaisingEvents = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
                 _consoleProcess.ErrorDataReceived += ErrorOutputHandler;
-                _consoleProcess.Exited += FFmpeg_Exited;
+                _consoleProcess.Exited += ExitedHandler;
 
                 _consoleProcess.Start();
                 _consoleProcess.BeginErrorReadLine();
@@ -86,13 +81,13 @@ namespace RPChecker.Util
             }
         }
 
-        private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        public void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            PsnrUpdated?.Invoke(outLine.Data);
+            ValueUpdated?.Invoke(outLine.Data);
             //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140)
         }
 
-        private static void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        public void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             // No such file or directory
             ProgressUpdated?.Invoke(outLine.Data);
@@ -104,13 +99,13 @@ namespace RPChecker.Util
             }
         }
 
-        private static void FFmpeg_Exited(object sender, EventArgs e)
+        public void ExitedHandler(object sender, EventArgs e)
         {
             ExitCode = _consoleProcess.ExitCode;
             Debug.WriteLine("Exit code: {0}", ExitCode);
 
             _consoleProcess.Close();
-            _consoleProcess.Exited -= FFmpeg_Exited;
+            _consoleProcess.Exited -= ExitedHandler;
         }
     }
 }

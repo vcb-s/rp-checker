@@ -26,7 +26,7 @@ namespace RPChecker.Forms
 
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
-        private readonly StringBuilder _erroeMessageBuilder = new StringBuilder();
+        private readonly StringBuilder _errorMessageBuilder = new StringBuilder();
         private bool _beginErrorRecord;
         private int _threshold = 30;
 
@@ -66,7 +66,7 @@ namespace RPChecker.Forms
             }
             btnAnalyze.Enabled = false;
             VsPipeProcess.ProgressUpdated += ProgressUpdated;
-            VsPipeProcess.PsnrUpdated     += PsnrUpdated;
+            VsPipeProcess.ValueUpdated     += ValueUpdated;
             Updater.CheckUpdateWeekly("RPChecker");
         }
 
@@ -85,9 +85,9 @@ namespace RPChecker.Forms
 
         private void btnLog_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(_erroeMessageBuilder.ToString()))
+            if (_errorMessageBuilder?.Length > 0)
             {
-                MessageBox.Show(_erroeMessageBuilder.ToString(), @"Message");
+                MessageBox.Show(_errorMessageBuilder.ToString(), @"Message");
             }
         }
 
@@ -194,7 +194,7 @@ namespace RPChecker.Forms
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
-            _erroeMessageBuilder.Clear();
+            _errorMessageBuilder.Clear();
             cbFileList.Items.Clear();
             foreach (var item in FilePathsPair)
             {
@@ -212,13 +212,13 @@ namespace RPChecker.Forms
                 }
             }
             _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileName) ?? ""));
-            btnLog.Enabled = _erroeMessageBuilder.ToString().Split('\n').Length > FilePathsPair.Count + 1;
+            btnLog.Enabled = _errorMessageBuilder.ToString().Split('\n').Length > FilePathsPair.Count + 1;
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
             ChangeClipDisplay(cbFileList.SelectedIndex);
         }
 
-        private static readonly Regex ProgressRegex = new Regex(@"Frame: (?<done>\d+)/(?<undo>\d+)", RegexOptions.Compiled);
+        private static readonly Regex ProgressRegex = new Regex(@"Frame: (?<processed>\d+)/(?<total>\d+)", RegexOptions.Compiled);
 
         private void UpdateProgress(string progress)
         {
@@ -230,29 +230,30 @@ namespace RPChecker.Forms
             }
             if (_beginErrorRecord)
             {
-                _erroeMessageBuilder.Append(progress + Environment.NewLine);
+                _errorMessageBuilder.Append(progress);
+                _errorMessageBuilder.Append(Environment.NewLine);
                 if (progress == "ImportError: No module named 'mvsfunc'")
                 {
-                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                    new Action(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc' {Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
+                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Invoke();
                 }
                 else if (progress == "AttributeError: There is no function named PlaneAverage")
                 {
-                    MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                    new Action(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages");
+                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Invoke();
                 }
                 return;
             }
 
-            var value = ProgressRegex.Match(progress);
-            if (!value.Success) return;
-            var done = double.Parse(value.Groups["done"].Value);
-            var undo = double.Parse(value.Groups["undo"].Value);
-            if (done <= undo)
+            var ret = ProgressRegex.Match(progress);
+            if (!ret.Success) return;
+            var processed = double.Parse(ret.Groups["processed"].Value);
+            var total = double.Parse(ret.Groups["total"].Value);
+            if (processed <= total)
             {
-                toolStripProgressBar1.Value = (int) Math.Floor(done/undo*100);
+                toolStripProgressBar1.Value = (int) Math.Floor(processed / total * 100);
             }
             Application.DoEvents();
         }
@@ -267,18 +268,18 @@ namespace RPChecker.Forms
 
         private volatile Dictionary<int, double> _tempData = new Dictionary<int, double>();
 
-        private static readonly Regex DataFormatRegex = new Regex(@"(?<fram>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
+        private static readonly Regex PSNRDataFormatRegex = new Regex(@"(?<frame>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
 
         private void UpdatePsnr(string data)
         {
-            var rawData = DataFormatRegex.Match(data);
+            var rawData = PSNRDataFormatRegex.Match(data);
             if (!rawData.Success) return;
-            _tempData[int.Parse(rawData.Groups["fram"].Value)] = double.Parse(rawData.Groups["PSNR"].Value);
+            _tempData[int.Parse(rawData.Groups["frame"].Value)] = double.Parse(rawData.Groups["PSNR"].Value);
         }
 
         private delegate void UpdatePsnrDelegate(string data);
 
-        private void PsnrUpdated(string data)
+        private void ValueUpdated(string data)
         {
             if (string.IsNullOrEmpty(data)) return;
             Invoke(new UpdatePsnrDelegate(UpdatePsnr), data);
@@ -311,7 +312,7 @@ namespace RPChecker.Forms
             try
             {
                 ConvertMethod.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
-                _erroeMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
+                _errorMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
 
                 var vsThread = new Thread(VsPipeProcess.GenerateLog);
                 vsThread.Start(vsFile);
@@ -330,7 +331,7 @@ namespace RPChecker.Forms
             finally
             {
                 //VsPipeProcess.ProgressUpdated -= ProgressUpdated;
-                //VsPipeProcess.PsnrUpdated     -= PsnrUpdated;
+                //VsPipeProcess.ValueUpdated     -= ValueUpdated;
                 toolStripProgressBar1.Value    = 100;
                 Enable                         = true;
                 Refresh();

@@ -15,18 +15,14 @@ namespace RPChecker.Util
 
         public static bool VsPipeNotFind { get; private set; }
 
-        public delegate void ProgressUpdatedEventHandler(string progress);
+        public static event Action<string> ProgressUpdated;
 
-        public static  event ProgressUpdatedEventHandler ProgressUpdated;
-
-        public delegate void PsnrDataUpdateEventHandler(string data);
-
-        public static  event PsnrDataUpdateEventHandler PsnrUpdated;
+        public static event Action<string> ValueUpdated;
 
 
         public static void GenerateLog(object scriptFile)
         {
-            const bool value = true;
+            
             string vspipePath;
             try
             {
@@ -57,16 +53,16 @@ namespace RPChecker.Util
                     FileName               = $"{vspipePath}vspipe",
                     Arguments              = $" -p \"{scriptFile}\" .",
                     UseShellExecute        = false,
-                    CreateNoWindow         = value,
-                    RedirectStandardOutput = value,
-                    RedirectStandardError  = value
+                    CreateNoWindow         = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError  = true
                     },
                     EnableRaisingEvents    = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
                 _consoleProcess.ErrorDataReceived  += ErrorOutputHandler;
-                _consoleProcess.Exited             += VsPipe_Exited;
+                _consoleProcess.Exited             += ExitedHandler;
 
                 _consoleProcess.Start();
                 _consoleProcess.BeginErrorReadLine();
@@ -85,14 +81,14 @@ namespace RPChecker.Util
 
         private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            PsnrUpdated?.Invoke(outLine.Data);
+            ValueUpdated?.Invoke(outLine.Data);
             //Debug.WriteLine(outLine.Data);
         }
 
         private static void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ProgressUpdated?.Invoke(outLine.Data);
-            Debug.WriteLine(outLine.Data);
+            //Debug.WriteLine(outLine.Data);
             if (Abort)
             {
                 ((Process)sendingProcess).Kill();
@@ -100,13 +96,13 @@ namespace RPChecker.Util
             }
         }
 
-        private static void VsPipe_Exited(object sender, EventArgs e)
+        private static void ExitedHandler(object sender, EventArgs e)
         {
             ExitCode = _consoleProcess.ExitCode;
             Debug.WriteLine("Exit code: {0}", ExitCode);
 
             _consoleProcess.Close();
-            _consoleProcess.Exited -= VsPipe_Exited;
+            _consoleProcess.Exited -= ExitedHandler;
         }
     }
 }
