@@ -223,8 +223,7 @@ namespace RPChecker.Forms
         private void UpdateProgress(string progress)
         {
             toolStripStatusStdError.Text = progress;
-            if (progress == "Script evaluation failed:" ||
-                progress == "Failed to evaluate the script:")
+            if (Regex.IsMatch(progress, "Failed", RegexOptions.IgnoreCase))
             {
                 _beginErrorRecord = true;
             }

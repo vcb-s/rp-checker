@@ -86,19 +86,19 @@ namespace RPChecker.Properties {
         ///import mvsfunc as mvf
         ///import functools
         ///
-        ///core = vs.get_core(accept_lowercase=True)
+        ///core=vs.get_core(accept_lowercase=True)
         ///core.max_cache_size = 5000
         ///
-        ///src = core.lsmas.LWLibavSource(r&quot;%File1%&quot;, format=&quot;yuv420p16&quot;)
-        ///opt = core.lsmas.LWLibavSource(r&quot;%File2%&quot;, format=&quot;yuv420p16&quot;)
+        ///src=core.lsmas.LWLibavSource(r&quot;%File1%&quot;,format=&quot;yuv420p16&quot;)
+        ///opt=core.lsmas.LWLibavSource(r&quot;%File2%&quot;,format=&quot;yuv420p16&quot;)
         ///
-        ///cmp = mvf.PlaneCompare(opt, src, mae=False, rmse=False, cov=False, corr=False)
+        ///if src.width!=opt.width:
+        ///    src= src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.YUV420P16)
         ///
-        ///def callback(n, clip, f):
-        ///   print(n, f.props.PlanePSNR)
-        ///   return clip
+        ///cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
         ///
-        ///cmp = core.std.FrameEval(cmp, functools.partial(callback, clip=cmp),  [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///def callback(n,clip,f):
+        ///   print(n,f.props.Plane [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string vpyTemplate {
             get {
