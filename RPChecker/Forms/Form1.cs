@@ -85,10 +85,8 @@ namespace RPChecker.Forms
 
         private void btnLog_Click(object sender, EventArgs e)
         {
-            if (_errorMessageBuilder?.Length > 0)
-            {
-                MessageBox.Show(_errorMessageBuilder.ToString(), @"Message");
-            }
+            if (_errorMessageBuilder.Length == 0) return;
+            MessageBox.Show(_errorMessageBuilder.ToString(), @"Log");
         }
 
         private void btnAbort_Click(object sender, EventArgs e)
@@ -187,7 +185,7 @@ namespace RPChecker.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                new Thread(() => MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
             }
         }
 
@@ -211,7 +209,9 @@ namespace RPChecker.Forms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    new Thread(() =>MessageBox.Show(
+                                $"{item.Key}{Environment.NewLine}{item.Value}{Environment.NewLine}{ex.Message}",
+                                @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error)).Start();
                 }
             }
             _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileName) ?? ""));
@@ -237,16 +237,16 @@ namespace RPChecker.Forms
                 if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
                 {
                     _errorDialogShowed = true;
-                    new Action(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                    new Thread(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Invoke();
+                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Start();
                 }
                 else if (!_errorDialogShowed && progress.EndsWith("There is no function named PlaneAverage"))
                 {
                     _errorDialogShowed = true;
-                    new Action(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                    new Thread(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Invoke();
+                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Start();
                 }
                 return;
             }
@@ -330,7 +330,7 @@ namespace RPChecker.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                new Thread(() => MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
             }
             finally
             {
@@ -384,7 +384,7 @@ namespace RPChecker.Forms
             ++_poi[0];
             if (_poi[0] < 3 && _poi[1] == 10)
             {
-                MessageBox.Show(@"Something happened", @"Something happened");
+                new Thread(() => MessageBox.Show(@"Something happened", @"Something happened")).Start();
             }
             if (_poi[0] < _poi[1]) return;
             if (MessageBox.Show(@"是否打开关于界面", @"RPCheckerについて", MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -396,10 +396,10 @@ namespace RPChecker.Forms
             {
                 var frame = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Frame");
                 var time  = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Time");
-                MessageBox.Show(caption: @"Statistics",
+                new Thread(() => MessageBox.Show(caption: @"Statistics",
                     text: $"总计帧数->[{frame}]<-{Environment.NewLine}" +
                           $"总计时间->[{time}]<-{Environment.NewLine}" +
-                          $"平均帧率->{int.Parse(frame) / time.ToTimeSpan().TotalSeconds:F3}fps<-");
+                          $"平均帧率->{int.Parse(frame) / time.ToTimeSpan().TotalSeconds:F3}fps<-")).Start();
             }
             _poi[0]  = 00;
             _poi[1] += 10;
