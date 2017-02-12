@@ -56,8 +56,8 @@ namespace RPChecker.Forms
                     series1.Points.AddXY(frame.Key, frame.Value);
                     if ((frame.Key + 1) % interval == 0)
                     {
-                        chart1.ChartAreas[0].AxisX.CustomLabels.Add(frame.Key - 20, frame.Key + 20,
-                            $"{TimeSpan.FromSeconds(Math.Round(frame.Key / _fps)):mm\\:ss}");
+                        Invoke(new Action(() => chart1.ChartAreas[0].AxisX.CustomLabels.Add(frame.Key - 20, frame.Key + 20,
+                            $"{TimeSpan.FromSeconds(Math.Round(frame.Key / _fps)):mm\\:ss}")));
                     }
                     if (frame.Value < _threshold)
                     {

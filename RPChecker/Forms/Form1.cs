@@ -140,15 +140,13 @@ namespace RPChecker.Forms
         private void cbFileList_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
 
 
-        private bool _updating;
 
         private void UpdataGridView(ReSulT info, double frameRate)
         {
             dataGridView1.Rows.Clear();
-            _updating = true;
             foreach (var item in info.Data)
             {
-                if (item.Value > _threshold && dataGridView1.RowCount > 450) break;
+                if ((item.Value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
 
                 DataGridViewRow newRow = new DataGridViewRow {Tag = item};
                 TimeSpan temp = ToolKits.Second2Time(item.Key / frameRate);
@@ -159,7 +157,6 @@ namespace RPChecker.Forms
                 Application.DoEvents();
             }
             Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines");
-            _updating = false;
         }
 
         private void AddStatic()
@@ -351,7 +348,6 @@ namespace RPChecker.Forms
 
         private void btnChart_Click(object sender, EventArgs e)
         {
-            if (_updating) return;
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
             FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex]);
             chart.Load   += (o, args) => _chartFormOpened = true;
