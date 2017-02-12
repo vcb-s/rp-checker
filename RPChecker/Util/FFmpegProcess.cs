@@ -23,28 +23,33 @@ namespace RPChecker.Util
         public event Action<string> ProgressUpdated;
 
         public event Action<string> ValueUpdated;
-
+        
         public void GenerateLog(object inputFilePair)
         {
             string ffmpegPath;
             try
             {
                 ffmpegPath = RegistryStorage.Load(name : "FFmpegPath");
-                if (!File.Exists(Path.Combine(ffmpegPath, "FFmpeg.exe")))
+                if (!File.Exists(Path.Combine(ffmpegPath, "ffmpeg.exe")))//the file has been moved
                 {
-                    //ffmpegPath = ToolKits.GetVapourSynthPathViaRegistry();
-                    //todo: show dialog to get the ffmpeg path
-                    RegistryStorage.Save(ffmpegPath,name: "FFmpegPath");
+                    ffmpegPath = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
+                    RegistryStorage.Save(ffmpegPath, name: "FFmpegPath");
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 ffmpegPath = string.Empty;
-                if (!File.Exists("FFmpeg.exe"))
+                if (!File.Exists("ffmpeg.exe"))
                 {
-                    ProcessNotFind = true;
-                    return;
+                    ffmpegPath = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
+                    if (!File.Exists(ffmpegPath))
+                    {
+                        ProcessNotFind = true;
+                        return;
+                    }
+                    ffmpegPath = Path.GetDirectoryName(ffmpegPath) ?? "";
+                    RegistryStorage.Save(ffmpegPath, name: "FFmpegPath");
                 }
             }
             ProcessNotFind = false;
@@ -55,7 +60,7 @@ namespace RPChecker.Util
                 {
                     StartInfo =
                     {
-                    FileName               = $"{Path.Combine(ffmpegPath, "FFmpeg.exe")}",
+                    FileName               = Path.Combine(ffmpegPath, "ffmpeg"),
                     Arguments              = $"-i \"{inputFile.Key}\" -i \"{inputFile.Value}\" -filter_complex ssim=\"stats_file=-\" -an -f null -",
                     UseShellExecute        = false,
                     CreateNoWindow         = true,
