@@ -22,5 +22,9 @@ namespace RPChecker.Util
         event Action<string> ProgressUpdated;
 
         event Action<string> ValueUpdated;
+
+        string Loading { get; }
+
+        string FileNotFind { get; }
     }
 }

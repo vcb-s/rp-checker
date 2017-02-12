@@ -15,6 +15,10 @@ namespace RPChecker.Util
 
         public bool ProcessNotFind { get; set; }
 
+        public string Loading => "生成lwi文件中……";
+
+        public string FileNotFind => "无可用vspipe";
+
         public event Action<string> ProgressUpdated;
 
         public event Action<string> ValueUpdated;

@@ -16,6 +16,10 @@ namespace RPChecker.Util
 
         public bool ProcessNotFind { get; set; }
 
+        public string Loading => "读条中";
+
+        public string FileNotFind => "无可用FFmpeg";
+
         public event Action<string> ProgressUpdated;
 
         public event Action<string> ValueUpdated;

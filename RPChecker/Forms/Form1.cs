@@ -42,14 +42,14 @@ namespace RPChecker.Forms
             _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
             _systemMenu.AddCommand("使用PSNR(&P)", () =>
             {
-                if (_coreProcess.GetType() != typeof(VsPipeProcess))
+                if (_coreProcess is VsPipeProcess)
                 {
                     _coreProcess = new VsPipeProcess();
                 }
             }, true);
             _systemMenu.AddCommand("使用SSIM(&S)", () =>
             {
-                if (_coreProcess.GetType() != typeof(FFmpegProcess))
+                if (_coreProcess is FFmpegProcess)
                 {
                     _coreProcess = new FFmpegProcess();
                 }
@@ -232,13 +232,13 @@ namespace RPChecker.Forms
             string vsFile = $"{file2}.vpy";
             _beginErrorRecord = false;
             Enable = false;
-            toolStripStatusStdError.Text = @"生成lwi文件中……";
+            toolStripStatusStdError.Text = _coreProcess.Loading;
             toolStripProgressBar1.Value = 0;
             try
             {
                 var vsThread = new Thread(_coreProcess.GenerateLog);
 
-                if (_coreProcess.GetType() == typeof(VsPipeProcess))
+                if (_coreProcess is VsPipeProcess)
                 {
                     ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
                     _errorMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
@@ -254,7 +254,7 @@ namespace RPChecker.Forms
                 while (vsThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
                 if (_coreProcess.ProcessNotFind)
                 {
-                    toolStripStatusStdError.Text = @"无可用vspipe";
+                    toolStripStatusStdError.Text = _coreProcess.FileNotFind;
                     throw new Exception(toolStripStatusStdError.Text);
                 }
             }
@@ -276,7 +276,7 @@ namespace RPChecker.Forms
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress))return;
-            Invoke(_coreProcess.GetType() == typeof(VsPipeProcess)
+            Invoke(_coreProcess is VsPipeProcess
                 ? new Action(() => VsUpdateProgress(progress))
                 : (() => FFmpegUpdateProgress(progress)));
         }
@@ -284,7 +284,7 @@ namespace RPChecker.Forms
         private void ValueUpdated(string data)
         {
             if (string.IsNullOrEmpty(data)) return;
-            Invoke(_coreProcess.GetType() == typeof(VsPipeProcess)
+            Invoke(_coreProcess is VsPipeProcess
                 ? new Action(() => UpdatePSNR(data))
                 : (() => UpdateSSIM(data)));
         }
