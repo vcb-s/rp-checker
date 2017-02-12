@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Linq;
 
 namespace RPChecker.Forms
 {
@@ -12,13 +13,15 @@ namespace RPChecker.Forms
     {
         private readonly ReSulT _info = new ReSulT();
         private readonly int _threshold;
-        public FrmChart(ReSulT info, int threshold)
+        private readonly double _fps;
+        public FrmChart(ReSulT info, int threshold, double fps)
         {
             InitializeComponent();
             _info.FileName = info.FileName;
             _info.Data = info.Data;
             //_info.PropertyChanged += (sender, args) => DrawChart();
             _threshold = threshold;
+            _fps = fps;
         }
 
         private void FrmChart_Load(object sender, EventArgs e)
@@ -45,18 +48,22 @@ namespace RPChecker.Forms
                 ChartType = SeriesChartType.Point,
                 IsValueShownAsLabel = false
             };
+            int interval = (int) Math.Round(_fps) * 30;
             var task = new Task(() =>
             {
-                _info.Data.Sort((a, b) => a.Key.CompareTo(b.Key));
-
-                _info.Data.ForEach(frame =>
+                foreach(var frame in _info.Data.OrderBy(item => item.Key))
                 {
                     series1.Points.AddXY(frame.Key, frame.Value);
+                    if ((frame.Key + 1) % interval == 0)
+                    {
+                        chart1.ChartAreas[0].AxisX.CustomLabels.Add(frame.Key - 20, frame.Key + 20,
+                            $"{TimeSpan.FromSeconds(Math.Round(frame.Key / _fps)):mm\\:ss}");
+                    }
                     if (frame.Value < _threshold)
                     {
                         series2.Points.AddXY(frame.Key, frame.Value);
                     }
-                });
+                }
             });
             task.ContinueWith(t =>
             {
