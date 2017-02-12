@@ -5,22 +5,22 @@ using System.Windows.Forms;
 
 namespace RPChecker.Util
 {
-    public static class VsPipeProcess
+    public class VsPipeProcess: IProcess
     {
-        private static Process _consoleProcess;
+        private Process _consoleProcess;
 
-        public static bool Abort         { private get; set; }
+        public bool Abort          { get; set; }
 
-        private static int ExitCode      { get; set; }
+        public int ExitCode        { get; set; }
 
-        public static bool VsPipeNotFind { get; private set; }
+        public bool ProcessNotFind { get; set; }
 
-        public static event Action<string> ProgressUpdated;
+        public event Action<string> ProgressUpdated;
 
-        public static event Action<string> ValueUpdated;
+        public event Action<string> ValueUpdated;
 
 
-        public static void GenerateLog(object scriptFile)
+        public void GenerateLog(object scriptFile)
         {
             
             string vspipePath;
@@ -39,11 +39,11 @@ namespace RPChecker.Util
                 vspipePath = string.Empty;
                 if (!File.Exists("vspipe.exe"))
                 {
-                    VsPipeNotFind = true;
+                    ProcessNotFind = true;
                     return;
                 }
             }
-            VsPipeNotFind = false;
+            ProcessNotFind = false;
             try
             {
                 _consoleProcess = new Process
@@ -79,13 +79,13 @@ namespace RPChecker.Util
             }
         }
 
-        private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        public void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ValueUpdated?.Invoke(outLine.Data);
             //Debug.WriteLine(outLine.Data);
         }
 
-        private static void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        public void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ProgressUpdated?.Invoke(outLine.Data);
             //Debug.WriteLine(outLine.Data);
@@ -96,7 +96,7 @@ namespace RPChecker.Util
             }
         }
 
-        private static void ExitedHandler(object sender, EventArgs e)
+        public void ExitedHandler(object sender, EventArgs e)
         {
             ExitCode = _consoleProcess.ExitCode;
             Debug.WriteLine("Exit code: {0}", ExitCode);

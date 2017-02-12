@@ -31,6 +31,8 @@ namespace RPChecker.Forms
         private bool _beginErrorRecord;
         private int _threshold = 30;
 
+        private IProcess _coreProcess = new VsPipeProcess();
+
         #region Update
         private SystemMenu _systemMenu;
 
@@ -61,13 +63,12 @@ namespace RPChecker.Forms
             cbFPS.SelectedIndex     = 0;
             cbVpyFile.SelectedIndex = 0;
             DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            foreach (var item in current.GetFiles().Where(item => item.Extension.ToLowerInvariant() == ".vpy"))
+            foreach (var item in current.GetFiles().Where(item => item.Extension.ToLower() == ".vpy"))
             {
                 cbVpyFile.Items.Add(item);
             }
             btnAnalyze.Enabled = false;
-            VsPipeProcess.ProgressUpdated += ProgressUpdated;
-            VsPipeProcess.ValueUpdated     += ValueUpdated;
+            
             Updater.CheckUpdateWeekly("RPChecker");
         }
 
@@ -94,7 +95,7 @@ namespace RPChecker.Forms
         {
             try
             {
-                VsPipeProcess.Abort = true;
+                _coreProcess.Abort = true;
             }
             catch (Exception ex)
             {
@@ -308,6 +309,8 @@ namespace RPChecker.Forms
 
         private void AnalyseClip(string file1, string file2)
         {
+            _coreProcess.ProgressUpdated += ProgressUpdated;
+            _coreProcess.ValueUpdated += ValueUpdated;
             _tempData          = new Dictionary<int, double>();
             string vsFile      = $"{file2}.vpy";
             _beginErrorRecord  = false;
@@ -319,11 +322,11 @@ namespace RPChecker.Forms
                 ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
                 _errorMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
 
-                var vsThread = new Thread(VsPipeProcess.GenerateLog);
+                var vsThread = new Thread(_coreProcess.GenerateLog);
                 vsThread.Start(vsFile);
 
                 while (vsThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
-                if (VsPipeProcess.VsPipeNotFind)
+                if (_coreProcess.ProcessNotFind)
                 {
                     toolStripStatusStdError.Text = @"无可用vspipe";
                     throw new Exception(toolStripStatusStdError.Text);
@@ -335,8 +338,8 @@ namespace RPChecker.Forms
             }
             finally
             {
-                //VsPipeProcess.ProgressUpdated -= ProgressUpdated;
-                //VsPipeProcess.ValueUpdated     -= ValueUpdated;
+                _coreProcess.ProgressUpdated -= ProgressUpdated;
+                _coreProcess.ValueUpdated -= ValueUpdated;
                 toolStripProgressBar1.Value    = 100;
                 Enable                         = true;
                 Refresh();
