@@ -31,7 +31,7 @@ namespace RPChecker.Util
             try
             {
                 vspipePath = RegistryStorage.Load();
-                if (!File.Exists(vspipePath + "vspipe.exe"))
+                if (!File.Exists(Path.Combine(vspipePath, "vspipe.exe")))
                 {
                     vspipePath = ToolKits.GetVapourSynthPathViaRegistry();
                     RegistryStorage.Save(vspipePath);
@@ -50,11 +50,12 @@ namespace RPChecker.Util
             ProcessNotFind = false;
             try
             {
+                //ffmpeg -i file1.mkv -i fil2.mkv -filter_complex psnr="stats_file=-" -an -f null -
                 _consoleProcess = new Process
                 {
                     StartInfo =
                     {
-                    FileName               = $"{vspipePath}vspipe",
+                    FileName               = Path.Combine(vspipePath, "vspipe"),
                     Arguments              = $" -p \"{scriptFile}\" .",
                     UseShellExecute        = false,
                     CreateNoWindow         = true,

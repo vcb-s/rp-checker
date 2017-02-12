@@ -208,7 +208,7 @@ namespace RPChecker.Forms
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileName = item.Value, Data = data});
                     if (_beginErrorRecord) continue; AddStatic();
-                    if (_remainFile) continue; RemoveScript(item);
+                    if (_coreProcess is FFmpegProcess || _remainFile) continue; RemoveScript(item);
                 }
                 catch (Exception ex)
                 {
@@ -329,7 +329,7 @@ namespace RPChecker.Forms
             var total = int.Parse(ret.Groups["total"].Value);
             if (processed <= total)
             {
-                toolStripProgressBar1.Value = (int)Math.Floor(processed / (total * 100.0));
+                toolStripProgressBar1.Value = (int)Math.Floor(processed * 100.0 / total);
             }
             Application.DoEvents();
         }
@@ -365,11 +365,11 @@ namespace RPChecker.Forms
             var processed = int.Parse(ret.Groups["processed"].Value);
             if (processed <= _ffmpegTotalFrame)
             {
-                toolStripProgressBar1.Value = (int)Math.Floor(processed / (_ffmpegTotalFrame * 100.0));
+                toolStripProgressBar1.Value = (int)Math.Floor(processed * 100.0 / _ffmpegTotalFrame);
             }
         }
 
-        private static readonly Regex SSIMDataFormatRegex = new Regex(@"n:(?<frame>\d+) Y:(?<Y>[-+]?[0-9]*\.?[0-9]+) U:(?<U>[-+]?[0-9]*\.?[0-9]+) V:(?<V>[-+]?[0-9]*\.?[0-9]+) All:(?<All>[-+]?[0-9]*\.?[0-9]+) \((?<SSIM>(?:[-+]?[0-9]*\.?[0-9]+)?(?:inf)?)\)", RegexOptions.Compiled);
+        private static readonly Regex SSIMDataFormatRegex = new Regex(@"n:(?<frame>\d+) Y:(?<Y>[-+]?[0-9]*\.?[0-9]+) U:(?<U>[-+]?[0-9]*\.?[0-9]+) V:(?<V>[-+]?[0-9]*\.?[0-9]+) All:(?<All>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);// \((?<SSIM>(?:[-+]?[0-9]*\.?[0-9]+)?(?:inf)?)\)
 
         private void UpdateSSIM(string data)
         {
@@ -377,8 +377,7 @@ namespace RPChecker.Forms
             var rawData = SSIMDataFormatRegex.Match(data);
             if (!rawData.Success) return;
             string ssim = rawData.Groups["All"].Value;
-            double ssimValue = 100;
-            if (ssim != "inf") ssimValue = double.Parse(ssim) * 100;
+            double ssimValue = double.Parse(ssim) * 100;
             _tempData[int.Parse(rawData.Groups["frame"].Value)] = ssimValue;
         }
 
@@ -390,7 +389,7 @@ namespace RPChecker.Forms
         private void btnChart_Click(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
-            string type = (_coreProcess is VsPipeProcess ? "PSNR" : "SSIM");
+            string type = _coreProcess is VsPipeProcess ? "PSNR" : "SSIM";
             FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;
@@ -439,9 +438,10 @@ namespace RPChecker.Forms
             try
             {
                 RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
-                var resultRegex = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
-                var timespam = ToolKits.Second2Time(double.Parse(resultRegex.Groups["second"].Value));
-                var frame = int.Parse(resultRegex.Groups["frame"].Value);
+                var result = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
+                if (!result.Success) return;
+                var timespam = ToolKits.Second2Time(double.Parse(result.Groups["second"].Value));
+                var frame = int.Parse(result.Groups["frame"].Value);
                 RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
                 RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Frame", frame);
             }

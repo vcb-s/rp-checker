@@ -35,9 +35,6 @@ namespace RPChecker.Forms
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnAnalyze = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.frams = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.PSNR = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnLoad = new System.Windows.Forms.Button();
             this.cbFileList = new System.Windows.Forms.ComboBox();
             this.cbFPS = new System.Windows.Forms.ComboBox();
@@ -52,6 +49,9 @@ namespace RPChecker.Forms
             this.toolStripStatusStdError = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.frams = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.PSNR = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -93,24 +93,6 @@ namespace RPChecker.Forms
             this.dataGridView1.Size = new System.Drawing.Size(388, 440);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.TabStop = false;
-            // 
-            // frams
-            // 
-            this.frams.HeaderText = "帧数";
-            this.frams.Name = "frams";
-            this.frams.ReadOnly = true;
-            // 
-            // PSNR
-            // 
-            this.PSNR.HeaderText = "PSNR";
-            this.PSNR.Name = "PSNR";
-            this.PSNR.ReadOnly = true;
-            // 
-            // Time
-            // 
-            this.Time.HeaderText = "时间";
-            this.Time.Name = "Time";
-            this.Time.ReadOnly = true;
             // 
             // btnLoad
             // 
@@ -282,6 +264,24 @@ namespace RPChecker.Forms
             this.toolStripDropDownButton1.MouseEnter += new System.EventHandler(this.toolStripDropDownButton1_MouseEnter);
             this.toolStripDropDownButton1.MouseLeave += new System.EventHandler(this.toolStripDropDownButton1_MouseLeave);
             // 
+            // frams
+            // 
+            this.frams.HeaderText = "帧数";
+            this.frams.Name = "frams";
+            this.frams.ReadOnly = true;
+            // 
+            // PSNR
+            // 
+            this.PSNR.HeaderText = "指标";
+            this.PSNR.Name = "PSNR";
+            this.PSNR.ReadOnly = true;
+            // 
+            // Time
+            // 
+            this.Time.HeaderText = "时间";
+            this.Time.Name = "Time";
+            this.Time.ReadOnly = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -320,9 +320,6 @@ namespace RPChecker.Forms
 
         private Button btnAnalyze;
         private DataGridView dataGridView1;
-        private DataGridViewTextBoxColumn frams;
-        private DataGridViewTextBoxColumn PSNR;
-        private DataGridViewTextBoxColumn Time;
         private Button btnLoad;
         private ComboBox cbFileList;
         private ComboBox cbFPS;
@@ -337,6 +334,9 @@ namespace RPChecker.Forms
         private ToolStripStatusLabel toolStripStatusStdError;
         private ToolStripProgressBar toolStripProgressBar1;
         private ToolStripDropDownButton toolStripDropDownButton1;
+        private DataGridViewTextBoxColumn frams;
+        private DataGridViewTextBoxColumn PSNR;
+        private DataGridViewTextBoxColumn Time;
     }
 }
 
