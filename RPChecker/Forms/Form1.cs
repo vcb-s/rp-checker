@@ -229,29 +229,29 @@ namespace RPChecker.Forms
             _coreProcess.ProgressUpdated += ProgressUpdated;
             _coreProcess.ValueUpdated += ValueUpdated;
             _tempData = new Dictionary<int, double>();
-            string vsFile = $"{file2}.vpy";
+            
             _beginErrorRecord = false;
             Enable = false;
             toolStripStatusStdError.Text = _coreProcess.Loading;
             toolStripProgressBar1.Value = 0;
             try
             {
-                var vsThread = new Thread(_coreProcess.GenerateLog);
+                var coreThread = new Thread(_coreProcess.GenerateLog);
 
                 if (_coreProcess is VsPipeProcess)
                 {
+                    string vsFile = $"{file2}.vpy";
                     ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
                     _errorMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
-
-                    vsThread.Start(vsFile);
+                    coreThread.Start(vsFile);
                 }
                 else
                 {
                     _errorMessageBuilder.Append($"---{Path.GetFileName(file1)}|{Path.GetFileName(file2)}---{Environment.NewLine}");
-                    vsThread.Start(new KeyValuePair<string, string>(file1, file2));
+                    coreThread.Start(new KeyValuePair<string, string>(file1, file2));
                 }
 
-                while (vsThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
+                while (coreThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
                 if (_coreProcess.ProcessNotFind)
                 {
                     toolStripStatusStdError.Text = _coreProcess.FileNotFind;
