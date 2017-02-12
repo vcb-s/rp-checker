@@ -191,6 +191,8 @@ namespace RPChecker.Forms
             }
         }
 
+        private bool _errorDialogShowed;
+
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
@@ -200,6 +202,7 @@ namespace RPChecker.Forms
             {
                 try
                 {
+                    _errorDialogShowed = false;
                     AnalyseClip(item.Key, item.Value);
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileName = item.Value, Data = data});
@@ -231,14 +234,16 @@ namespace RPChecker.Forms
             {
                 _errorMessageBuilder.Append(progress);
                 _errorMessageBuilder.Append(Environment.NewLine);
-                if (progress == "ImportError: No module named 'mvsfunc'")
+                if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
                 {
+                    _errorDialogShowed = true;
                     new Action(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
                         text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Invoke();
                 }
-                else if (progress == "AttributeError: There is no function named PlaneAverage")
+                else if (!_errorDialogShowed && progress.EndsWith("There is no function named PlaneAverage"))
                 {
+                    _errorDialogShowed = true;
                     new Action(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
                         text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Invoke();
@@ -248,11 +253,11 @@ namespace RPChecker.Forms
 
             var ret = ProgressRegex.Match(progress);
             if (!ret.Success) return;
-            var processed = double.Parse(ret.Groups["processed"].Value);
-            var total = double.Parse(ret.Groups["total"].Value);
+            var processed = int.Parse(ret.Groups["processed"].Value);
+            var total = int.Parse(ret.Groups["total"].Value);
             if (processed <= total)
             {
-                toolStripProgressBar1.Value = (int) Math.Floor(processed / total * 100);
+                toolStripProgressBar1.Value = (int) Math.Floor(processed / (total * 100.0));
             }
             Application.DoEvents();
         }
