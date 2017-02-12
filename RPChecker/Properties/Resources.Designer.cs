@@ -93,12 +93,12 @@ namespace RPChecker.Properties {
         ///opt=core.lsmas.LWLibavSource(r&quot;%File2%&quot;,format=&quot;yuv420p16&quot;)
         ///
         ///if src.width!=opt.width:
-        ///    src= src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.YUV420P16)
+        ///    src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.YUV420P16)
         ///
         ///cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
         ///
         ///def callback(n,clip,f):
-        ///   print(n,f.props.Plane [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///   print(n,f.props.PlaneP [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string vpyTemplate {
             get {

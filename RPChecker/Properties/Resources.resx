@@ -137,7 +137,7 @@ src=core.lsmas.LWLibavSource(r"%File1%",format="yuv420p16")
 opt=core.lsmas.LWLibavSource(r"%File2%",format="yuv420p16")
 
 if src.width!=opt.width:
-    src= src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.YUV420P16)
+    src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.YUV420P16)
 
 cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
 
