@@ -376,9 +376,9 @@ namespace RPChecker.Forms
             //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140|inf)
             var rawData = SSIMDataFormatRegex.Match(data);
             if (!rawData.Success) return;
-            string ssim = rawData.Groups["SSIM"].Value;
+            string ssim = rawData.Groups["All"].Value;
             double ssimValue = 100;
-            if (ssim != "inf") ssimValue = double.Parse(ssim);
+            if (ssim != "inf") ssimValue = double.Parse(ssim) * 100;
             _tempData[int.Parse(rawData.Groups["frame"].Value)] = ssimValue;
         }
 
@@ -390,7 +390,8 @@ namespace RPChecker.Forms
         private void btnChart_Click(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
-            FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex]);
+            string type = (_coreProcess is VsPipeProcess ? "PSNR" : "SSIM");
+            FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;
             chart.Show();

@@ -14,7 +14,8 @@ namespace RPChecker.Forms
         private readonly ReSulT _info = new ReSulT();
         private readonly int _threshold;
         private readonly double _fps;
-        public FrmChart(ReSulT info, int threshold, double fps)
+        private readonly string _type;
+        public FrmChart(ReSulT info, int threshold, double fps, string type)
         {
             InitializeComponent();
             _info.FileName = info.FileName;
@@ -22,6 +23,7 @@ namespace RPChecker.Forms
             //_info.PropertyChanged += (sender, args) => DrawChart();
             _threshold = threshold;
             _fps = fps;
+            _type = type;
         }
 
         private void FrmChart_Load(object sender, EventArgs e)
@@ -35,7 +37,7 @@ namespace RPChecker.Forms
         private void DrawChart()
         {
             chart1.Series.Clear();
-            Series series1 = new Series("PSNR")
+            Series series1 = new Series(_type)
             {
                 Color = Color.Blue,
                 ChartType = SeriesChartType.Line,
