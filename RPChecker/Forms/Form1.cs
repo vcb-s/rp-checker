@@ -42,14 +42,14 @@ namespace RPChecker.Forms
             _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
             _systemMenu.AddCommand("使用PSNR(&P)", () =>
             {
-                if (_coreProcess is VsPipeProcess)
+                if (!(_coreProcess is VsPipeProcess))
                 {
                     _coreProcess = new VsPipeProcess();
                 }
             }, true);
             _systemMenu.AddCommand("使用SSIM(&S)", () =>
             {
-                if (_coreProcess is FFmpegProcess)
+                if (!(_coreProcess is FFmpegProcess))
                 {
                     _coreProcess = new FFmpegProcess();
                 }
