@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace RPChecker.Forms
 {
@@ -185,7 +186,7 @@ namespace RPChecker.Forms
             }
             catch (Exception ex)
             {
-                new Thread(() => MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
+                new Task(() => MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
             }
         }
 
@@ -209,7 +210,7 @@ namespace RPChecker.Forms
                 }
                 catch (Exception ex)
                 {
-                    new Thread(() =>MessageBox.Show(
+                    new Task(() => MessageBox.Show(
                                 $"{item.Key}{Environment.NewLine}{item.Value}{Environment.NewLine}{ex.Message}",
                                 @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error)).Start();
                 }
@@ -237,14 +238,14 @@ namespace RPChecker.Forms
                 if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
                 {
                     _errorDialogShowed = true;
-                    new Thread(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                    new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
                         text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Start();
                 }
                 else if (!_errorDialogShowed && progress.EndsWith("There is no function named PlaneAverage"))
                 {
                     _errorDialogShowed = true;
-                    new Thread(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                    new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
                         text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Start();
                 }
@@ -330,7 +331,7 @@ namespace RPChecker.Forms
             }
             catch (Exception ex)
             {
-                new Thread(() => MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
+                new Task(() => MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
             }
             finally
             {
@@ -384,7 +385,7 @@ namespace RPChecker.Forms
             ++_poi[0];
             if (_poi[0] < 3 && _poi[1] == 10)
             {
-                new Thread(() => MessageBox.Show(@"Something happened", @"Something happened")).Start();
+                new Task(() => MessageBox.Show(@"Something happened", @"Something happened")).Start();
             }
             if (_poi[0] < _poi[1]) return;
             if (MessageBox.Show(@"是否打开关于界面", @"RPCheckerについて", MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -396,7 +397,7 @@ namespace RPChecker.Forms
             {
                 var frame = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Frame");
                 var time  = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Time");
-                new Thread(() => MessageBox.Show(caption: @"Statistics",
+                new Task(() => MessageBox.Show(caption: @"Statistics",
                     text: $"总计帧数->[{frame}]<-{Environment.NewLine}" +
                           $"总计时间->[{time}]<-{Environment.NewLine}" +
                           $"平均帧率->{int.Parse(frame) / time.ToTimeSpan().TotalSeconds:F3}fps<-")).Start();
