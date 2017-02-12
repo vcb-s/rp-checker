@@ -33,13 +33,27 @@ namespace RPChecker.Forms
 
         private IProcess _coreProcess = new VsPipeProcess();
 
-        #region Update
+        #region SystemMenu
         private SystemMenu _systemMenu;
 
         private void AddCommand()
         {
             _systemMenu = new SystemMenu(this);
             _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
+            _systemMenu.AddCommand("使用PSNR(&P)", () =>
+            {
+                if (_coreProcess.GetType() != typeof(VsPipeProcess))
+                {
+                    _coreProcess = new VsPipeProcess();
+                }
+            }, true);
+            _systemMenu.AddCommand("使用SSIM(&S)", () =>
+            {
+                if (_coreProcess.GetType() != typeof(FFmpegProcess))
+                {
+                    _coreProcess = new FFmpegProcess();
+                }
+            }, false);
         }
 
         protected override void WndProc(ref Message msg)
@@ -222,11 +236,20 @@ namespace RPChecker.Forms
             toolStripProgressBar1.Value = 0;
             try
             {
-                ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
-                _errorMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
-
                 var vsThread = new Thread(_coreProcess.GenerateLog);
-                vsThread.Start(vsFile);
+
+                if (_coreProcess.GetType() == typeof(VsPipeProcess))
+                {
+                    ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
+                    _errorMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
+
+                    vsThread.Start(vsFile);
+                }
+                else
+                {
+                    _errorMessageBuilder.Append($"---{Path.GetFileName(file1)}|{Path.GetFileName(file2)}---{Environment.NewLine}");
+                    vsThread.Start(new KeyValuePair<string, string>(file1, file2));
+                }
 
                 while (vsThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
                 if (_coreProcess.ProcessNotFind)
@@ -253,17 +276,24 @@ namespace RPChecker.Forms
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress))return;
-            Invoke(new Action(() => VsUpdateProgress(progress)));
+            Invoke(_coreProcess.GetType() == typeof(VsPipeProcess)
+                ? new Action(() => VsUpdateProgress(progress))
+                : (() => FFmpegUpdateProgress(progress)));
         }
 
         private void ValueUpdated(string data)
         {
             if (string.IsNullOrEmpty(data)) return;
-            Invoke(new Action(() => UpdatePsnr(data)));
+            Invoke(_coreProcess.GetType() == typeof(VsPipeProcess)
+                ? new Action(() => UpdatePSNR(data))
+                : (() => UpdateSSIM(data)));
         }
 
+
+        private volatile Dictionary<int, double> _tempData = new Dictionary<int, double>();
+
         #region vapoursynth
-        private static readonly Regex ProgressRegex = new Regex(@"Frame: (?<processed>\d+)/(?<total>\d+)", RegexOptions.Compiled);
+        private static readonly Regex VsProgressRegex = new Regex(@"Frame: (?<processed>\d+)/(?<total>\d+)", RegexOptions.Compiled);
 
         private void VsUpdateProgress(string progress)
         {
@@ -293,7 +323,7 @@ namespace RPChecker.Forms
                 return;
             }
 
-            var ret = ProgressRegex.Match(progress);
+            var ret = VsProgressRegex.Match(progress);
             if (!ret.Success) return;
             var processed = int.Parse(ret.Groups["processed"].Value);
             var total = int.Parse(ret.Groups["total"].Value);
@@ -304,12 +334,9 @@ namespace RPChecker.Forms
             Application.DoEvents();
         }
 
-
-        private volatile Dictionary<int, double> _tempData = new Dictionary<int, double>();
-
         private static readonly Regex PSNRDataFormatRegex = new Regex(@"(?<frame>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
 
-        private void UpdatePsnr(string data)
+        private void UpdatePSNR(string data)
         {
             var rawData = PSNRDataFormatRegex.Match(data);
             if (!rawData.Success) return;
@@ -318,6 +345,43 @@ namespace RPChecker.Forms
         #endregion
 
         #region ffmpeg
+
+        private int _ffmpegTotalFrame = int.MaxValue;
+        private static readonly Regex FFmpegFrameRegex = new Regex(@"NUMBER_OF_FRAMES: (?<frame>\d+)", RegexOptions.Compiled);
+        private static readonly Regex FFmpegProgressRegex = new Regex(@"frame=\s*(?<processed>\d+)", RegexOptions.Compiled);
+        private void FFmpegUpdateProgress(string progress)
+        {
+            // NUMBER_OF_FRAMES: 960
+            //frame=  287 fps= 57 q=-0.0 size=N/A time=00:00:04.78 bitrate=N/A speed=0.953x
+            toolStripStatusStdError.Text = progress;
+            var frameRet = FFmpegFrameRegex.Match(progress);
+            if (_ffmpegTotalFrame == int.MaxValue && frameRet.Success)
+            {
+                _ffmpegTotalFrame = int.Parse(frameRet.Groups["frame"].Value);
+                return;
+            }
+            var ret = FFmpegProgressRegex.Match(progress);
+            if (!ret.Success) return;
+            var processed = int.Parse(ret.Groups["processed"].Value);
+            if (processed <= _ffmpegTotalFrame)
+            {
+                toolStripProgressBar1.Value = (int)Math.Floor(processed / (_ffmpegTotalFrame * 100.0));
+            }
+        }
+
+        private static readonly Regex SSIMDataFormatRegex = new Regex(@"n:(?<frame>\d+) Y:(?<Y>[-+]?[0-9]*\.?[0-9]+) U:(?<U>[-+]?[0-9]*\.?[0-9]+) V:(?<V>[-+]?[0-9]*\.?[0-9]+) All:(?<All>[-+]?[0-9]*\.?[0-9]+) \((?<SSIM>(?:[-+]?[0-9]*\.?[0-9]+)?(?:inf)?)\)", RegexOptions.Compiled);
+
+        private void UpdateSSIM(string data)
+        {
+            //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140|inf)
+            var rawData = SSIMDataFormatRegex.Match(data);
+            if (!rawData.Success) return;
+            string ssim = rawData.Groups["SSIM"].Value;
+            double ssimValue = 100;
+            if (ssim != "inf") ssimValue = double.Parse(ssim);
+            _tempData[int.Parse(rawData.Groups["frame"].Value)] = ssimValue;
+        }
+
         #endregion
 
         #region chartForm

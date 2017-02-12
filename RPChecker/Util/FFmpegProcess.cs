@@ -20,17 +20,17 @@ namespace RPChecker.Util
 
         public event Action<string> ValueUpdated;
 
-        public void GenerateLog(object inputFileList)
+        public void GenerateLog(object inputFilePair)
         {
             string ffmpegPath;
             try
             {
-                ffmpegPath = RegistryStorage.Load(name : "FFmpeg");
-                if (!File.Exists(ffmpegPath + "FFmpeg.exe"))
+                ffmpegPath = RegistryStorage.Load(name : "FFmpegPath");
+                if (!File.Exists(Path.Combine(ffmpegPath, "FFmpeg.exe")))
                 {
                     //ffmpegPath = ToolKits.GetVapourSynthPathViaRegistry();
                     //todo: show dialog to get the ffmpeg path
-                    RegistryStorage.Save(ffmpegPath,name: "FFmpeg");
+                    RegistryStorage.Save(ffmpegPath,name: "FFmpegPath");
                 }
             }
             catch (Exception ex)
@@ -44,16 +44,15 @@ namespace RPChecker.Util
                 }
             }
             ProcessNotFind = false;
-            var inputFile = inputFileList as List<string>;
-            Debug.Assert(inputFile != null);
+            var inputFile = (KeyValuePair<string, string>)inputFilePair;
             try
             {
                 _consoleProcess = new Process
                 {
                     StartInfo =
                     {
-                    FileName               = $"{ffmpegPath}FFmpeg",
-                    Arguments              = $"-i \"{inputFile[0]}\" -i \"{inputFile[1]}\" -filter_complex ssim=\"stats_file=-\" -an -f null -",
+                    FileName               = $"{Path.Combine(ffmpegPath, "FFmpeg.exe")}",
+                    Arguments              = $"-i \"{inputFile.Key}\" -i \"{inputFile.Value}\" -filter_complex ssim=\"stats_file=-\" -an -f null -",
                     UseShellExecute        = false,
                     CreateNoWindow         = true,
                     RedirectStandardOutput = true,
@@ -84,14 +83,15 @@ namespace RPChecker.Util
         public void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ValueUpdated?.Invoke(outLine.Data);
+            //Debug.WriteLine("std: " + outLine.Data?.Trim());
             //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140)
         }
 
         public void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            // No such file or directory
             ProgressUpdated?.Invoke(outLine.Data);
-            Debug.WriteLine(outLine.Data);
+            //Debug.WriteLine("dbg: " + outLine.Data?.Trim());
+            //format sample: frame=  287 fps= 57 q=-0.0 size=N/A time=00:00:04.78 bitrate=N/A speed=0.953x
             if (Abort)
             {
                 ((Process)sendingProcess).Kill();
