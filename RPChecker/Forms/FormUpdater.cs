@@ -25,7 +25,7 @@ namespace RPChecker.Forms
         public FormUpdater(string currentProgram, Version version, string baseUrl)
         {
             InitializeComponent();
-            Icon              = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+            Icon              = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             _newPath          = currentProgram + ".new";
             _exePath          = currentProgram;
             _backupPath       = currentProgram + ".bak";

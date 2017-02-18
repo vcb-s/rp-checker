@@ -130,19 +130,22 @@ import vapoursynth as vs
 import mvsfunc as mvf
 import functools
 
-core = vs.get_core(accept_lowercase=True)
+core=vs.get_core(accept_lowercase=True)
 core.max_cache_size = 5000
 
-src = core.lsmas.LWLibavSource(r"%File1%", format="yuv420p16")
-opt = core.lsmas.LWLibavSource(r"%File2%", format="yuv420p16")
+src=core.lsmas.LWLibavSource(r"%File1%",format="yuv420p16")
+opt=core.lsmas.LWLibavSource(r"%File2%",format="yuv420p16")
 
-cmp = mvf.PlaneCompare(opt, src, mae=False, rmse=False, cov=False, corr=False)
+if src.width!=opt.width:
+    src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.YUV420P16)
 
-def callback(n, clip, f):
-   print(n, f.props.PlanePSNR)
+cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
+
+def callback(n,clip,f):
+   print(n,f.props.PlanePSNR)
    return clip
 
-cmp = core.std.FrameEval(cmp, functools.partial(callback, clip=cmp), prop_src=[cmp])
+cmp=core.std.FrameEval(cmp,functools.partial(callback, clip=cmp),prop_src=[cmp])
 cmp.set_output()
 </value>
     <comment>默认的vpy模板</comment>

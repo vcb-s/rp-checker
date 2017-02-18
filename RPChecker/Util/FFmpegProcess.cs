@@ -6,70 +6,73 @@ using System.Collections.Generic;
 
 namespace RPChecker.Util
 {
-    public class FFmpegProcess
+    public class FFmpegProcess: IProcess
     {
-        private static Process _consoleProcess;
+        private Process _consoleProcess;
 
-        public static bool Abort { private get; set; }
+        public bool Abort { get; set; }
 
-        private static int ExitCode { get; set; }
+        public int ExitCode { get; set; }
 
-        public static bool FFmpegNotFind { get; private set; }
+        public bool ProcessNotFind { get; set; }
 
-        public delegate void ProgressUpdatedEventHandler(string progress);
+        public string Loading => "读条中";
 
-        public static event ProgressUpdatedEventHandler ProgressUpdated;
+        public string FileNotFind => "无可用FFmpeg";
 
-        public delegate void SSIMDataUpdateEventHandler(string data);
+        public event Action<string> ProgressUpdated;
 
-        public static event SSIMDataUpdateEventHandler PsnrUpdated;
-
-        public static void GenerateLog(object inputFileList)
+        public event Action<string> ValueUpdated;
+        
+        public void GenerateLog(object inputFilePair)
         {
-            const bool value = true;
             string ffmpegPath;
             try
             {
-                ffmpegPath = RegistryStorage.Load(name : "FFmpeg");
-                if (!File.Exists(ffmpegPath + "FFmpeg.exe"))
+                ffmpegPath = RegistryStorage.Load(name : "FFmpegPath");
+                if (!File.Exists(Path.Combine(ffmpegPath, "ffmpeg.exe")))//the file has been moved
                 {
-                    //ffmpegPath = ConvertMethod.GetVapourSynthPathViaRegistry();
-                    //todo: show dialog to get the ffmpeg path
-                    RegistryStorage.Save(ffmpegPath,name: "FFmpeg");
+                    ffmpegPath = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
+                    RegistryStorage.Save(Path.GetDirectoryName(ffmpegPath), name: "FFmpegPath");
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 ffmpegPath = string.Empty;
-                if (!File.Exists("FFmpeg.exe"))
+                if (!File.Exists("ffmpeg.exe"))
                 {
-                    FFmpegNotFind = true;
-                    return;
+                    ffmpegPath = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
+                    if (!File.Exists(ffmpegPath))
+                    {
+                        ProcessNotFind = true;
+                        return;
+                    }
+                    ffmpegPath = Path.GetDirectoryName(ffmpegPath) ?? "";
+                    RegistryStorage.Save(ffmpegPath, name: "FFmpegPath");
                 }
             }
-            FFmpegNotFind = false;
-            var inputFile = inputFileList as List<string>;
-            Debug.Assert(inputFile != null);
+            ProcessNotFind = false;
+            var inputFile = (KeyValuePair<string, string>)inputFilePair;
             try
             {
                 _consoleProcess = new Process
                 {
                     StartInfo =
                     {
-                    FileName               = $"{ffmpegPath}FFmpeg",
-                    Arguments              = $"-i \"{inputFile[0]}\" -i \"{inputFile[1]}\" -filter_complex ssim=\"stats_file=-\" -an -f null -",
+                    FileName               = Path.Combine(ffmpegPath, "ffmpeg"),
+                    Arguments              = $"-i \"{inputFile.Key}\" -i \"{inputFile.Value}\" -filter_complex ssim=\"stats_file=-\" -an -f null -",
                     UseShellExecute        = false,
-                    CreateNoWindow         = value,
-                    RedirectStandardOutput = value,
-                    RedirectStandardError  = value
+                    CreateNoWindow         = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError  = true
                     },
                     EnableRaisingEvents = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
                 _consoleProcess.ErrorDataReceived += ErrorOutputHandler;
-                _consoleProcess.Exited += FFmpeg_Exited;
+                _consoleProcess.Exited += ExitedHandler;
 
                 _consoleProcess.Start();
                 _consoleProcess.BeginErrorReadLine();
@@ -86,17 +89,18 @@ namespace RPChecker.Util
             }
         }
 
-        private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        public void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            PsnrUpdated?.Invoke(outLine.Data);
+            ValueUpdated?.Invoke(outLine.Data);
+            //Debug.WriteLine("std: " + outLine.Data?.Trim());
             //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140)
         }
 
-        private static void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        public void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            // No such file or directory
             ProgressUpdated?.Invoke(outLine.Data);
-            Debug.WriteLine(outLine.Data);
+            //Debug.WriteLine("dbg: " + outLine.Data?.Trim());
+            //format sample: frame=  287 fps= 57 q=-0.0 size=N/A time=00:00:04.78 bitrate=N/A speed=0.953x
             if (Abort)
             {
                 ((Process)sendingProcess).Kill();
@@ -104,13 +108,13 @@ namespace RPChecker.Util
             }
         }
 
-        private static void FFmpeg_Exited(object sender, EventArgs e)
+        public void ExitedHandler(object sender, EventArgs e)
         {
             ExitCode = _consoleProcess.ExitCode;
             Debug.WriteLine("Exit code: {0}", ExitCode);
 
             _consoleProcess.Close();
-            _consoleProcess.Exited -= FFmpeg_Exited;
+            _consoleProcess.Exited -= ExitedHandler;
         }
     }
 }

@@ -5,35 +5,35 @@ using System.Windows.Forms;
 
 namespace RPChecker.Util
 {
-    public static class VsPipeProcess
+    public class VsPipeProcess: IProcess
     {
-        private static Process _consoleProcess;
+        private Process _consoleProcess;
 
-        public static bool Abort         { private get; set; }
+        public bool Abort          { get; set; }
 
-        private static int ExitCode      { get; set; }
+        public int ExitCode        { get; set; }
 
-        public static bool VsPipeNotFind { get; private set; }
+        public bool ProcessNotFind { get; set; }
 
-        public delegate void ProgressUpdatedEventHandler(string progress);
+        public string Loading => "生成lwi文件中……";
 
-        public static  event ProgressUpdatedEventHandler ProgressUpdated;
+        public string FileNotFind => "无可用vspipe";
 
-        public delegate void PsnrDataUpdateEventHandler(string data);
+        public event Action<string> ProgressUpdated;
 
-        public static  event PsnrDataUpdateEventHandler PsnrUpdated;
+        public event Action<string> ValueUpdated;
 
 
-        public static void GenerateLog(object scriptFile)
+        public void GenerateLog(object scriptFile)
         {
-            const bool value = true;
+            
             string vspipePath;
             try
             {
                 vspipePath = RegistryStorage.Load();
-                if (!File.Exists(vspipePath + "vspipe.exe"))
+                if (!File.Exists(Path.Combine(vspipePath, "vspipe.exe")))
                 {
-                    vspipePath = ConvertMethod.GetVapourSynthPathViaRegistry();
+                    vspipePath = ToolKits.GetVapourSynthPathViaRegistry();
                     RegistryStorage.Save(vspipePath);
                 }
             }
@@ -43,30 +43,31 @@ namespace RPChecker.Util
                 vspipePath = string.Empty;
                 if (!File.Exists("vspipe.exe"))
                 {
-                    VsPipeNotFind = true;
+                    ProcessNotFind = true;
                     return;
                 }
             }
-            VsPipeNotFind = false;
+            ProcessNotFind = false;
             try
             {
+                //ffmpeg -i file1.mkv -i fil2.mkv -filter_complex psnr="stats_file=-" -an -f null -
                 _consoleProcess = new Process
                 {
                     StartInfo =
                     {
-                    FileName               = $"{vspipePath}vspipe",
+                    FileName               = Path.Combine(vspipePath, "vspipe"),
                     Arguments              = $" -p \"{scriptFile}\" .",
                     UseShellExecute        = false,
-                    CreateNoWindow         = value,
-                    RedirectStandardOutput = value,
-                    RedirectStandardError  = value
+                    CreateNoWindow         = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError  = true
                     },
                     EnableRaisingEvents    = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
                 _consoleProcess.ErrorDataReceived  += ErrorOutputHandler;
-                _consoleProcess.Exited             += VsPipe_Exited;
+                _consoleProcess.Exited             += ExitedHandler;
 
                 _consoleProcess.Start();
                 _consoleProcess.BeginErrorReadLine();
@@ -83,16 +84,16 @@ namespace RPChecker.Util
             }
         }
 
-        private static void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        public void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            PsnrUpdated?.Invoke(outLine.Data);
+            ValueUpdated?.Invoke(outLine.Data);
             //Debug.WriteLine(outLine.Data);
         }
 
-        private static void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+        public void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ProgressUpdated?.Invoke(outLine.Data);
-            Debug.WriteLine(outLine.Data);
+            //Debug.WriteLine(outLine.Data);
             if (Abort)
             {
                 ((Process)sendingProcess).Kill();
@@ -100,13 +101,13 @@ namespace RPChecker.Util
             }
         }
 
-        private static void VsPipe_Exited(object sender, EventArgs e)
+        public void ExitedHandler(object sender, EventArgs e)
         {
             ExitCode = _consoleProcess.ExitCode;
             Debug.WriteLine("Exit code: {0}", ExitCode);
 
             _consoleProcess.Close();
-            _consoleProcess.Exited -= VsPipe_Exited;
+            _consoleProcess.Exited -= ExitedHandler;
         }
     }
 }

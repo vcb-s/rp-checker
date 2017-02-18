@@ -1,12 +1,11 @@
 ﻿using System;
 using RPChecker.Util;
 using System.Drawing;
-using System.Reflection;
 using System.Windows.Forms;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Linq;
 
 namespace RPChecker.Forms
 {
@@ -14,19 +13,23 @@ namespace RPChecker.Forms
     {
         private readonly ReSulT _info = new ReSulT();
         private readonly int _threshold;
-        public FrmChart(ReSulT info, int threshold)
+        private readonly double _fps;
+        private readonly string _type;
+        public FrmChart(ReSulT info, int threshold, double fps, string type)
         {
             InitializeComponent();
             _info.FileName = info.FileName;
             _info.Data = info.Data;
             //_info.PropertyChanged += (sender, args) => DrawChart();
             _threshold = threshold;
+            _fps = fps;
+            _type = type;
         }
 
         private void FrmChart_Load(object sender, EventArgs e)
         {
-            Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-            Point saved = ConvertMethod.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
             DrawChart();
         }
@@ -34,7 +37,7 @@ namespace RPChecker.Forms
         private void DrawChart()
         {
             chart1.Series.Clear();
-            Series series1 = new Series("PSNR")
+            Series series1 = new Series(_type)
             {
                 Color = Color.Blue,
                 ChartType = SeriesChartType.Line,
@@ -47,23 +50,30 @@ namespace RPChecker.Forms
                 ChartType = SeriesChartType.Point,
                 IsValueShownAsLabel = false
             };
+            int interval = (int) Math.Round(_fps) * 30;
             var task = new Task(() =>
             {
-                _info.Data.Sort((a, b) => a.Key.CompareTo(b.Key));
-
-                _info.Data.ForEach(frame =>
+                foreach(var frame in _info.Data.OrderBy(item => item.Key))
                 {
                     series1.Points.AddXY(frame.Key, frame.Value);
+                    if ((frame.Key + 1) % interval == 0)
+                    {
+                        Invoke(new Action(() => chart1.ChartAreas[0].AxisX.CustomLabels.Add(frame.Key - 20, frame.Key + 20,
+                            $"{TimeSpan.FromSeconds(Math.Round(frame.Key / _fps)):mm\\:ss}")));
+                    }
                     if (frame.Value < _threshold)
                     {
                         series2.Points.AddXY(frame.Key, frame.Value);
                     }
-                });
+                }
             });
             task.ContinueWith(t =>
             {
-                Invoke(new Action(() => chart1.Series.Add(series1)));
-                Invoke(new Action(() => chart1.Series.Add(series2)));
+                Invoke(new Action(() =>
+                {
+                    chart1.Series.Add(series1);
+                    chart1.Series.Add(series2);
+                }));
             });
             task.Start();
         }
@@ -83,7 +93,7 @@ namespace RPChecker.Forms
         private void btnSaveAsImage_Click(object sender, EventArgs e)
         {
             var rnd = Path.GetRandomFileName().Substring(0, 8).ToUpper();
-            var fileName = Path.GetDirectoryName(_info.FileName) + "\\" + rnd + ".png";
+            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileName) ?? "", $"{rnd}.png");
             chart1.SaveImage(fileName, ChartImageFormat.Png);
         }
     }

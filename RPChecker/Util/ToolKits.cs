@@ -3,14 +3,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Resources;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
 namespace RPChecker.Util
 {
-    internal static class ConvertMethod
+    internal static class ToolKits
     {
         private static string GetUTF8String(byte[] buffer)
         {

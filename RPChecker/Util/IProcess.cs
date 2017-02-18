@@ -17,6 +17,14 @@ namespace RPChecker.Util
 
         void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine);
 
-        void Process_Exited(object sender, EventArgs e);
+        void ExitedHandler(object sender, EventArgs e);
+
+        event Action<string> ProgressUpdated;
+
+        event Action<string> ValueUpdated;
+
+        string Loading { get; }
+
+        string FileNotFind { get; }
     }
 }

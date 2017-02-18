@@ -19,7 +19,7 @@ namespace RPChecker.Forms
             FormBorderStyle      = FormBorderStyle.None;
             label1.Text          = AssemblyProduct;
             label2.Text          = $"Version {AssemblyVersion}";
-            label3.Text          = System.IO.File.GetLastWriteTime(GetType().Assembly.Location).ToString(CultureInfo.InvariantCulture);
+            label3.Text          = System.IO.File.GetLastWriteTime(Application.ExecutablePath).ToString(CultureInfo.InvariantCulture);
             notifyIcon1.Visible  = false;
         }
 
