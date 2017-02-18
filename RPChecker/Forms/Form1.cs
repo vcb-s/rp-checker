@@ -276,17 +276,19 @@ namespace RPChecker.Forms
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress))return;
-            Invoke(_coreProcess is VsPipeProcess
-                ? new Action(() => VsUpdateProgress(progress))
-                : (() => FFmpegUpdateProgress(progress)));
+            _coreProcess
+                .Match<VsPipeProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
+                .Match<FFmpegProcess>(_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
+                ;
         }
 
         private void ValueUpdated(string data)
         {
             if (string.IsNullOrEmpty(data)) return;
-            Invoke(_coreProcess is VsPipeProcess
-                ? new Action(() => UpdatePSNR(data))
-                : (() => UpdateSSIM(data)));
+            _coreProcess
+                .Match<VsPipeProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
+                .Match<FFmpegProcess>(_ => Invoke(new Action(() => UpdateSSIM(data))))
+                ;
         }
 
 
