@@ -69,8 +69,11 @@ namespace RPChecker.Forms
             });
             task.ContinueWith(t =>
             {
-                Invoke(new Action(() => chart1.Series.Add(series1)));
-                Invoke(new Action(() => chart1.Series.Add(series2)));
+                Invoke(new Action(() =>
+                {
+                    chart1.Series.Add(series1);
+                    chart1.Series.Add(series2);
+                }));
             });
             task.Start();
         }
@@ -90,7 +93,7 @@ namespace RPChecker.Forms
         private void btnSaveAsImage_Click(object sender, EventArgs e)
         {
             var rnd = Path.GetRandomFileName().Substring(0, 8).ToUpper();
-            var fileName = Path.GetDirectoryName(_info.FileName) + "\\" + rnd + ".png";
+            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileName) ?? "", $"{rnd}.png");
             chart1.SaveImage(fileName, ChartImageFormat.Png);
         }
     }

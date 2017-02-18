@@ -92,6 +92,7 @@
     <Compile Include="Forms\FormUpdater.designer.cs">
       <DependentUpon>FormUpdater.cs</DependentUpon>
     </Compile>
+    <Compile Include="Util\MatchExpression.cs" />
     <Compile Include="Util\Notification.cs" />
     <Compile Include="Util\ToolKits.cs" />
     <Compile Include="Forms\Form1.cs">

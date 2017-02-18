@@ -33,7 +33,7 @@ namespace RPChecker.Util
                 if (!File.Exists(Path.Combine(ffmpegPath, "ffmpeg.exe")))//the file has been moved
                 {
                     ffmpegPath = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
-                    RegistryStorage.Save(ffmpegPath, name: "FFmpegPath");
+                    RegistryStorage.Save(Path.GetDirectoryName(ffmpegPath), name: "FFmpegPath");
                 }
             }
             catch (Exception ex)
