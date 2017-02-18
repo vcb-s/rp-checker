@@ -242,12 +242,12 @@ namespace RPChecker.Forms
                 {
                     string vsFile = $"{file2}.vpy";
                     ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
-                    _errorMessageBuilder.Append($"---{vsFile}---{Environment.NewLine}");
+                    _errorMessageBuilder.AppendLine($"---{vsFile}---");
                     coreThread.Start(vsFile);
                 }
                 else
                 {
-                    _errorMessageBuilder.Append($"---{Path.GetFileName(file1)}|{Path.GetFileName(file2)}---{Environment.NewLine}");
+                    _errorMessageBuilder.AppendLine($"---{Path.GetFileName(file1)}|{Path.GetFileName(file2)}---");
                     coreThread.Start(new KeyValuePair<string, string>(file1, file2));
                 }
 
@@ -304,8 +304,7 @@ namespace RPChecker.Forms
             }
             if (_beginErrorRecord)
             {
-                _errorMessageBuilder.Append(progress);
-                _errorMessageBuilder.Append(Environment.NewLine);
+                _errorMessageBuilder.AppendLine(progress);
                 if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
                 {
                     _errorDialogShowed = true;
@@ -354,6 +353,11 @@ namespace RPChecker.Forms
             // NUMBER_OF_FRAMES: 960
             //frame=  287 fps= 57 q=-0.0 size=N/A time=00:00:04.78 bitrate=N/A speed=0.953x
             toolStripStatusStdError.Text = progress;
+            if (progress.StartsWith("[Parsed_ssim"))
+            {
+                _errorMessageBuilder.AppendLine(progress);
+                return;
+            }
             var frameRet = FFmpegFrameRegex.Match(progress);
             if (_ffmpegTotalFrame == int.MaxValue && frameRet.Success)
             {
