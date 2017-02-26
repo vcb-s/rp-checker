@@ -138,11 +138,11 @@ namespace RPChecker.Util
                 }
             }
             valuePath = valuePath ?? "";
-            if (!File.Exists(valuePath+@"core64\vspipe.exe"))
+            if (!File.Exists(Path.Combine(valuePath, "core64\\vspipe.exe")))
             {
                 throw new Exception($"Found a registry value ({valuePath}) for VapourSynth in your system but it is not valid!");
             }
-            return valuePath + @"core64\";
+            return Path.Combine(valuePath, "core64");
         }
     }
 }

@@ -13,8 +13,6 @@ namespace RPChecker.Util
 
         public int ExitCode        { get; set; }
 
-        public bool ProcessNotFind { get; set; }
-
         public string Loading => "生成lwi文件中……";
 
         public string FileNotFind => "无可用vspipe";
@@ -23,6 +21,7 @@ namespace RPChecker.Util
 
         public event Action<string> ValueUpdated;
 
+        public Exception Exceptions { get; set; }
 
         public void GenerateLog(object scriptFile)
         {
@@ -31,7 +30,7 @@ namespace RPChecker.Util
             try
             {
                 vspipePath = RegistryStorage.Load();
-                if (!File.Exists(Path.Combine(vspipePath, "vspipe.exe")))
+                if (vspipePath == null || !File.Exists(Path.Combine(vspipePath, "vspipe.exe")))
                 {
                     vspipePath = ToolKits.GetVapourSynthPathViaRegistry();
                     RegistryStorage.Save(vspipePath);
@@ -43,11 +42,10 @@ namespace RPChecker.Util
                 vspipePath = string.Empty;
                 if (!File.Exists("vspipe.exe"))
                 {
-                    ProcessNotFind = true;
+                    Exceptions = ex;
                     return;
                 }
             }
-            ProcessNotFind = false;
             try
             {
                 //ffmpeg -i file1.mkv -i fil2.mkv -filter_complex psnr="stats_file=-" -an -f null -
@@ -80,7 +78,8 @@ namespace RPChecker.Util
             catch (Exception ex)
             {
                 _consoleProcess = null;
-                MessageBox.Show(ex.Message, @"vspipe Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Exceptions = ex;
+                //MessageBox.Show(ex.Message, @"vspipe Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

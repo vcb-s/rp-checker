@@ -14,8 +14,6 @@ namespace RPChecker.Util
 
         public int ExitCode { get; set; }
 
-        public bool ProcessNotFind { get; set; }
-
         public string Loading => "读条中";
 
         public string FileNotFind => "无可用FFmpeg";
@@ -23,6 +21,8 @@ namespace RPChecker.Util
         public event Action<string> ProgressUpdated;
 
         public event Action<string> ValueUpdated;
+
+        public Exception Exceptions { get; set; }
         
         public void GenerateLog(object inputFilePair)
         {
@@ -45,14 +45,13 @@ namespace RPChecker.Util
                     ffmpegPath = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
                     if (!File.Exists(ffmpegPath))
                     {
-                        ProcessNotFind = true;
+                        Exceptions = new Exception(FileNotFind);
                         return;
                     }
                     ffmpegPath = Path.GetDirectoryName(ffmpegPath) ?? "";
                     RegistryStorage.Save(ffmpegPath, name: "FFmpegPath");
                 }
             }
-            ProcessNotFind = false;
             var inputFile = (KeyValuePair<string, string>)inputFilePair;
             try
             {

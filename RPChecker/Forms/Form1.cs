@@ -252,10 +252,10 @@ namespace RPChecker.Forms
                 }
 
                 while (coreThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
-                if (_coreProcess.ProcessNotFind)
+                if (_coreProcess.Exceptions != null)
                 {
-                    toolStripStatusStdError.Text = _coreProcess.FileNotFind;
-                    throw new Exception(toolStripStatusStdError.Text);
+                    toolStripStatusStdError.Text = _coreProcess.Exceptions.Message;
+                    throw _coreProcess.Exceptions;
                 }
             }
             catch (Exception ex)
