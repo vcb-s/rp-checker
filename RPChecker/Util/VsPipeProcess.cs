@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
 
 namespace RPChecker.Util
 {
@@ -79,7 +78,6 @@ namespace RPChecker.Util
             {
                 _consoleProcess = null;
                 Exceptions = ex;
-                //MessageBox.Show(ex.Message, @"vspipe Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
