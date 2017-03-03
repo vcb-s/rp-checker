@@ -23,6 +23,8 @@ namespace RPChecker.Util.FilterProcess
 
         public Exception Exceptions { get; set; }
 
+        public virtual string ValueText { get; } = null;
+
         protected virtual string Arguments { get; } = null;
 
         public void GenerateLog(object inputFilePair)

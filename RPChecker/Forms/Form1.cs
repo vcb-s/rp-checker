@@ -46,6 +46,7 @@ namespace RPChecker.Forms
                 if (!(_coreProcess is VsPipePSNRProcess))
                 {
                     _coreProcess = new VsPipePSNRProcess();
+                    label1.Text = _coreProcess.ValueText;
                 }
             }, true);
             _systemMenu.AddCommand("使用PSNR(FF)", () =>
@@ -53,6 +54,7 @@ namespace RPChecker.Forms
                 if (!(_coreProcess is FFmpegPSNRProcess))
                 {
                     _coreProcess = new FFmpegPSNRProcess();
+                    label1.Text = _coreProcess.ValueText;
                 }
             }, false);
             _systemMenu.AddCommand("使用SSIM(FF)", () =>
@@ -60,6 +62,7 @@ namespace RPChecker.Forms
                 if (!(_coreProcess is FFmpegSSIMProcess))
                 {
                     _coreProcess = new FFmpegSSIMProcess();
+                    label1.Text = _coreProcess.ValueText;
                 }
             }, false);
 
@@ -143,6 +146,7 @@ namespace RPChecker.Forms
         private void cbFileList_SelectionChangeCommitted(object sender, EventArgs e)
         {
             ChangeClipDisplay(cbFileList.SelectedIndex);
+            toolStripStatusStdError.Text = cbFileList.SelectedItem?.ToString();
         }
 
         private void cbFPS_SelectedIndexChanged(object sender, EventArgs e)
@@ -391,7 +395,7 @@ namespace RPChecker.Forms
         private void btnChart_Click(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
-            string type = _coreProcess is VsPipePSNRProcess ? "PSNR" : "SSIM";
+            string type = _coreProcess is VsPipePSNRProcess || _coreProcess is FFmpegPSNRProcess ? "PSNR" : "SSIM";
             FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;

@@ -25,6 +25,8 @@ namespace RPChecker.Util.FilterProcess
 
         string FileNotFind { get; }
 
+        string ValueText { get; }
+
         Exception Exceptions { get; set; }
     }
 }

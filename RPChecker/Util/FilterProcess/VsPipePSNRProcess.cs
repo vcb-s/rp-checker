@@ -22,6 +22,8 @@ namespace RPChecker.Util.FilterProcess
 
         public Exception Exceptions { get; set; }
 
+        public string ValueText { get; } = "峰值信噪比阈值";
+
         public void GenerateLog(object scriptFile)
         {
             string vspipePath = this.GetVsPipePath(out Exception exception);
