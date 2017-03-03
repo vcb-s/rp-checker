@@ -7,8 +7,6 @@ namespace RPChecker.Util.FilterProcess
     {
         protected override string Arguments { get; } = "-i \"{0}\" -i \"{1}\" -filter_complex ssim=\"stats_file=-\" -an -f null -";
 
-        private const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
-
         private static readonly Regex SSIMDataFormatRegex = new Regex($@"n:(?<frame>\d+) Y:(?<Y>{Number}) U:(?<U>{Number}) V:(?<V>{Number}) All:(?<All>{Number})", RegexOptions.Compiled);
 
         public override void UpdateValue(string data, ref Dictionary<int, double> tempData)

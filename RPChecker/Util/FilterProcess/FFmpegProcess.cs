@@ -93,7 +93,8 @@ namespace RPChecker.Util.FilterProcess
             _consoleProcess.Exited -= ExitedHandler;
         }
 
-        public abstract void UpdateValue(string data, ref Dictionary<int, double> tempData);
+        protected const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
 
+        public abstract void UpdateValue(string data, ref Dictionary<int, double> tempData);
     }
 }

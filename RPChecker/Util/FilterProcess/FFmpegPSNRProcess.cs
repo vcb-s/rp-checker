@@ -7,8 +7,6 @@ namespace RPChecker.Util.FilterProcess
     {
         protected override string Arguments { get; } = "-i \"{0}\" -i \"{1}\" -filter_complex psnr=\"stats_file=-\" -an -f null -";
 
-        private const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
-
         private static readonly Regex PSNRDataFormatRegex = new Regex($@"n:(?<frame>\d+) .*? psnr_avg:(?<avg>{Number}) psnr_y:(?<y>{Number}) psnr_u:(?<u>{Number}) psnr_v:(?<v>{Number})", RegexOptions.Compiled);
 
         public override void UpdateValue(string data, ref Dictionary<int, double> tempData)
