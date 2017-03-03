@@ -92,6 +92,9 @@
     <Compile Include="Forms\FormUpdater.designer.cs">
       <DependentUpon>FormUpdater.cs</DependentUpon>
     </Compile>
+    <Compile Include="Util\FilterProcess\FFmpegProcess.cs" />
+    <Compile Include="Util\FilterProcess\FFmpegPSNRProcess.cs" />
+    <Compile Include="Util\FilterProcess\Utils.cs" />
     <Compile Include="Util\MatchExpression.cs" />
     <Compile Include="Util\Notification.cs" />
     <Compile Include="Util\ToolKits.cs" />
@@ -121,12 +124,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\FFmpegProcess.cs" />
-    <Compile Include="Util\IProcess.cs" />
+    <Compile Include="Util\FilterProcess\FFmpegSSIMProcess.cs" />
+    <Compile Include="Util\FilterProcess\IProcess.cs" />
     <Compile Include="Util\RegistryStorage.cs" />
     <Compile Include="Util\SystemMenu.cs" />
     <Compile Include="Util\Updater.cs" />
-    <Compile Include="Util\VsPipeProcess.cs" />
+    <Compile Include="Util\FilterProcess\VsPipePSNRProcess.cs" />
     <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

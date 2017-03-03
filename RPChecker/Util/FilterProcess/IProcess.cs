@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace RPChecker.Util
+namespace RPChecker.Util.FilterProcess
 {
     public interface IProcess
     {

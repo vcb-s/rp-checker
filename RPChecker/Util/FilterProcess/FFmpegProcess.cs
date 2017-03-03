@@ -1,20 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace RPChecker.Util
+namespace RPChecker.Util.FilterProcess
 {
-    public class VsPipeProcess: IProcess
+    public abstract class FFmpegProcess: IProcess
     {
         private Process _consoleProcess;
 
-        public bool Abort          { get; set; }
+        public bool Abort { get; set; }
 
-        public int ExitCode        { get; set; }
+        public int ExitCode { get; set; }
 
-        public string Loading => "生成lwi文件中……";
+        public string Loading => "读条中";
 
-        public string FileNotFind => "无可用vspipe";
+        public string FileNotFind => "无可用FFmpeg";
 
         public event Action<string> ProgressUpdated;
 
@@ -22,56 +23,43 @@ namespace RPChecker.Util
 
         public Exception Exceptions { get; set; }
 
-        public void GenerateLog(object scriptFile)
+        protected virtual string Arguments { get; } = null;
+
+        public void GenerateLog(object inputFilePair)
         {
-            
-            string vspipePath;
+            string ffmpegPath = this.GetFFmpegPath(out Exception exception);
+            if (exception != null || ffmpegPath == null)
+            {
+                Exceptions = exception;
+                return;
+            }
+            var inputFile = (KeyValuePair<string, string>)inputFilePair;
             try
             {
-                vspipePath = RegistryStorage.Load();
-                if (vspipePath == null || !File.Exists(Path.Combine(vspipePath, "vspipe.exe")))
-                {
-                    vspipePath = ToolKits.GetVapourSynthPathViaRegistry();
-                    RegistryStorage.Save(vspipePath);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                vspipePath = string.Empty;
-                if (!File.Exists("vspipe.exe"))
-                {
-                    Exceptions = ex;
-                    return;
-                }
-            }
-            try
-            {
-                //ffmpeg -i file1.mkv -i fil2.mkv -filter_complex psnr="stats_file=-" -an -f null -
                 _consoleProcess = new Process
                 {
                     StartInfo =
                     {
-                    FileName               = Path.Combine(vspipePath, "vspipe"),
-                    Arguments              = $" -p \"{scriptFile}\" .",
+                    FileName               = Path.Combine(ffmpegPath, "ffmpeg"),
+                    Arguments              = string.Format(Arguments, inputFile.Key, inputFile.Value),
                     UseShellExecute        = false,
                     CreateNoWindow         = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError  = true
                     },
-                    EnableRaisingEvents    = true
+                    EnableRaisingEvents = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
-                _consoleProcess.ErrorDataReceived  += ErrorOutputHandler;
-                _consoleProcess.Exited             += ExitedHandler;
+                _consoleProcess.ErrorDataReceived += ErrorOutputHandler;
+                _consoleProcess.Exited += ExitedHandler;
 
                 _consoleProcess.Start();
                 _consoleProcess.BeginErrorReadLine();
                 _consoleProcess.BeginOutputReadLine();
                 _consoleProcess.WaitForExit();
 
-                _consoleProcess.ErrorDataReceived  -= ErrorOutputHandler;
+                _consoleProcess.ErrorDataReceived -= ErrorOutputHandler;
                 _consoleProcess.OutputDataReceived -= OutputHandler;
             }
             catch (Exception ex)
@@ -84,13 +72,11 @@ namespace RPChecker.Util
         public void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ValueUpdated?.Invoke(outLine.Data);
-            //Debug.WriteLine(outLine.Data);
         }
 
         public void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ProgressUpdated?.Invoke(outLine.Data);
-            //Debug.WriteLine(outLine.Data);
             if (Abort)
             {
                 ((Process)sendingProcess).Kill();
@@ -106,5 +92,8 @@ namespace RPChecker.Util
             _consoleProcess.Close();
             _consoleProcess.Exited -= ExitedHandler;
         }
+
+        public abstract void UpdateValue(string data, ref Dictionary<int, double> tempData);
+
     }
 }

@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using RPChecker.Util.FilterProcess;
 
 namespace RPChecker.Forms
 {
@@ -31,7 +32,7 @@ namespace RPChecker.Forms
         private bool _beginErrorRecord;
         private int _threshold = 30;
 
-        private IProcess _coreProcess = new VsPipeProcess();
+        private IProcess _coreProcess = new VsPipePSNRProcess();
 
         #region SystemMenu
         private SystemMenu _systemMenu;
@@ -40,20 +41,28 @@ namespace RPChecker.Forms
         {
             _systemMenu = new SystemMenu(this);
             _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
-            _systemMenu.AddCommand("使用PSNR(&P)", () =>
+            _systemMenu.AddCommand("使用PSNR(VS)", () =>
             {
-                if (!(_coreProcess is VsPipeProcess))
+                if (!(_coreProcess is VsPipePSNRProcess))
                 {
-                    _coreProcess = new VsPipeProcess();
+                    _coreProcess = new VsPipePSNRProcess();
                 }
             }, true);
-            _systemMenu.AddCommand("使用SSIM(&S)", () =>
+            _systemMenu.AddCommand("使用PSNR(FF)", () =>
             {
-                if (!(_coreProcess is FFmpegProcess))
+                if (!(_coreProcess is FFmpegPSNRProcess))
                 {
-                    _coreProcess = new FFmpegProcess();
+                    _coreProcess = new FFmpegPSNRProcess();
                 }
             }, false);
+            _systemMenu.AddCommand("使用SSIM(FF)", () =>
+            {
+                if (!(_coreProcess is FFmpegSSIMProcess))
+                {
+                    _coreProcess = new FFmpegSSIMProcess();
+                }
+            }, false);
+
         }
 
         protected override void WndProc(ref Message msg)
@@ -208,7 +217,7 @@ namespace RPChecker.Forms
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileName = item.Value, Data = data});
                     if (_beginErrorRecord) continue; AddStatic();
-                    if (_coreProcess is FFmpegProcess || _remainFile) continue; RemoveScript(item);
+                    if (_coreProcess is FFmpegSSIMProcess || _remainFile) continue; RemoveScript(item);
                 }
                 catch (Exception ex)
                 {
@@ -238,7 +247,7 @@ namespace RPChecker.Forms
             {
                 var coreThread = new Thread(_coreProcess.GenerateLog);
 
-                if (_coreProcess is VsPipeProcess)
+                if (_coreProcess is VsPipePSNRProcess)
                 {
                     string vsFile = $"{file2}.vpy";
                     ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
@@ -277,7 +286,7 @@ namespace RPChecker.Forms
         {
             if (string.IsNullOrEmpty(progress))return;
             _coreProcess
-                .Match<VsPipeProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
+                .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
                 .Match<FFmpegProcess>(_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
                 ;
         }
@@ -286,13 +295,13 @@ namespace RPChecker.Forms
         {
             if (string.IsNullOrEmpty(data)) return;
             _coreProcess
-                .Match<VsPipeProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
-                .Match<FFmpegProcess>(_ => Invoke(new Action(() => UpdateSSIM(data))))
+                .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
+                .Match<FFmpegProcess>(_ => Invoke(new Action(() => _.UpdateValue(data, ref _tempData))))
                 ;
         }
 
 
-        private volatile Dictionary<int, double> _tempData = new Dictionary<int, double>();
+        private Dictionary<int, double> _tempData = new Dictionary<int, double>();
 
         #region vapoursynth
         private static readonly Regex VsProgressRegex = new Regex(@"Frame: (?<processed>\d+)/(?<total>\d+)", RegexOptions.Compiled);
@@ -374,19 +383,6 @@ namespace RPChecker.Forms
                 toolStripProgressBar1.Value = (int)Math.Floor(processed * 100.0 / _ffmpegTotalFrame);
             }
         }
-
-        private static readonly Regex SSIMDataFormatRegex = new Regex(@"n:(?<frame>\d+) Y:(?<Y>[-+]?[0-9]*\.?[0-9]+) U:(?<U>[-+]?[0-9]*\.?[0-9]+) V:(?<V>[-+]?[0-9]*\.?[0-9]+) All:(?<All>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);// \((?<SSIM>(?:[-+]?[0-9]*\.?[0-9]+)?(?:inf)?)\)
-
-        private void UpdateSSIM(string data)
-        {
-            //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140|inf)
-            var rawData = SSIMDataFormatRegex.Match(data);
-            if (!rawData.Success) return;
-            string ssim = rawData.Groups["All"].Value;
-            double ssimValue = double.Parse(ssim) * 100;
-            _tempData[int.Parse(rawData.Groups["frame"].Value)] = ssimValue;
-        }
-
         #endregion
 
         #region chartForm
@@ -395,7 +391,7 @@ namespace RPChecker.Forms
         private void btnChart_Click(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
-            string type = _coreProcess is VsPipeProcess ? "PSNR" : "SSIM";
+            string type = _coreProcess is VsPipePSNRProcess ? "PSNR" : "SSIM";
             FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;
