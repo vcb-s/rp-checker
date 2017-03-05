@@ -86,6 +86,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\FormLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormLog.designer.cs">
+      <DependentUpon>FormLog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormUpdater.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +101,7 @@
     <Compile Include="Util\FilterProcess\FFmpegProcess.cs" />
     <Compile Include="Util\FilterProcess\FFmpegPSNRProcess.cs" />
     <Compile Include="Util\FilterProcess\Utils.cs" />
+    <Compile Include="Util\LogBuffer.cs" />
     <Compile Include="Util\MatchExpression.cs" />
     <Compile Include="Util\Notification.cs" />
     <Compile Include="Util\ToolKits.cs" />
@@ -135,6 +142,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormLog.resx">
+      <DependentUpon>FormLog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormUpdater.resx">
       <DependentUpon>FormUpdater.cs</DependentUpon>

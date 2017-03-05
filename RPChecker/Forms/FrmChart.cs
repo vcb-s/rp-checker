@@ -18,9 +18,7 @@ namespace RPChecker.Forms
         public FrmChart(ReSulT info, int threshold, double fps, string type)
         {
             InitializeComponent();
-            _info.FileName = info.FileName;
-            _info.Data = info.Data;
-            //_info.PropertyChanged += (sender, args) => DrawChart();
+            _info = info;
             _threshold = threshold;
             _fps = fps;
             _type = type;
@@ -93,7 +91,7 @@ namespace RPChecker.Forms
         private void btnSaveAsImage_Click(object sender, EventArgs e)
         {
             var rnd = Path.GetRandomFileName().Substring(0, 8).ToUpper();
-            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileName) ?? "", $"{rnd}.png");
+            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.Key) ?? "", $"{rnd}.png");
             chart1.SaveImage(fileName, ChartImageFormat.Png);
         }
     }

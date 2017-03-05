@@ -28,8 +28,6 @@ namespace RPChecker.Forms
 
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
-        private readonly StringBuilder _errorMessageBuilder = new StringBuilder();
-        private bool _beginErrorRecord;
         private int _threshold = 30;
 
         private IProcess _coreProcess = new VsPipePSNRProcess();
@@ -118,8 +116,8 @@ namespace RPChecker.Forms
 
         private void btnLog_Click(object sender, EventArgs e)
         {
-            if (_errorMessageBuilder.Length == 0) return;
-            MessageBox.Show(_errorMessageBuilder.ToString(), @"Log");
+            if (_fullData[cbFileList.SelectedIndex].Logs.IsEmpty()) return;
+            new FormLog(_fullData[cbFileList.SelectedIndex]).Show();
         }
 
         private void btnAbort_Click(object sender, EventArgs e)
@@ -207,20 +205,21 @@ namespace RPChecker.Forms
         }
 
         private bool _errorDialogShowed;
+        private LogBuffer _currentBuffer;
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
-            _errorMessageBuilder.Clear();
             cbFileList.Items.Clear();
             foreach (var item in FilePathsPair)
             {
                 try
                 {
                     _errorDialogShowed = false;
+                    _currentBuffer = new LogBuffer();
                     AnalyseClip(item.Key, item.Value);
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
-                    _fullData.Add(new ReSulT {FileName = item.Value, Data = data});
-                    if (_beginErrorRecord) continue; AddStatic();
+                    _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
+                    if (_currentBuffer.Inf) continue; AddStatic();
                     if (_coreProcess is FFmpegSSIMProcess || _remainFile) continue; RemoveScript(item);
                 }
                 catch (Exception ex)
@@ -230,20 +229,22 @@ namespace RPChecker.Forms
                                 @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error)).Start();
                 }
             }
-            _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileName) ?? ""));
-            btnLog.Enabled = _errorMessageBuilder.ToString().Split('\n').Length > FilePathsPair.Count + 1;
+            _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.Key) ?? ""));
+            //btnLog.Enabled = _errorMessageBuilder.ToString().Split('\n').Length > FilePathsPair.Count + 1;
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
             ChangeClipDisplay(cbFileList.SelectedIndex);
         }
+
+        
+
 
         private void AnalyseClip(string file1, string file2)
         {
             _coreProcess.ProgressUpdated += ProgressUpdated;
             _coreProcess.ValueUpdated += ValueUpdated;
             _tempData = new Dictionary<int, double>();
-            
-            _beginErrorRecord = false;
+
             Enable = false;
             toolStripStatusStdError.Text = _coreProcess.Loading;
             toolStripProgressBar1.Value = 0;
@@ -254,15 +255,13 @@ namespace RPChecker.Forms
                 {
                     string vsFile = $"{file2}.vpy";
                     ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
-                    _errorMessageBuilder.AppendLine($"---{vsFile}---");
                     coreThread = new Thread(() => _coreProcess.GenerateLog(vsFile));
                 }
                 else
                 {
-                    _errorMessageBuilder.AppendLine($"---{Path.GetFileName(file1)}|{Path.GetFileName(file2)}---");
                     coreThread = new Thread(() => _coreProcess.GenerateLog(file1, file2));
                 }
-
+                coreThread.Start();
                 while (coreThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
                 if (_coreProcess.Exceptions != null)
                 {
@@ -288,6 +287,7 @@ namespace RPChecker.Forms
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress)) return;
+            _currentBuffer.Log(progress);
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
                 .Match<FFmpegProcess>(_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
@@ -314,11 +314,10 @@ namespace RPChecker.Forms
             toolStripStatusStdError.Text = progress;
             if (Regex.IsMatch(progress, "Failed", RegexOptions.IgnoreCase))
             {
-                _beginErrorRecord = true;
+                _currentBuffer.Inf = true;
             }
-            if (_beginErrorRecord)
+            if (_currentBuffer.Inf)
             {
-                _errorMessageBuilder.AppendLine(progress);
                 if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
                 {
                     _errorDialogShowed = true;
@@ -369,9 +368,9 @@ namespace RPChecker.Forms
             toolStripStatusStdError.Text = progress;
             if (progress.StartsWith("[Parsed_"))
             {
-                _errorMessageBuilder.AppendLine(progress);
-                return;
+                _currentBuffer.Inf = true;
             }
+            if (_currentBuffer.Inf) return;
             var frameRet = FFmpegFrameRegex.Match(progress);
             if (_ffmpegTotalFrame == int.MaxValue && frameRet.Success)
             {
@@ -486,23 +485,10 @@ namespace RPChecker.Forms
         #endregion
     }
 
-    public class ReSulT: INotifyPropertyChanged
+    public struct ReSulT
     {
-        private List<KeyValuePair<int, double>> _data;
-        public List<KeyValuePair<int, double>> Data {
-            get { return _data; }
-            set {
-                _data = value;
-                NotifyPropertyChanged();
-            }
-        }
-        public string FileName { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public List<KeyValuePair<int, double>> Data { get; set; }
+        public KeyValuePair<string, string> FileNamePair { get; set; }
+        public LogBuffer Logs { get; set; }
     }
 }
