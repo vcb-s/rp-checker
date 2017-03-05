@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using RPChecker.Util;
 using System.Drawing;
 using System.Threading;
@@ -9,27 +8,52 @@ using System.Reflection;
 using System.Diagnostics;
 using RPChecker.Properties;
 using System.Windows.Forms;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using RPChecker.Util.FilterProcess;
+using System.Text.RegularExpressions;
 
 namespace RPChecker.Forms
 {
     public partial class Form1 : Form
     {
+        #region Form init
         public Form1()
         {
             InitializeComponent();
             AddCommand();
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
+
+            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
+            if (saved != new Point(-32000, -32000)) Location = saved;
+            RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
+
+            cbFPS.SelectedIndex = 0;
+            cbVpyFile.SelectedIndex = 0;
+            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            foreach (var item in current.GetFiles().Where(item => item.Extension.ToLower() == ".vpy"))
+            {
+                cbVpyFile.Items.Add(item);
+            }
+            btnAnalyze.Enabled = false;
+
+            Updater.CheckUpdateWeekly("RPChecker");
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "Location");
+        }
+        #endregion
+
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
         private int _threshold = 30;
-
+        private readonly double[] _frameRate = { 24000 / 1001.0, 24, 25, 30000 / 1001.0, 50, 60000 / 1001.0 };
         private IProcess _coreProcess = new VsPipePSNRProcess();
 
         #region SystemMenu
@@ -76,64 +100,26 @@ namespace RPChecker.Forms
         }
         #endregion
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
-
-            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
-            if (saved != new Point(-32000, -32000)) Location = saved;
-            RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
-
-            cbFPS.SelectedIndex     = 0;
-            cbVpyFile.SelectedIndex = 0;
-            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            foreach (var item in current.GetFiles().Where(item => item.Extension.ToLower() == ".vpy"))
-            {
-                cbVpyFile.Items.Add(item);
-            }
-            btnAnalyze.Enabled = false;
-            
-            Updater.CheckUpdateWeekly("RPChecker");
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "Location");
-        }
-
+        #region LoadFile
         private bool _loadFormOpened;
         private void btnLoad_Click(object sender, EventArgs e)
         {
             if (_loadFormOpened) return;
             FrmLoadFiles flf = new FrmLoadFiles(this);
-            flf.Load   += (o, args) => _loadFormOpened = true;
+            flf.Load += (o, args) =>
+            {
+                _loadFormOpened = true;
+                btnAnalyze.Enabled = false;
+            };
             flf.Closed += (o, args) =>  {
                 btnAnalyze.Enabled = FilePathsPair.Count > 0;
                 _loadFormOpened = false;
             };
             flf.Show();
         }
+        #endregion
 
-        private void btnLog_Click(object sender, EventArgs e)
-        {
-            if (_fullData[cbFileList.SelectedIndex].Logs.IsEmpty()) return;
-            new FormLog(_fullData[cbFileList.SelectedIndex]).Show();
-        }
-
-        private void btnAbort_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _coreProcess.Abort = true;
-            }
-            catch (Exception ex)
-            {
-                new Task(() => MessageBox.Show(ex.Message, "Terminate Process Failed")).Start();
-            }
-        }
-
-        private readonly double[] _frameRate = { 24000/1001.0, 24, 25, 30000/1001.0, 50, 60000/1001.0 };
-
+        #region switch
         private void ChangeClipDisplay(int index)
         {
             if (index < 0 || index > _fullData.Count) return;
@@ -169,7 +155,9 @@ namespace RPChecker.Forms
         private void cbFileList_MouseEnter(object sender, EventArgs e) => toolTip1.Show(cbFileList.SelectedItem?.ToString(), (IWin32Window)sender);
 
         private void cbFileList_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
+        #endregion
 
+        #region core
         private bool Enable
         {
             set
@@ -185,7 +173,6 @@ namespace RPChecker.Forms
                 btnAbort.Enabled = !value;
             }
         }
-
         private void UpdataGridView(ReSulT info, double frameRate)
         {
             dataGridView1.Rows.Clear();
@@ -206,6 +193,8 @@ namespace RPChecker.Forms
 
         private bool _errorDialogShowed;
         private LogBuffer _currentBuffer;
+        private Dictionary<int, double> _tempData;
+
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
@@ -216,6 +205,8 @@ namespace RPChecker.Forms
                 {
                     _errorDialogShowed = false;
                     _currentBuffer = new LogBuffer();
+                    _tempData = new Dictionary<int, double>();
+
                     AnalyseClip(item.Key, item.Value);
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
@@ -236,14 +227,10 @@ namespace RPChecker.Forms
             ChangeClipDisplay(cbFileList.SelectedIndex);
         }
 
-        
-
-
         private void AnalyseClip(string file1, string file2)
         {
             _coreProcess.ProgressUpdated += ProgressUpdated;
             _coreProcess.ValueUpdated += ValueUpdated;
-            _tempData = new Dictionary<int, double>();
 
             Enable = false;
             toolStripStatusStdError.Text = _coreProcess.Loading;
@@ -284,6 +271,24 @@ namespace RPChecker.Forms
             }
         }
 
+        private void btnAbort_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _coreProcess.Abort = true;
+            }
+            catch (Exception ex)
+            {
+                new Task(() => MessageBox.Show(ex.Message, "Terminate Process Failed")).Start();
+            }
+        }
+
+        private void btnLog_Click(object sender, EventArgs e)
+        {
+            if (_fullData[cbFileList.SelectedIndex].Logs.IsEmpty()) return;
+            new FormLog(_fullData[cbFileList.SelectedIndex]).Show();
+        }
+
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress)) return;
@@ -302,9 +307,7 @@ namespace RPChecker.Forms
                 .Match<FFmpegProcess>(self => Invoke(new Action(() => self.UpdateValue(data, ref _tempData))))
                 ;
         }
-
-
-        private Dictionary<int, double> _tempData = new Dictionary<int, double>();
+        #endregion
 
         #region vapoursynth
         private static readonly Regex VsProgressRegex = new Regex(@"Frame: (?<processed>\d+)/(?<total>\d+)", RegexOptions.Compiled);
@@ -357,7 +360,6 @@ namespace RPChecker.Forms
         #endregion
 
         #region ffmpeg
-
         private int _ffmpegTotalFrame = int.MaxValue;
         private static readonly Regex FFmpegFrameRegex = new Regex(@"NUMBER_OF_FRAMES: (?<frame>\d+)", RegexOptions.Compiled);
         private static readonly Regex FFmpegProgressRegex = new Regex(@"frame=\s*(?<processed>\d+)", RegexOptions.Compiled);
@@ -416,9 +418,7 @@ namespace RPChecker.Forms
             }
         }
 
-
         private bool _remainFile;
-
         private void toolStripDropDownButton1_Click(object sender, EventArgs e)
         {
             _remainFile = !_remainFile;
@@ -439,6 +439,7 @@ namespace RPChecker.Forms
         #region statistics
         private void AddStatic()
         {
+            if (_coreProcess is FFmpegProcess) return;
             try
             {
                 RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
