@@ -7,7 +7,7 @@ namespace RPChecker.Util.FilterProcess
     {
         public override string ValueText { get; } = "结构相似性阈值";
 
-        protected override string Arguments { get; } = "-i \"{0}\" -i \"{1}\" -filter_complex ssim=\"stats_file=-\" -an -f null -";
+        protected override string Arguments { get; } = "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex ssim=\"stats_file=-\" -an -f null -";
 
         private static readonly Regex SSIMDataFormatRegex = new Regex($@"n:(?<frame>\d+) Y:(?<Y>{Number}) U:(?<U>{Number}) V:(?<V>{Number}) All:(?<All>{Number})", RegexOptions.Compiled);
 

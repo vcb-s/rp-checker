@@ -27,7 +27,7 @@ namespace RPChecker.Util.FilterProcess
 
         protected virtual string Arguments { get; } = null;
 
-        public void GenerateLog(object inputFilePair)
+        public void GenerateLog(params string[] inputFiles)
         {
             string ffmpegPath = this.GetFFmpegPath(out Exception exception);
             if (exception != null || ffmpegPath == null)
@@ -35,7 +35,11 @@ namespace RPChecker.Util.FilterProcess
                 Exceptions = exception;
                 return;
             }
-            var inputFile = (KeyValuePair<string, string>)inputFilePair;
+            if (inputFiles.Length != 2)
+            {
+                Exceptions = new ArgumentException("Incorrect number of parameters", nameof(inputFiles));
+                return;
+            }
             try
             {
                 _consoleProcess = new Process
@@ -43,7 +47,7 @@ namespace RPChecker.Util.FilterProcess
                     StartInfo =
                     {
                     FileName               = Path.Combine(ffmpegPath, "ffmpeg"),
-                    Arguments              = string.Format(Arguments, inputFile.Key, inputFile.Value),
+                    Arguments              = string.Format(Arguments, inputFiles[0], inputFiles[1]),
                     UseShellExecute        = false,
                     CreateNoWindow         = true,
                     RedirectStandardOutput = true,

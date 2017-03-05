@@ -9,7 +9,7 @@ namespace RPChecker.Util.FilterProcess
 
         int ExitCode { get; set; }
 
-        void GenerateLog(object args);
+        void GenerateLog(params string[] inputFiles);
 
         void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine);
 

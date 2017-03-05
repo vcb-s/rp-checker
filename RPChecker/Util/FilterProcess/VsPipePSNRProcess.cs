@@ -24,12 +24,17 @@ namespace RPChecker.Util.FilterProcess
 
         public string ValueText { get; } = "峰值信噪比阈值";
 
-        public void GenerateLog(object scriptFile)
+        public void GenerateLog(params string[] inputFiles)
         {
             string vspipePath = this.GetVsPipePath(out Exception exception);
             if (exception != null || vspipePath == null)
             {
                 Exceptions = exception;
+                return;
+            }
+            if (inputFiles.Length != 1)
+            {
+                Exceptions = new ArgumentException("Incorrect number of parameters", nameof(inputFiles));
                 return;
             }
             try
@@ -39,7 +44,7 @@ namespace RPChecker.Util.FilterProcess
                     StartInfo =
                     {
                     FileName               = Path.Combine(vspipePath, "vspipe"),
-                    Arguments              = $" -p \"{scriptFile}\" .",
+                    Arguments              = $" -p \"{inputFiles[0]}\" .",
                     UseShellExecute        = false,
                     CreateNoWindow         = true,
                     RedirectStandardOutput = true,

@@ -249,19 +249,18 @@ namespace RPChecker.Forms
             toolStripProgressBar1.Value = 0;
             try
             {
-                var coreThread = new Thread(_coreProcess.GenerateLog);
-
+                Thread coreThread;
                 if (_coreProcess is VsPipePSNRProcess)
                 {
                     string vsFile = $"{file2}.vpy";
                     ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
                     _errorMessageBuilder.AppendLine($"---{vsFile}---");
-                    coreThread.Start(vsFile);
+                    coreThread = new Thread(() => _coreProcess.GenerateLog(vsFile));
                 }
                 else
                 {
                     _errorMessageBuilder.AppendLine($"---{Path.GetFileName(file1)}|{Path.GetFileName(file2)}---");
-                    coreThread.Start(new KeyValuePair<string, string>(file1, file2));
+                    coreThread = new Thread(() => _coreProcess.GenerateLog(file1, file2));
                 }
 
                 while (coreThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
@@ -288,7 +287,7 @@ namespace RPChecker.Forms
 
         private void ProgressUpdated(string progress)
         {
-            if (string.IsNullOrEmpty(progress))return;
+            if (string.IsNullOrEmpty(progress)) return;
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
                 .Match<FFmpegProcess>(_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
@@ -300,7 +299,7 @@ namespace RPChecker.Forms
             if (string.IsNullOrEmpty(data)) return;
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
-                .Match<FFmpegProcess>(_ => Invoke(new Action(() => _.UpdateValue(data, ref _tempData))))
+                .Match<FFmpegProcess>(self => Invoke(new Action(() => self.UpdateValue(data, ref _tempData))))
                 ;
         }
 
@@ -368,7 +367,7 @@ namespace RPChecker.Forms
             // NUMBER_OF_FRAMES: 960
             //frame=  287 fps= 57 q=-0.0 size=N/A time=00:00:04.78 bitrate=N/A speed=0.953x
             toolStripStatusStdError.Text = progress;
-            if (progress.StartsWith("[Parsed_ssim"))
+            if (progress.StartsWith("[Parsed_"))
             {
                 _errorMessageBuilder.AppendLine(progress);
                 return;

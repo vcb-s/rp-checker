@@ -7,7 +7,7 @@ namespace RPChecker.Util.FilterProcess
     {
         public override string ValueText { get; } = "峰值信噪比阈值";
 
-        protected override string Arguments { get; } = "-i \"{0}\" -i \"{1}\" -filter_complex psnr=\"stats_file=-\" -an -f null -";
+        protected override string Arguments { get; } = "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex psnr=\"stats_file=-\" -an -f null -";
 
         private static readonly Regex PSNRDataFormatRegex = new Regex($@"n:(?<frame>\d+) .*? psnr_avg:(?<avg>{Number}) psnr_y:(?<y>{Number}) psnr_u:(?<u>{Number}) psnr_v:(?<v>{Number})", RegexOptions.Compiled);
 
