@@ -16,6 +16,7 @@ namespace RPChecker.Forms
         public FrmLoadFiles(Form1 arg)
         {
             _mainWindow = arg;
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             InitializeComponent();
         }
 
@@ -79,7 +80,7 @@ namespace RPChecker.Forms
             listView2.Items.Remove(draggedItem);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnLoad1_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
             foreach (var item in openFileDialog1.FileNames)
@@ -88,7 +89,7 @@ namespace RPChecker.Forms
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void btnLoad2_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() != DialogResult.OK) return;
             foreach (var item in openFileDialog1.FileNames)
@@ -97,7 +98,7 @@ namespace RPChecker.Forms
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void btnConfirm_Click(object sender, EventArgs e)
         {
             _mainWindow.FilePathsPair.Clear();
             if (listView1.Items.Count == listView2.Items.Count)
@@ -115,7 +116,7 @@ namespace RPChecker.Forms
             MessageBox.Show(@"个数都不对应，确定个屁啊");
         }
 
-        private void button4_MouseUp(object sender, MouseEventArgs e)
+        private void btnClear_MouseUp(object sender, MouseEventArgs e)
         {
             switch (e.Button)
             {
@@ -184,8 +185,8 @@ namespace RPChecker.Forms
         {
             var midLine         = (textBox1.Location.X - textBox1.Margin.Left - listView1.Margin.Left) / 2;
             listView2.Width     = listView1.Width = midLine - 12;
-            listView2.Location  = new Point(button2.Location.X   + button2.Width   - listView2.Width, listView2.Location.Y);
-            button1.Location    = new Point(listView1.Location.X + listView1.Width - button1.Width + 1, button1.Location.Y);
+            listView2.Location  = new Point(btnLoad2.Location.X   + btnLoad2.Width   - listView2.Width, listView2.Location.Y);
+            btnLoad1.Location    = new Point(listView1.Location.X + listView1.Width - btnLoad1.Width + 1, btnLoad1.Location.Y);
             label2.Location     = new Point(listView2.Location.X, label2.Location.Y);
             columnHeader1.Width = listView1.Width - 4;
             columnHeader2.Width = listView1.Width - 4;

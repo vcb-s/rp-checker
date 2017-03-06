@@ -191,7 +191,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Icon\Blank.ico" />
     <Content Include="Icon\Rp.ico" />
     <None Include="Resources\ic_check_box_outline_blank_black_24dp.png" />
     <None Include="Resources\ic_check_box_black_24dp.png" />
