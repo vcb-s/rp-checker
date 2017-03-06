@@ -1,99 +1,88 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Forms;
 
-namespace RPChecker.Util
+namespace RPChecker.Util.FilterProcess
 {
-    public class VsPipeProcess: IProcess
+    public abstract class FFmpegProcess: IProcess
     {
         private Process _consoleProcess;
 
-        public bool Abort          { get; set; }
+        public bool Abort { get; set; }
 
-        public int ExitCode        { get; set; }
+        public int ExitCode { get; set; }
 
-        public bool ProcessNotFind { get; set; }
+        public string Loading => "读条中";
 
-        public string Loading => "生成lwi文件中……";
-
-        public string FileNotFind => "无可用vspipe";
+        public string FileNotFind => "无可用FFmpeg";
 
         public event Action<string> ProgressUpdated;
 
         public event Action<string> ValueUpdated;
 
+        public Exception Exceptions { get; set; }
 
-        public void GenerateLog(object scriptFile)
+        public virtual string ValueText { get; } = null;
+
+        protected virtual string Arguments { get; } = null;
+
+        public void GenerateLog(params string[] inputFiles)
         {
-            
-            string vspipePath;
+            string ffmpegPath = this.GetFFmpegPath(out Exception exception);
+            if (exception != null || ffmpegPath == null)
+            {
+                Exceptions = exception;
+                return;
+            }
+            if (inputFiles.Length != 2)
+            {
+                Exceptions = new ArgumentException("Incorrect number of parameters", nameof(inputFiles));
+                return;
+            }
             try
             {
-                vspipePath = RegistryStorage.Load();
-                if (!File.Exists(Path.Combine(vspipePath, "vspipe.exe")))
-                {
-                    vspipePath = ToolKits.GetVapourSynthPathViaRegistry();
-                    RegistryStorage.Save(vspipePath);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                vspipePath = string.Empty;
-                if (!File.Exists("vspipe.exe"))
-                {
-                    ProcessNotFind = true;
-                    return;
-                }
-            }
-            ProcessNotFind = false;
-            try
-            {
-                //ffmpeg -i file1.mkv -i fil2.mkv -filter_complex psnr="stats_file=-" -an -f null -
                 _consoleProcess = new Process
                 {
                     StartInfo =
                     {
-                    FileName               = Path.Combine(vspipePath, "vspipe"),
-                    Arguments              = $" -p \"{scriptFile}\" .",
+                    FileName               = Path.Combine(ffmpegPath, "ffmpeg"),
+                    Arguments              = string.Format(Arguments, inputFiles[0], inputFiles[1]),
                     UseShellExecute        = false,
                     CreateNoWindow         = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError  = true
                     },
-                    EnableRaisingEvents    = true
+                    EnableRaisingEvents = true
                 };
 
                 _consoleProcess.OutputDataReceived += OutputHandler;
-                _consoleProcess.ErrorDataReceived  += ErrorOutputHandler;
-                _consoleProcess.Exited             += ExitedHandler;
+                _consoleProcess.ErrorDataReceived += ErrorOutputHandler;
+                _consoleProcess.Exited += ExitedHandler;
 
                 _consoleProcess.Start();
                 _consoleProcess.BeginErrorReadLine();
                 _consoleProcess.BeginOutputReadLine();
                 _consoleProcess.WaitForExit();
 
-                _consoleProcess.ErrorDataReceived  -= ErrorOutputHandler;
+                _consoleProcess.ErrorDataReceived -= ErrorOutputHandler;
                 _consoleProcess.OutputDataReceived -= OutputHandler;
             }
             catch (Exception ex)
             {
                 _consoleProcess = null;
-                MessageBox.Show(ex.Message, @"vspipe Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Exceptions = ex;
             }
         }
 
         public void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ValueUpdated?.Invoke(outLine.Data);
-            //Debug.WriteLine(outLine.Data);
         }
 
         public void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
             ProgressUpdated?.Invoke(outLine.Data);
-            //Debug.WriteLine(outLine.Data);
             if (Abort)
             {
                 ((Process)sendingProcess).Kill();
@@ -109,5 +98,9 @@ namespace RPChecker.Util
             _consoleProcess.Close();
             _consoleProcess.Exited -= ExitedHandler;
         }
+
+        protected const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
+
+        public abstract void UpdateValue(string data, ref Dictionary<int, double> tempData);
     }
 }

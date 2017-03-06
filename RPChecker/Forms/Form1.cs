@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using RPChecker.Util;
 using System.Drawing;
 using System.Threading;
@@ -9,29 +8,53 @@ using System.Reflection;
 using System.Diagnostics;
 using RPChecker.Properties;
 using System.Windows.Forms;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using RPChecker.Util.FilterProcess;
+using System.Text.RegularExpressions;
 
 namespace RPChecker.Forms
 {
     public partial class Form1 : Form
     {
+        #region Form init
         public Form1()
         {
             InitializeComponent();
             AddCommand();
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
+
+            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
+            if (saved != new Point(-32000, -32000)) Location = saved;
+            RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
+
+            cbFPS.SelectedIndex = 0;
+            cbVpyFile.SelectedIndex = 0;
+            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            foreach (var item in current.GetFiles().Where(item => item.Extension.ToLower() == ".vpy"))
+            {
+                cbVpyFile.Items.Add(item);
+            }
+            btnAnalyze.Enabled = false;
+
+            Updater.CheckUpdateWeekly("RPChecker");
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "Location");
+        }
+        #endregion
+
         public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
-        private readonly StringBuilder _errorMessageBuilder = new StringBuilder();
-        private bool _beginErrorRecord;
         private int _threshold = 30;
-
-        private IProcess _coreProcess = new VsPipeProcess();
+        private readonly double[] _frameRate = { 24000 / 1001.0, 24, 25, 30000 / 1001.0, 50, 60000 / 1001.0 };
+        private IProcess _coreProcess = new VsPipePSNRProcess();
 
         #region SystemMenu
         private SystemMenu _systemMenu;
@@ -40,20 +63,31 @@ namespace RPChecker.Forms
         {
             _systemMenu = new SystemMenu(this);
             _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
-            _systemMenu.AddCommand("使用PSNR(&P)", () =>
+            _systemMenu.AddCommand("使用PSNR(VS)", () =>
             {
-                if (!(_coreProcess is VsPipeProcess))
+                if (!(_coreProcess is VsPipePSNRProcess))
                 {
-                    _coreProcess = new VsPipeProcess();
+                    _coreProcess = new VsPipePSNRProcess();
+                    label1.Text = _coreProcess.ValueText;
                 }
             }, true);
-            _systemMenu.AddCommand("使用SSIM(&S)", () =>
+            _systemMenu.AddCommand("使用PSNR(FF)", () =>
             {
-                if (!(_coreProcess is FFmpegProcess))
+                if (!(_coreProcess is FFmpegPSNRProcess))
                 {
-                    _coreProcess = new FFmpegProcess();
+                    _coreProcess = new FFmpegPSNRProcess();
+                    label1.Text = _coreProcess.ValueText;
                 }
             }, false);
+            _systemMenu.AddCommand("使用SSIM(FF)", () =>
+            {
+                if (!(_coreProcess is FFmpegSSIMProcess))
+                {
+                    _coreProcess = new FFmpegSSIMProcess();
+                    label1.Text = _coreProcess.ValueText;
+                }
+            }, false);
+
         }
 
         protected override void WndProc(ref Message msg)
@@ -66,64 +100,26 @@ namespace RPChecker.Forms
         }
         #endregion
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
-
-            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
-            if (saved != new Point(-32000, -32000)) Location = saved;
-            RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
-
-            cbFPS.SelectedIndex     = 0;
-            cbVpyFile.SelectedIndex = 0;
-            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            foreach (var item in current.GetFiles().Where(item => item.Extension.ToLower() == ".vpy"))
-            {
-                cbVpyFile.Items.Add(item);
-            }
-            btnAnalyze.Enabled = false;
-            
-            Updater.CheckUpdateWeekly("RPChecker");
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "Location");
-        }
-
+        #region LoadFile
         private bool _loadFormOpened;
         private void btnLoad_Click(object sender, EventArgs e)
         {
             if (_loadFormOpened) return;
             FrmLoadFiles flf = new FrmLoadFiles(this);
-            flf.Load   += (o, args) => _loadFormOpened = true;
+            flf.Load += (o, args) =>
+            {
+                _loadFormOpened = true;
+                btnAnalyze.Enabled = false;
+            };
             flf.Closed += (o, args) =>  {
                 btnAnalyze.Enabled = FilePathsPair.Count > 0;
                 _loadFormOpened = false;
             };
             flf.Show();
         }
+        #endregion
 
-        private void btnLog_Click(object sender, EventArgs e)
-        {
-            if (_errorMessageBuilder.Length == 0) return;
-            MessageBox.Show(_errorMessageBuilder.ToString(), @"Log");
-        }
-
-        private void btnAbort_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                _coreProcess.Abort = true;
-            }
-            catch (Exception ex)
-            {
-                new Task(() => MessageBox.Show(ex.Message, "Terminate Process Failed")).Start();
-            }
-        }
-
-        private readonly double[] _frameRate = { 24000/1001.0, 24, 25, 30000/1001.0, 50, 60000/1001.0 };
-
+        #region switch
         private void ChangeClipDisplay(int index)
         {
             if (index < 0 || index > _fullData.Count) return;
@@ -134,6 +130,7 @@ namespace RPChecker.Forms
         private void cbFileList_SelectionChangeCommitted(object sender, EventArgs e)
         {
             ChangeClipDisplay(cbFileList.SelectedIndex);
+            toolStripStatusStdError.Text = cbFileList.SelectedItem?.ToString();
         }
 
         private void cbFPS_SelectedIndexChanged(object sender, EventArgs e)
@@ -158,7 +155,9 @@ namespace RPChecker.Forms
         private void cbFileList_MouseEnter(object sender, EventArgs e) => toolTip1.Show(cbFileList.SelectedItem?.ToString(), (IWin32Window)sender);
 
         private void cbFileList_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
+        #endregion
 
+        #region core
         private bool Enable
         {
             set
@@ -174,7 +173,6 @@ namespace RPChecker.Forms
                 btnAbort.Enabled = !value;
             }
         }
-
         private void UpdataGridView(ReSulT info, double frameRate)
         {
             dataGridView1.Rows.Clear();
@@ -194,21 +192,26 @@ namespace RPChecker.Forms
         }
 
         private bool _errorDialogShowed;
+        private LogBuffer _currentBuffer;
+        private Dictionary<int, double> _tempData;
+
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
             _fullData.Clear();
-            _errorMessageBuilder.Clear();
             cbFileList.Items.Clear();
             foreach (var item in FilePathsPair)
             {
                 try
                 {
                     _errorDialogShowed = false;
+                    _currentBuffer = new LogBuffer();
+                    _tempData = new Dictionary<int, double>();
+
                     AnalyseClip(item.Key, item.Value);
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
-                    _fullData.Add(new ReSulT {FileName = item.Value, Data = data});
-                    if (_beginErrorRecord) continue; AddStatic();
-                    if (_coreProcess is FFmpegProcess || _remainFile) continue; RemoveScript(item);
+                    _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
+                    if (_currentBuffer.Inf) continue; AddStatic();
+                    if (_coreProcess is FFmpegSSIMProcess || _remainFile) continue; RemoveScript(item);
                 }
                 catch (Exception ex)
                 {
@@ -217,8 +220,8 @@ namespace RPChecker.Forms
                                 @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error)).Start();
                 }
             }
-            _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileName) ?? ""));
-            btnLog.Enabled = _errorMessageBuilder.ToString().Split('\n').Length > FilePathsPair.Count + 1;
+            _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.Key) ?? ""));
+            //btnLog.Enabled = _errorMessageBuilder.ToString().Split('\n').Length > FilePathsPair.Count + 1;
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
             ChangeClipDisplay(cbFileList.SelectedIndex);
@@ -228,34 +231,29 @@ namespace RPChecker.Forms
         {
             _coreProcess.ProgressUpdated += ProgressUpdated;
             _coreProcess.ValueUpdated += ValueUpdated;
-            _tempData = new Dictionary<int, double>();
-            
-            _beginErrorRecord = false;
+
             Enable = false;
             toolStripStatusStdError.Text = _coreProcess.Loading;
             toolStripProgressBar1.Value = 0;
             try
             {
-                var coreThread = new Thread(_coreProcess.GenerateLog);
-
-                if (_coreProcess is VsPipeProcess)
+                Thread coreThread;
+                if (_coreProcess is VsPipePSNRProcess)
                 {
                     string vsFile = $"{file2}.vpy";
                     ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
-                    _errorMessageBuilder.AppendLine($"---{vsFile}---");
-                    coreThread.Start(vsFile);
+                    coreThread = new Thread(() => _coreProcess.GenerateLog(vsFile));
                 }
                 else
                 {
-                    _errorMessageBuilder.AppendLine($"---{Path.GetFileName(file1)}|{Path.GetFileName(file2)}---");
-                    coreThread.Start(new KeyValuePair<string, string>(file1, file2));
+                    coreThread = new Thread(() => _coreProcess.GenerateLog(file1, file2));
                 }
-
+                coreThread.Start();
                 while (coreThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
-                if (_coreProcess.ProcessNotFind)
+                if (_coreProcess.Exceptions != null)
                 {
-                    toolStripStatusStdError.Text = _coreProcess.FileNotFind;
-                    throw new Exception(toolStripStatusStdError.Text);
+                    toolStripStatusStdError.Text = _coreProcess.Exceptions.Message;
+                    throw _coreProcess.Exceptions;
                 }
             }
             catch (Exception ex)
@@ -273,11 +271,30 @@ namespace RPChecker.Forms
             }
         }
 
+        private void btnAbort_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _coreProcess.Abort = true;
+            }
+            catch (Exception ex)
+            {
+                new Task(() => MessageBox.Show(ex.Message, "Terminate Process Failed")).Start();
+            }
+        }
+
+        private void btnLog_Click(object sender, EventArgs e)
+        {
+            if (_fullData[cbFileList.SelectedIndex].Logs.IsEmpty()) return;
+            new FormLog(_fullData[cbFileList.SelectedIndex]).Show();
+        }
+
         private void ProgressUpdated(string progress)
         {
-            if (string.IsNullOrEmpty(progress))return;
+            if (string.IsNullOrEmpty(progress)) return;
+            _currentBuffer.Log(progress);
             _coreProcess
-                .Match<VsPipeProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
+                .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
                 .Match<FFmpegProcess>(_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
                 ;
         }
@@ -286,13 +303,11 @@ namespace RPChecker.Forms
         {
             if (string.IsNullOrEmpty(data)) return;
             _coreProcess
-                .Match<VsPipeProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
-                .Match<FFmpegProcess>(_ => Invoke(new Action(() => UpdateSSIM(data))))
+                .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
+                .Match<FFmpegProcess>(self => Invoke(new Action(() => self.UpdateValue(data, ref _tempData))))
                 ;
         }
-
-
-        private volatile Dictionary<int, double> _tempData = new Dictionary<int, double>();
+        #endregion
 
         #region vapoursynth
         private static readonly Regex VsProgressRegex = new Regex(@"Frame: (?<processed>\d+)/(?<total>\d+)", RegexOptions.Compiled);
@@ -302,11 +317,10 @@ namespace RPChecker.Forms
             toolStripStatusStdError.Text = progress;
             if (Regex.IsMatch(progress, "Failed", RegexOptions.IgnoreCase))
             {
-                _beginErrorRecord = true;
+                _currentBuffer.Inf = true;
             }
-            if (_beginErrorRecord)
+            if (_currentBuffer.Inf)
             {
-                _errorMessageBuilder.AppendLine(progress);
                 if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
                 {
                     _errorDialogShowed = true;
@@ -346,7 +360,6 @@ namespace RPChecker.Forms
         #endregion
 
         #region ffmpeg
-
         private int _ffmpegTotalFrame = int.MaxValue;
         private static readonly Regex FFmpegFrameRegex = new Regex(@"NUMBER_OF_FRAMES: (?<frame>\d+)", RegexOptions.Compiled);
         private static readonly Regex FFmpegProgressRegex = new Regex(@"frame=\s*(?<processed>\d+)", RegexOptions.Compiled);
@@ -355,11 +368,11 @@ namespace RPChecker.Forms
             // NUMBER_OF_FRAMES: 960
             //frame=  287 fps= 57 q=-0.0 size=N/A time=00:00:04.78 bitrate=N/A speed=0.953x
             toolStripStatusStdError.Text = progress;
-            if (progress.StartsWith("[Parsed_ssim"))
+            if (progress.StartsWith("[Parsed_"))
             {
-                _errorMessageBuilder.AppendLine(progress);
-                return;
+                _currentBuffer.Inf = true;
             }
+            if (_currentBuffer.Inf) return;
             var frameRet = FFmpegFrameRegex.Match(progress);
             if (_ffmpegTotalFrame == int.MaxValue && frameRet.Success)
             {
@@ -374,19 +387,6 @@ namespace RPChecker.Forms
                 toolStripProgressBar1.Value = (int)Math.Floor(processed * 100.0 / _ffmpegTotalFrame);
             }
         }
-
-        private static readonly Regex SSIMDataFormatRegex = new Regex(@"n:(?<frame>\d+) Y:(?<Y>[-+]?[0-9]*\.?[0-9]+) U:(?<U>[-+]?[0-9]*\.?[0-9]+) V:(?<V>[-+]?[0-9]*\.?[0-9]+) All:(?<All>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);// \((?<SSIM>(?:[-+]?[0-9]*\.?[0-9]+)?(?:inf)?)\)
-
-        private void UpdateSSIM(string data)
-        {
-            //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140|inf)
-            var rawData = SSIMDataFormatRegex.Match(data);
-            if (!rawData.Success) return;
-            string ssim = rawData.Groups["All"].Value;
-            double ssimValue = double.Parse(ssim) * 100;
-            _tempData[int.Parse(rawData.Groups["frame"].Value)] = ssimValue;
-        }
-
         #endregion
 
         #region chartForm
@@ -395,7 +395,7 @@ namespace RPChecker.Forms
         private void btnChart_Click(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
-            string type = _coreProcess is VsPipeProcess ? "PSNR" : "SSIM";
+            string type = _coreProcess is VsPipePSNRProcess || _coreProcess is FFmpegPSNRProcess ? "PSNR" : "SSIM";
             FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;
@@ -418,9 +418,7 @@ namespace RPChecker.Forms
             }
         }
 
-
         private bool _remainFile;
-
         private void toolStripDropDownButton1_Click(object sender, EventArgs e)
         {
             _remainFile = !_remainFile;
@@ -441,6 +439,7 @@ namespace RPChecker.Forms
         #region statistics
         private void AddStatic()
         {
+            if (_coreProcess is FFmpegProcess) return;
             try
             {
                 RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
@@ -487,23 +486,10 @@ namespace RPChecker.Forms
         #endregion
     }
 
-    public class ReSulT: INotifyPropertyChanged
+    public struct ReSulT
     {
-        private List<KeyValuePair<int, double>> _data;
-        public List<KeyValuePair<int, double>> Data {
-            get { return _data; }
-            set {
-                _data = value;
-                NotifyPropertyChanged();
-            }
-        }
-        public string FileName { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public List<KeyValuePair<int, double>> Data { get; set; }
+        public KeyValuePair<string, string> FileNamePair { get; set; }
+        public LogBuffer Logs { get; set; }
     }
 }
