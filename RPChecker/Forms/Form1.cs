@@ -211,7 +211,7 @@ namespace RPChecker.Forms
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue; AddStatic();
-                    if (_coreProcess is FFmpegSSIMProcess || _remainFile) continue; RemoveScript(item);
+                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile) continue; RemoveScript(item);
                 }
                 catch (Exception ex)
                 {
@@ -326,14 +326,14 @@ namespace RPChecker.Forms
                     _errorDialogShowed = true;
                     new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Start();
+                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python36\\Lib\\site-packages")).Start();
                 }
                 else if (!_errorDialogShowed && progress.EndsWith("There is no function named PlaneAverage"))
                 {
                     _errorDialogShowed = true;
                     new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python35\\Lib\\site-packages")).Start();
+                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python36\\Lib\\site-packages")).Start();
                 }
                 return;
             }
