@@ -142,7 +142,7 @@ if src.width!=opt.width:
 cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
 
 def callback(n,clip,f):
-   print(n,f.props.PlanePSNR)
+   print(n,f.props.PlanePSNR,flush=True)
    return clip
 
 cmp=core.std.FrameEval(cmp,functools.partial(callback, clip=cmp),prop_src=[cmp])
