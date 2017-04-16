@@ -211,7 +211,7 @@ namespace RPChecker.Forms
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue; AddStatic();
-                    if (_coreProcess is FFmpegSSIMProcess || _remainFile) continue; RemoveScript(item);
+                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile) continue; RemoveScript(item);
                 }
                 catch (Exception ex)
                 {
