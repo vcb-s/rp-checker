@@ -134,7 +134,7 @@ namespace RPChecker.Util
                             break;
                         }
                     }
-                    if (!subKeyFound) throw new Exception("Found VapourSynth in your system but not the registry value InstallLocation!");
+                    if (!subKeyFound) throw new Exception("Can not found VapourSynth in your system!");
                 }
             }
             valuePath = valuePath ?? "";
