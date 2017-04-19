@@ -27,7 +27,7 @@ namespace RPChecker.Forms
         private void FrmChart_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
+            var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
             DrawChart();
         }
@@ -35,20 +35,20 @@ namespace RPChecker.Forms
         private void DrawChart()
         {
             chart1.Series.Clear();
-            Series series1 = new Series(_type)
+            var series1 = new Series(_type)
             {
                 Color = Color.Blue,
                 ChartType = SeriesChartType.Line,
                 IsValueShownAsLabel = false
             };
 
-            Series series2 = new Series("frame")
+            var series2 = new Series("frame")
             {
                 Color = Color.Red,
                 ChartType = SeriesChartType.Point,
                 IsValueShownAsLabel = false
             };
-            int interval = (int) Math.Round(_fps) * 30;
+            var interval = (int) Math.Round(_fps) * 30;
             var task = new Task(() =>
             {
                 foreach(var frame in _info.Data.OrderBy(item => item.Key))

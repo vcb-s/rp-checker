@@ -54,7 +54,7 @@ namespace RPChecker.Util
 
         public static string InputBox(string caption, string prompt, string defaultText)
         {
-            string localInputText = defaultText;
+            var localInputText = defaultText;
             return InputQuery(caption, prompt, ref localInputText) ? localInputText : "";
         }
 
@@ -111,11 +111,11 @@ namespace RPChecker.Util
             edInput.SelectAll();
 
 
-            int buttonTop = MulDiv(41, dialogUnits.Height, 8);
+            var buttonTop = MulDiv(41, dialogUnits.Height, 8);
             //Command buttons should be 50x14 dlus
-            Size buttonSize = ScaleSize(new Size(50, 14), dialogUnits.Width / 4, dialogUnits.Height / 8);
+            var buttonSize = ScaleSize(new Size(50, 14), dialogUnits.Width / 4, dialogUnits.Height / 8);
 
-            Button bbOk = new Button
+            var bbOk = new Button
             {
                 Parent = form,
                 Text = "OK",
@@ -125,7 +125,7 @@ namespace RPChecker.Util
             bbOk.Location = new Point(MulDiv(38, dialogUnits.Width, 4), buttonTop);
             bbOk.Size = buttonSize;
 
-            Button bbCancel = new Button
+            var bbCancel = new Button
             {
                 Parent = form,
                 Text = "Cancel",

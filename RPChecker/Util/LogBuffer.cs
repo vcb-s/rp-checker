@@ -43,7 +43,7 @@ namespace RPChecker.Util
 
         public override string ToString()
         {
-            StringBuilder ret = new StringBuilder();
+            var ret = new StringBuilder();
             foreach (var node in _content)
             {
                 ret.AppendLine(node);

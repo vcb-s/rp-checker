@@ -28,13 +28,13 @@ namespace RPChecker.Forms
         {
             Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
 
-            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
+            var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
             if (saved != new Point(-32000, -32000)) Location = saved;
             RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
 
             cbFPS.SelectedIndex = 0;
             cbVpyFile.SelectedIndex = 0;
-            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             foreach (var item in current.GetFiles().Where(item => item.Extension.ToLower() == ".vpy"))
             {
                 cbVpyFile.Items.Add(item);
@@ -105,7 +105,7 @@ namespace RPChecker.Forms
         private void btnLoad_Click(object sender, EventArgs e)
         {
             if (_loadFormOpened) return;
-            FrmLoadFiles flf = new FrmLoadFiles(this);
+            var flf = new FrmLoadFiles(this);
             flf.Load += (o, args) =>
             {
                 _loadFormOpened = true;
@@ -136,11 +136,11 @@ namespace RPChecker.Forms
         private void cbFPS_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0) return;
-            double frameRate = _frameRate[cbFPS.SelectedIndex];
+            var frameRate = _frameRate[cbFPS.SelectedIndex];
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 if(row.Tag == null) continue;
-                TimeSpan temp = ToolKits.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
+                var temp = ToolKits.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
                 row.Cells[2].Value = temp.Time2String();
             }
         }
@@ -180,8 +180,8 @@ namespace RPChecker.Forms
             {
                 if ((item.Value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
 
-                DataGridViewRow newRow = new DataGridViewRow {Tag = item};
-                TimeSpan temp = ToolKits.Second2Time(item.Key / frameRate);
+                var newRow = new DataGridViewRow {Tag = item};
+                var temp = ToolKits.Second2Time(item.Key / frameRate);
                 newRow.CreateCells(dataGridView1, item.Key, $"{item.Value:F4}", temp.Time2String());
                 newRow.DefaultCellStyle.BackColor = item.Value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
@@ -321,6 +321,13 @@ namespace RPChecker.Forms
             }
             if (_currentBuffer.Inf)
             {
+                if (!_errorDialogShowed && progress.Contains("No attribute with the name lsmas exists"))
+                {
+                    _errorDialogShowed = true;
+                    new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                        buttons: MessageBoxButtons.OK,
+                        text: $"尚未安装 'L-SMASH' 滤镜{Environment.NewLine}大概的位置是在VapourSynth\\plugins64")).Start();
+                }
                 if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
                 {
                     _errorDialogShowed = true;
@@ -395,8 +402,8 @@ namespace RPChecker.Forms
         private void btnChart_Click(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
-            string type = _coreProcess is VsPipePSNRProcess || _coreProcess is FFmpegPSNRProcess ? "PSNR" : "SSIM";
-            FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
+            var type = _coreProcess is VsPipePSNRProcess || _coreProcess is FFmpegPSNRProcess ? "PSNR" : "SSIM";
+            var chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;
             chart.Show();
@@ -468,7 +475,7 @@ namespace RPChecker.Forms
             if (_poi[0] < _poi[1]) return;
             if (MessageBox.Show(@"是否打开关于界面", @"RPCheckerについて", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                Form2 version = new Form2();
+                var version = new Form2();
                 version.Show();
             }
             else

@@ -14,9 +14,9 @@ namespace RPChecker.Util
     {
         private static void OnResponse(IAsyncResult ar)
         {
-            Regex versionRegex = new Regex(@"<meta\s+name\s*=\s*'RPChecker'\s+content\s*=\s*'(\d+\.\d+\.\d+\.\d+)'\s*>");
-            Regex baseUrlRegex = new Regex(@"<meta\s+name\s*=\s*'BaseUrl'\s+content\s*=\s*'(.+)'\s*>");
-            WebRequest webRequest = (WebRequest)ar.AsyncState;
+            var versionRegex = new Regex(@"<meta\s+name\s*=\s*'RPChecker'\s+content\s*=\s*'(\d+\.\d+\.\d+\.\d+)'\s*>");
+            var baseUrlRegex = new Regex(@"<meta\s+name\s*=\s*'BaseUrl'\s+content\s*=\s*'(.+)'\s*>");
+            var webRequest   = (WebRequest)ar.AsyncState;
             Stream responseStream;
             try
             {
@@ -30,14 +30,14 @@ namespace RPChecker.Util
             }
             if (responseStream == null) return;
 
-            StreamReader streamReader = new StreamReader(responseStream);
-            string context = streamReader.ReadToEnd();
+            var streamReader = new StreamReader(responseStream);
+            var context = streamReader.ReadToEnd();
             var result = versionRegex.Match(context);
             var urlResult = baseUrlRegex.Match(context);
             if (!result.Success || !result.Success) return;
 
             var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            Version remoteVersion = Version.Parse(result.Groups[1].Value);
+            var remoteVersion = Version.Parse(result.Groups[1].Value);
             if (currentVersion >= remoteVersion)
             {
                 MessageBox.Show($"v{currentVersion} 已是最新版", @"As Expected");
@@ -46,14 +46,14 @@ namespace RPChecker.Util
             var dialogResult = MessageBox.Show(caption: @"Wow! Such Impressive", text: $"新车已发车 v{remoteVersion}，上车!",
                                                buttons: MessageBoxButtons.YesNo, icon: MessageBoxIcon.Asterisk);
             if (dialogResult != DialogResult.Yes) return;
-            FormUpdater formUpdater = new FormUpdater(Application.ExecutablePath, remoteVersion, urlResult.Groups[1].Value);
+            var formUpdater = new FormUpdater(Application.ExecutablePath, remoteVersion, urlResult.Groups[1].Value);
             formUpdater.ShowDialog();
         }
 
         public static void CheckUpdate()
         {
             if (!IsConnectInternet()) return;
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create("http://tautcony.github.io/tcupdate");
+            var webRequest = (HttpWebRequest)WebRequest.Create("http://tautcony.github.io/tcupdate");
             #if DEBUG
             webRequest = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:4000/tcupdate");
             #endif

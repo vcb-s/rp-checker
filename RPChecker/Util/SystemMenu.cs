@@ -69,7 +69,7 @@ namespace RPChecker.Util
         /// <param name="separatorBeforeCommand">Indicates whether a separator is inserted before the command.</param>
         public void AddCommand(string text, Action action, bool separatorBeforeCommand)
         {
-            int id = ++lastId;
+            var id = ++lastId;
             if (!form.IsHandleCreated)
             {
                 // The form is not yet created, queue the command for later addition
@@ -126,7 +126,7 @@ namespace RPChecker.Util
             // Add all queued commands now
             if (pendingCommands != null)
             {
-                foreach (CommandInfo command in pendingCommands)
+                foreach (var command in pendingCommands)
                 {
                     if (command.Separator)
                     {

@@ -26,7 +26,7 @@ namespace RPChecker.Util.FilterProcess
 
         public void GenerateLog(params string[] inputFiles)
         {
-            string vspipePath = this.GetVsPipePath(out Exception exception);
+            var vspipePath = this.GetVsPipePath(out Exception exception);
             if (exception != null || vspipePath == null)
             {
                 Exceptions = exception;

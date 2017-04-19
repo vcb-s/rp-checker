@@ -16,8 +16,8 @@ namespace RPChecker.Util.FilterProcess
             //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140|inf)
             var rawData = SSIMDataFormatRegex.Match(data);
             if (!rawData.Success) return;
-            string ssim = rawData.Groups["All"].Value;
-            double ssimValue = double.Parse(ssim) * 100;
+            var ssim = rawData.Groups["All"].Value;
+            var ssimValue = double.Parse(ssim) * 100;
             tempData[int.Parse(rawData.Groups["frame"].Value)] = ssimValue;
         }
     }
