@@ -211,7 +211,8 @@ namespace RPChecker.Forms
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue; AddStatic();
-                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile) continue; RemoveScript(item);
+                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || NativeMethods.IsUserAnAdmin()) continue;
+                    RemoveScript(item);
                 }
                 catch (Exception ex)
                 {
@@ -242,6 +243,7 @@ namespace RPChecker.Forms
                 AnalyseClip(linkedFile1, linkedFile2);
                 File.Delete(linkedFile1);
                 File.Delete(linkedFile2);
+                RemoveScript(new KeyValuePair<string, string>(linkedFile1, linkedFile2));
             }
             else
             {
