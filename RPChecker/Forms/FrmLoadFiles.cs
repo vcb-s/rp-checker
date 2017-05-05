@@ -18,6 +18,11 @@ namespace RPChecker.Forms
             _mainWindow = arg;
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             InitializeComponent();
+            if (NativeMethods.IsUserAnAdmin())
+            {
+                textBox1.Text = textBox2.Text = "管理员模式下并不支持拖拽";
+                textBox1.Enabled = textBox2.Enabled = false;
+            }
         }
 
         private void listView1_ItemDrag(object sender, ItemDragEventArgs e)
