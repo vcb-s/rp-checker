@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace RPChecker.Util
@@ -14,6 +15,20 @@ namespace RPChecker.Util
         public static bool CreateHardLink(string lpFileName, string lpExistingFileName)
         {
             return CreateHardLink(lpFileName, lpExistingFileName, IntPtr.Zero);
+        }
+
+        public static void CreateHardLinkCMD(string lpFileName, string lpExistingFileName)
+        {
+            new Process {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "fsutil",
+                    Arguments = $"hardlink create \"{lpFileName}\" \"{lpExistingFileName}\"",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            }.Start();
         }
     }
 }

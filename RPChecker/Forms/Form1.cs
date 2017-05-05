@@ -87,6 +87,7 @@ namespace RPChecker.Forms
                     label1.Text = _coreProcess.ValueText;
                 }
             }, false);
+            _systemMenu.AddCommand("使用原始路径", () => _useOriginPath = true, true);
 
         }
 
@@ -211,7 +212,7 @@ namespace RPChecker.Forms
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue; AddStatic();
-                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || NativeMethods.IsUserAnAdmin()) continue;
+                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || !_useOriginPath) continue;
                     RemoveScript(item);
                 }
                 catch (Exception ex)
@@ -228,16 +229,18 @@ namespace RPChecker.Forms
             ChangeClipDisplay(cbFileList.SelectedIndex);
         }
 
+        private bool _useOriginPath;
+
         private void AnalyseClipLink(string file1, string file2)
         {
             Debug.Assert(file1 != null);
             Debug.Assert(file2 != null);
-            if (NativeMethods.IsUserAnAdmin())
+            if (!_useOriginPath)
             {
                 var linkedFile1 = Path.Combine(Path.GetPathRoot(file1), Guid.NewGuid().ToString());
                 var linkedFile2 = Path.Combine(Path.GetPathRoot(file2), Guid.NewGuid().ToString());
-                NativeMethods.CreateHardLink(linkedFile1, file1);
-                NativeMethods.CreateHardLink(linkedFile2, file2);
+                NativeMethods.CreateHardLinkCMD(linkedFile1, file1);
+                NativeMethods.CreateHardLinkCMD(linkedFile2, file2);
                 Debug.WriteLine($"HardLink: {file1} => {linkedFile1}");
                 Debug.WriteLine($"HardLink: {file2} => {linkedFile2}");
                 AnalyseClip(linkedFile1, linkedFile2);
