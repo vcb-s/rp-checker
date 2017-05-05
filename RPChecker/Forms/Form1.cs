@@ -207,7 +207,7 @@ namespace RPChecker.Forms
                     _currentBuffer = new LogBuffer();
                     _tempData = new Dictionary<int, double>();
 
-                    AnalyseClip(item.Key, item.Value);
+                    AnalyseClipLink(item.Key, item.Value);
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue; AddStatic();
@@ -225,6 +225,28 @@ namespace RPChecker.Forms
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
             ChangeClipDisplay(cbFileList.SelectedIndex);
+        }
+
+        private void AnalyseClipLink(string file1, string file2)
+        {
+            Debug.Assert(file1 != null);
+            Debug.Assert(file2 != null);
+            if (NativeMethods.IsUserAnAdmin())
+            {
+                var linkedFile1 = Path.Combine(Path.GetPathRoot(file1), Guid.NewGuid().ToString());
+                var linkedFile2 = Path.Combine(Path.GetPathRoot(file2), Guid.NewGuid().ToString());
+                NativeMethods.CreateHardLink(linkedFile1, file1);
+                NativeMethods.CreateHardLink(linkedFile2, file2);
+                Debug.WriteLine($"HardLink: {file1} => {linkedFile1}");
+                Debug.WriteLine($"HardLink: {file2} => {linkedFile2}");
+                AnalyseClip(linkedFile1, linkedFile2);
+                File.Delete(linkedFile1);
+                File.Delete(linkedFile2);
+            }
+            else
+            {
+                AnalyseClip(file1, file2);
+            }
         }
 
         private void AnalyseClip(string file1, string file2)
