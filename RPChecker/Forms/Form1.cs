@@ -455,8 +455,15 @@ namespace RPChecker.Forms
         private bool _remainFile;
         private void toolStripDropDownButton1_Click(object sender, EventArgs e)
         {
-            _remainFile = !_remainFile;
-            toolStripDropDownButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
+            if (_useOriginPath)
+            {
+                _remainFile = !_remainFile;
+                toolStripDropDownButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
+            }
+            else
+            {
+                Notification.ShowInfo("在硬链模式下该功能已被禁用", MessageBoxButtons.OK);
+            }
         }
 
         private void toolStripDropDownButton1_MouseEnter(object sender, EventArgs e)
