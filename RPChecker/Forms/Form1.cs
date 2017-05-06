@@ -212,7 +212,7 @@ namespace RPChecker.Forms
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue; AddStatic();
-                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || !_useOriginPath) continue;
+                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || !UseOriginPath) continue;
                     RemoveScript(item);
                 }
                 catch (Exception ex)
@@ -231,11 +231,13 @@ namespace RPChecker.Forms
 
         private bool _useOriginPath;
 
+        private bool UseOriginPath => _useOriginPath || !(_coreProcess is VsPipePSNRProcess);
+
         private void AnalyseClipLink(string file1, string file2)
         {
             Debug.Assert(file1 != null);
             Debug.Assert(file2 != null);
-            if (!_useOriginPath)
+            if (!UseOriginPath)
             {
                 var linkedFile1 = Path.Combine(Path.GetPathRoot(file1), Guid.NewGuid().ToString());
                 var linkedFile2 = Path.Combine(Path.GetPathRoot(file2), Guid.NewGuid().ToString());
@@ -455,7 +457,7 @@ namespace RPChecker.Forms
         private bool _remainFile;
         private void toolStripDropDownButton1_Click(object sender, EventArgs e)
         {
-            if (_useOriginPath)
+            if (UseOriginPath)
             {
                 _remainFile = !_remainFile;
                 toolStripDropDownButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
