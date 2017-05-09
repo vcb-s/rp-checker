@@ -11,7 +11,7 @@ namespace RPChecker.Forms
 {
     public partial class FrmChart : Form
     {
-        private readonly ReSulT _info = new ReSulT();
+        private readonly ReSulT _info;
         private readonly int _threshold;
         private readonly double _fps;
         private readonly string _type;
@@ -37,14 +37,14 @@ namespace RPChecker.Forms
             chart1.Series.Clear();
             var series1 = new Series(_type)
             {
-                Color = Color.Blue,
+                Color = Color.FromArgb(078, 079, 251),
                 ChartType = SeriesChartType.Line,
                 IsValueShownAsLabel = false
             };
 
             var series2 = new Series("frame")
             {
-                Color = Color.Red,
+                Color = Color.FromArgb(255, 010, 050),
                 ChartType = SeriesChartType.Point,
                 IsValueShownAsLabel = false
             };
@@ -90,8 +90,7 @@ namespace RPChecker.Forms
 
         private void btnSaveAsImage_Click(object sender, EventArgs e)
         {
-            var rnd = Path.GetRandomFileName().Substring(0, 8).ToUpper();
-            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.Key) ?? "", $"{rnd}.png");
+            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.Key) ?? "", $"{Guid.NewGuid()}.png");
             chart1.SaveImage(fileName, ChartImageFormat.Png);
         }
     }

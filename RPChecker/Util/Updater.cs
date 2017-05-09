@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -57,8 +58,9 @@ namespace RPChecker.Util
             #if DEBUG
             webRequest = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:4000/tcupdate");
             #endif
-            webRequest.UserAgent      = $"{Environment.UserName}({Environment.OSVersion}) / {Assembly.GetExecutingAssembly().GetName().FullName}";
-            webRequest.Method = "GET";
+            var userName              = Environment.UserName.ToCharArray().Aggregate("", (current, c) => current + $"{(int)c:X} ");
+            webRequest.UserAgent      = $"{userName}({Environment.OSVersion}) / {Assembly.GetExecutingAssembly().GetName().FullName}";
+            webRequest.Method         = "GET";
             webRequest.Credentials    = CredentialCache.DefaultCredentials;
             webRequest.BeginGetResponse(OnResponse, webRequest);
         }

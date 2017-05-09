@@ -416,7 +416,7 @@ namespace RPChecker.Forms
                 return;
             }
             var ret = FFmpegProgressRegex.Match(progress);
-            if (!ret.Success) return;
+            if (!ret.Success || _ffmpegTotalFrame == int.MaxValue) return;
             var processed = int.Parse(ret.Groups["processed"].Value);
             if (processed <= _ffmpegTotalFrame)
             {
