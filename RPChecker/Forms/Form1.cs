@@ -326,7 +326,7 @@ namespace RPChecker.Forms
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress)) return;
-            _currentBuffer.Log(progress);
+            _currentBuffer.Log("err|" + progress);
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
                 .Match<FFmpegProcess>(_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
@@ -336,6 +336,7 @@ namespace RPChecker.Forms
         private void ValueUpdated(string data)
         {
             if (string.IsNullOrEmpty(data)) return;
+            _currentBuffer.Log("std|" + data);
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
                 .Match<FFmpegProcess>(self => Invoke(new Action(() => self.UpdateValue(data, ref _tempData))))
