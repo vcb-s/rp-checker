@@ -87,18 +87,18 @@ namespace RPChecker.Properties {
         ///import functools
         ///
         ///core=vs.get_core(accept_lowercase=True)
-        ///core.max_cache_size = 5000
+        ///core.max_cache_size=5000
         ///
-        ///src=core.lsmas.LWLibavSource(r&quot;%File1%&quot;,format=&quot;yuv420p16&quot;)
-        ///opt=core.lsmas.LWLibavSource(r&quot;%File2%&quot;,format=&quot;yuv420p16&quot;)
+        ///srcPath=r&quot;%File1%&quot;
+        ///optPath=r&quot;%File2%&quot;
+        ///fmt=&quot;yuv420p16&quot;
         ///
-        ///if src.width!=opt.width:
-        ///    src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.YUV420P16)
+        ///source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt) if path.lower().endswith(&quot;mp4&quot;) else core.lsmas.LWLibavSource(path,format=fmt)
         ///
-        ///cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
+        ///src=mvf.GetPlane(source(srcPath))
+        ///opt=mvf.GetPlane(source(optPath))
         ///
-        ///def callback(n,clip,f):
-        ///   print(n,f.props.PlaneP [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,form [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string vpyTemplate {
             get {
