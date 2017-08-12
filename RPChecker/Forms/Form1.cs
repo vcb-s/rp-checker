@@ -344,7 +344,7 @@ namespace RPChecker.Forms
         private void VsUpdateProgress(string progress)
         {
             toolStripStatusStdError.Text = progress;
-            if (Regex.IsMatch(progress, "Failed", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(progress, "Failed|Error", RegexOptions.IgnoreCase))
             {
                 _currentBuffer.Inf = true;
             }

@@ -19,7 +19,8 @@ namespace RPChecker.Util
 
         public static void CreateHardLinkCMD(string lpFileName, string lpExistingFileName)
         {
-            new Process {
+            var process = new Process
+            {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "fsutil",
@@ -28,7 +29,9 @@ namespace RPChecker.Util
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }
-            }.Start();
+            };
+            process.Start();
+            process.WaitForExit();
         }
     }
 }
