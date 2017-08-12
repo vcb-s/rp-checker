@@ -63,7 +63,8 @@ namespace RPChecker.Forms
         private void UpdateText()
         {
             label1.Text = _coreProcess.ValueText;
-            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version} [{_coreProcess.Title}][{(_useOriginPath ? "ORG" : "LINK")}]";
+            cbVpyFile.Enabled = _coreProcess is VsPipePSNRProcess;
+            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version} [{_coreProcess.Title}][{(UseOriginPath ? "ORG" : "LINK")}]";
         }
 
         private void AddCommand()
@@ -72,26 +73,17 @@ namespace RPChecker.Forms
             _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
             _systemMenu.AddCommand("使用PSNR(VS)", () =>
             {
-                if (!(_coreProcess is VsPipePSNRProcess))
-                {
-                    _coreProcess = new VsPipePSNRProcess();
-                }
+                _coreProcess = _coreProcess as VsPipePSNRProcess ?? new VsPipePSNRProcess();
                 UpdateText();
             }, true);
             _systemMenu.AddCommand("使用PSNR(FF)", () =>
             {
-                if (!(_coreProcess is FFmpegPSNRProcess))
-                {
-                    _coreProcess = new FFmpegPSNRProcess();
-                }
+                _coreProcess = _coreProcess as FFmpegPSNRProcess ?? new FFmpegPSNRProcess();
                 UpdateText();
             }, false);
             _systemMenu.AddCommand("使用SSIM(FF)", () =>
             {
-                if (!(_coreProcess is FFmpegSSIMProcess))
-                {
-                    _coreProcess = new FFmpegSSIMProcess();
-                }
+                _coreProcess = _coreProcess as FFmpegSSIMProcess ?? new FFmpegSSIMProcess();
                 UpdateText();
             }, false);
             _systemMenu.AddCommand("使用原始路径", () =>
