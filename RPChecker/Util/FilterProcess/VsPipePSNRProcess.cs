@@ -22,7 +22,9 @@ namespace RPChecker.Util.FilterProcess
 
         public Exception Exceptions { get; set; }
 
-        public string ValueText { get; } = "峰值信噪比阈值";
+        public string ValueText => "峰值信噪比阈值";
+
+        public string Title => "VapourSynth PSNR";
 
         public void GenerateLog(params string[] inputFiles)
         {

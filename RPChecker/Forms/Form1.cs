@@ -26,7 +26,7 @@ namespace RPChecker.Forms
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
+            UpdateText();
 
             var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
             if (saved != new Point(-32000, -32000)) Location = saved;
@@ -59,6 +59,12 @@ namespace RPChecker.Forms
         #region SystemMenu
         private SystemMenu _systemMenu;
 
+        private void UpdateText()
+        {
+            label1.Text = _coreProcess.ValueText;
+            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version} [{_coreProcess.Title}][{(_useOriginPath ? "ORG" : "LINK")}]";
+        }
+
         private void AddCommand()
         {
             _systemMenu = new SystemMenu(this);
@@ -68,27 +74,30 @@ namespace RPChecker.Forms
                 if (!(_coreProcess is VsPipePSNRProcess))
                 {
                     _coreProcess = new VsPipePSNRProcess();
-                    label1.Text = _coreProcess.ValueText;
                 }
+                UpdateText();
             }, true);
             _systemMenu.AddCommand("使用PSNR(FF)", () =>
             {
                 if (!(_coreProcess is FFmpegPSNRProcess))
                 {
                     _coreProcess = new FFmpegPSNRProcess();
-                    label1.Text = _coreProcess.ValueText;
                 }
+                UpdateText();
             }, false);
             _systemMenu.AddCommand("使用SSIM(FF)", () =>
             {
                 if (!(_coreProcess is FFmpegSSIMProcess))
                 {
                     _coreProcess = new FFmpegSSIMProcess();
-                    label1.Text = _coreProcess.ValueText;
                 }
+                UpdateText();
             }, false);
-            _systemMenu.AddCommand("使用原始路径", () => _useOriginPath = true, true);
-
+            _systemMenu.AddCommand("使用原始路径", () =>
+            {
+                _useOriginPath = true;
+                UpdateText();
+            }, true);
         }
 
         protected override void WndProc(ref Message msg)

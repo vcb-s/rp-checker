@@ -5,9 +5,11 @@ namespace RPChecker.Util.FilterProcess
 {
     public class FFmpegSSIMProcess: FFmpegProcess
     {
-        public override string ValueText { get; } = "结构相似性阈值";
+        public override string ValueText => "结构相似性阈值";
 
-        protected override string Arguments { get; } = "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex ssim=\"stats_file=-\" -an -f null -";
+        public override string Title => "FFmpeg SSIM";
+
+        protected override string Arguments => "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex ssim=\"stats_file=-\" -an -f null -";
 
         private static readonly Regex SSIMDataFormatRegex = new Regex($@"n:(?<frame>\d+) Y:(?<Y>{Number}) U:(?<U>{Number}) V:(?<V>{Number}) All:(?<All>{Number})", RegexOptions.Compiled);
 

@@ -27,6 +27,8 @@ namespace RPChecker.Util.FilterProcess
 
         string ValueText { get; }
 
+        string Title { get; }
+
         Exception Exceptions { get; set; }
     }
 }
