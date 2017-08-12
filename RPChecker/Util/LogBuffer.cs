@@ -19,10 +19,13 @@ namespace RPChecker.Util
 
         public void Log(string line)
         {
-            _content.AddLast(line);
-            if (!Inf && _content.Count > _count)
+            lock (_content)
             {
-                _content.RemoveFirst();
+                _content.AddLast(line);
+                if (!Inf && _content.Count > _count)
+                {
+                    _content.RemoveFirst();
+                }
             }
         }
 
@@ -43,12 +46,15 @@ namespace RPChecker.Util
 
         public override string ToString()
         {
-            var ret = new StringBuilder();
-            foreach (var node in _content)
+            lock (_content)
             {
-                ret.AppendLine(node);
+                var ret = new StringBuilder();
+                foreach (var node in _content)
+                {
+                    ret.AppendLine(node);
+                }
+                return ret.ToString();
             }
-            return ret.ToString();
         }
     }
 }
