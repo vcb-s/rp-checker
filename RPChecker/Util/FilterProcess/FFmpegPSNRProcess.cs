@@ -11,7 +11,9 @@ namespace RPChecker.Util.FilterProcess
 
         protected override string Arguments => "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex psnr=\"stats_file=-\" -an -f null -";
 
-        private static readonly Regex PSNRDataFormatRegex = new Regex($@"n:(?<frame>\d+) .*? psnr_avg:(?<avg>{Number}) psnr_y:(?<y>{Number}) psnr_u:(?<u>{Number}) psnr_v:(?<v>{Number})", RegexOptions.Compiled);
+        private static readonly string NumberOrInf = $"{Number}|inf";
+
+        private static readonly Regex PSNRDataFormatRegex = new Regex($@"n:(?<frame>\d+) .*? psnr_avg:(?<avg>{Number}) psnr_y:(?<y>{NumberOrInf}) psnr_u:(?<u>{NumberOrInf}) psnr_v:(?<v>{NumberOrInf})", RegexOptions.Compiled);
 
         public override void UpdateValue(string data, ref Dictionary<int, double> tempData)
         {
