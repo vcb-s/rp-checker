@@ -23,13 +23,15 @@ namespace RPChecker.Util.FilterProcess
 
         public Exception Exceptions { get; set; }
 
-        public virtual string ValueText { get; } = null;
+        public virtual string ValueText => null;
 
-        protected virtual string Arguments { get; } = null;
+        public virtual string Title => null;
+
+        protected virtual string Arguments => null;
 
         public void GenerateLog(params string[] inputFiles)
         {
-            string ffmpegPath = this.GetFFmpegPath(out Exception exception);
+            var ffmpegPath = this.GetFFmpegPath(out Exception exception);
             if (exception != null || ffmpegPath == null)
             {
                 Exceptions = exception;

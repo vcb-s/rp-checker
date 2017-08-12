@@ -16,7 +16,7 @@ namespace RPChecker.Util.FilterProcess
         void ErrorOutputHandler(object sendingProcess, DataReceivedEventArgs outLine);
 
         void ExitedHandler(object sender, EventArgs e);
- 
+
         event Action<string> ProgressUpdated;
 
         event Action<string> ValueUpdated;
@@ -26,6 +26,8 @@ namespace RPChecker.Util.FilterProcess
         string FileNotFind { get; }
 
         string ValueText { get; }
+
+        string Title { get; }
 
         Exception Exceptions { get; set; }
     }

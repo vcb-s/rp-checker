@@ -9,7 +9,7 @@ namespace RPChecker.Util
 
         private readonly int _count;
 
-        public LogBuffer(int count = 100)
+        public LogBuffer(int count = 1024)
         {
             _content = new LinkedList<string>();
             _count = count;
@@ -43,7 +43,7 @@ namespace RPChecker.Util
 
         public override string ToString()
         {
-            StringBuilder ret = new StringBuilder();
+            var ret = new StringBuilder();
             foreach (var node in _content)
             {
                 ret.AppendLine(node);

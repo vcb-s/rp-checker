@@ -22,11 +22,13 @@ namespace RPChecker.Util.FilterProcess
 
         public Exception Exceptions { get; set; }
 
-        public string ValueText { get; } = "峰值信噪比阈值";
+        public string ValueText => "峰值信噪比阈值";
+
+        public string Title => "VapourSynth PSNR";
 
         public void GenerateLog(params string[] inputFiles)
         {
-            string vspipePath = this.GetVsPipePath(out Exception exception);
+            var vspipePath = this.GetVsPipePath(out Exception exception);
             if (exception != null || vspipePath == null)
             {
                 Exceptions = exception;

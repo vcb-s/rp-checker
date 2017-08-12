@@ -11,7 +11,7 @@ namespace RPChecker.Forms
 {
     public partial class FrmChart : Form
     {
-        private readonly ReSulT _info = new ReSulT();
+        private readonly ReSulT _info;
         private readonly int _threshold;
         private readonly double _fps;
         private readonly string _type;
@@ -27,7 +27,7 @@ namespace RPChecker.Forms
         private void FrmChart_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
+            var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
             DrawChart();
         }
@@ -35,20 +35,20 @@ namespace RPChecker.Forms
         private void DrawChart()
         {
             chart1.Series.Clear();
-            Series series1 = new Series(_type)
+            var series1 = new Series(_type)
             {
-                Color = Color.Blue,
+                Color = Color.FromArgb(078, 079, 251),
                 ChartType = SeriesChartType.Line,
                 IsValueShownAsLabel = false
             };
 
-            Series series2 = new Series("frame")
+            var series2 = new Series("frame")
             {
-                Color = Color.Red,
+                Color = Color.FromArgb(255, 010, 050),
                 ChartType = SeriesChartType.Point,
                 IsValueShownAsLabel = false
             };
-            int interval = (int) Math.Round(_fps) * 30;
+            var interval = (int) Math.Round(_fps) * 30;
             var task = new Task(() =>
             {
                 foreach(var frame in _info.Data.OrderBy(item => item.Key))
@@ -90,8 +90,7 @@ namespace RPChecker.Forms
 
         private void btnSaveAsImage_Click(object sender, EventArgs e)
         {
-            var rnd = Path.GetRandomFileName().Substring(0, 8).ToUpper();
-            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.Key) ?? "", $"{rnd}.png");
+            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.Key) ?? "", $"{Guid.NewGuid()}.png");
             chart1.SaveImage(fileName, ChartImageFormat.Png);
         }
     }

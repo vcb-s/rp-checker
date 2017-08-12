@@ -18,6 +18,11 @@ namespace RPChecker.Forms
             _mainWindow = arg;
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             InitializeComponent();
+            if (NativeMethods.IsUserAnAdmin())
+            {
+                textBox1.Text = textBox2.Text = "管理员模式下并不支持拖拽";
+                textBox1.Enabled = textBox2.Enabled = false;
+            }
         }
 
         private void listView1_ItemDrag(object sender, ItemDragEventArgs e)
@@ -32,19 +37,19 @@ namespace RPChecker.Forms
 
         private void listView1_DragOver(object sender, DragEventArgs e)
         {
-            Point ptScreen = new Point(e.X, e.Y);
-            Point pt = listView1.PointToClient(ptScreen);
-            ListViewItem item = listView1.GetItemAt(pt.X, pt.Y);
+            var ptScreen = new Point(e.X, e.Y);
+            var pt       = listView1.PointToClient(ptScreen);
+            var item     = listView1.GetItemAt(pt.X, pt.Y);
             if (item != null)
                 item.Selected = true;
         }
 
         private void listView1_DragDrop(object sender, DragEventArgs e)
         {
-            ListViewItem draggedItem = (ListViewItem)e.Data.GetData(typeof(ListViewItem));
-            Point ptScreen = new Point(e.X, e.Y);
-            Point pt = listView1.PointToClient(ptScreen);
-            ListViewItem targetItem = listView1.GetItemAt(pt.X, pt.Y);//拖动的项将放置于该项之前
+            var draggedItem = (ListViewItem)e.Data.GetData(typeof(ListViewItem));
+            var ptScreen    = new Point(e.X, e.Y);
+            var pt          = listView1.PointToClient(ptScreen);
+            var targetItem  = listView1.GetItemAt(pt.X, pt.Y);//拖动的项将放置于该项之前
             if (targetItem == null) return;
             listView1.Items.Insert(targetItem.Index, (ListViewItem)draggedItem.Clone());
             listView1.Items.Remove(draggedItem);
@@ -62,19 +67,19 @@ namespace RPChecker.Forms
         }
         private void listView2_DragOver(object sender, DragEventArgs e)
         {
-            Point ptScreen = new Point(e.X, e.Y);
-            Point pt = listView2.PointToClient(ptScreen);
-            ListViewItem item = listView2.GetItemAt(pt.X, pt.Y);
+            var ptScreen = new Point(e.X, e.Y);
+            var pt       = listView2.PointToClient(ptScreen);
+            var item     = listView2.GetItemAt(pt.X, pt.Y);
             if (item != null)
                 item.Selected = true;
         }
         private void listView2_DragDrop(object sender, DragEventArgs e)
         {
 
-            ListViewItem draggedItem = (ListViewItem)e.Data.GetData(typeof(ListViewItem));
-            Point ptScreen = new Point(e.X, e.Y);
-            Point pt = listView2.PointToClient(ptScreen);
-            ListViewItem targetItem = listView2.GetItemAt(pt.X, pt.Y);//拖动的项将放置于该项之前
+            var draggedItem = (ListViewItem)e.Data.GetData(typeof(ListViewItem));
+            var ptScreen    = new Point(e.X, e.Y);
+            var pt          = listView2.PointToClient(ptScreen);
+            var targetItem = listView2.GetItemAt(pt.X, pt.Y);//拖动的项将放置于该项之前
             if (targetItem == null) return;
             listView2.Items.Insert(targetItem.Index, (ListViewItem)draggedItem.Clone());
             listView2.Items.Remove(draggedItem);
@@ -103,7 +108,7 @@ namespace RPChecker.Forms
             _mainWindow.FilePathsPair.Clear();
             if (listView1.Items.Count == listView2.Items.Count)
             {
-                int i = 0;
+                var i = 0;
                 foreach (ListViewItem item in listView1.Items)
                 {
                     _mainWindow.FilePathsPair.Add(new KeyValuePair<string, string>(item.Tag as string, listView2.Items[i].Tag as string));
@@ -195,7 +200,7 @@ namespace RPChecker.Forms
         private void FrmLoadFiles_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "LoadLocation"));
+            var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "LoadLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
         }
 

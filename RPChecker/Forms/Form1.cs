@@ -26,15 +26,16 @@ namespace RPChecker.Forms
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version}";
+            UpdateText();
 
-            Point saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
+            var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
             if (saved != new Point(-32000, -32000)) Location = saved;
+            this.NormalizePosition();
             RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
 
             cbFPS.SelectedIndex = 0;
             cbVpyFile.SelectedIndex = 0;
-            DirectoryInfo current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             foreach (var item in current.GetFiles().Where(item => item.Extension.ToLower() == ".vpy"))
             {
                 cbVpyFile.Items.Add(item);
@@ -59,35 +60,37 @@ namespace RPChecker.Forms
         #region SystemMenu
         private SystemMenu _systemMenu;
 
+        private void UpdateText()
+        {
+            label1.Text = _coreProcess.ValueText;
+            cbVpyFile.Enabled = _coreProcess is VsPipePSNRProcess;
+            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version} [{_coreProcess.Title}][{(UseOriginPath ? "ORG" : "LINK")}]";
+        }
+
         private void AddCommand()
         {
             _systemMenu = new SystemMenu(this);
             _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
             _systemMenu.AddCommand("使用PSNR(VS)", () =>
             {
-                if (!(_coreProcess is VsPipePSNRProcess))
-                {
-                    _coreProcess = new VsPipePSNRProcess();
-                    label1.Text = _coreProcess.ValueText;
-                }
+                _coreProcess = _coreProcess as VsPipePSNRProcess ?? new VsPipePSNRProcess();
+                UpdateText();
             }, true);
             _systemMenu.AddCommand("使用PSNR(FF)", () =>
             {
-                if (!(_coreProcess is FFmpegPSNRProcess))
-                {
-                    _coreProcess = new FFmpegPSNRProcess();
-                    label1.Text = _coreProcess.ValueText;
-                }
+                _coreProcess = _coreProcess as FFmpegPSNRProcess ?? new FFmpegPSNRProcess();
+                UpdateText();
             }, false);
             _systemMenu.AddCommand("使用SSIM(FF)", () =>
             {
-                if (!(_coreProcess is FFmpegSSIMProcess))
-                {
-                    _coreProcess = new FFmpegSSIMProcess();
-                    label1.Text = _coreProcess.ValueText;
-                }
+                _coreProcess = _coreProcess as FFmpegSSIMProcess ?? new FFmpegSSIMProcess();
+                UpdateText();
             }, false);
-
+            _systemMenu.AddCommand("使用原始路径", () =>
+            {
+                _useOriginPath = true;
+                UpdateText();
+            }, true);
         }
 
         protected override void WndProc(ref Message msg)
@@ -105,7 +108,7 @@ namespace RPChecker.Forms
         private void btnLoad_Click(object sender, EventArgs e)
         {
             if (_loadFormOpened) return;
-            FrmLoadFiles flf = new FrmLoadFiles(this);
+            var flf = new FrmLoadFiles(this);
             flf.Load += (o, args) =>
             {
                 _loadFormOpened = true;
@@ -116,6 +119,7 @@ namespace RPChecker.Forms
                 _loadFormOpened = false;
             };
             flf.Show();
+            flf.NormalizePosition();
         }
         #endregion
 
@@ -136,11 +140,11 @@ namespace RPChecker.Forms
         private void cbFPS_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0) return;
-            double frameRate = _frameRate[cbFPS.SelectedIndex];
+            var frameRate = _frameRate[cbFPS.SelectedIndex];
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 if(row.Tag == null) continue;
-                TimeSpan temp = ToolKits.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
+                var temp = ToolKits.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
                 row.Cells[2].Value = temp.Time2String();
             }
         }
@@ -180,8 +184,8 @@ namespace RPChecker.Forms
             {
                 if ((item.Value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
 
-                DataGridViewRow newRow = new DataGridViewRow {Tag = item};
-                TimeSpan temp = ToolKits.Second2Time(item.Key / frameRate);
+                var newRow = new DataGridViewRow {Tag = item};
+                var temp = ToolKits.Second2Time(item.Key / frameRate);
                 newRow.CreateCells(dataGridView1, item.Key, $"{item.Value:F4}", temp.Time2String());
                 newRow.DefaultCellStyle.BackColor = item.Value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
@@ -207,11 +211,12 @@ namespace RPChecker.Forms
                     _currentBuffer = new LogBuffer();
                     _tempData = new Dictionary<int, double>();
 
-                    AnalyseClip(item.Key, item.Value);
+                    AnalyseClipLink(item.Key, item.Value);
                     var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue; AddStatic();
-                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile) continue; RemoveScript(item);
+                    if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || !UseOriginPath) continue;
+                    RemoveScript(item);
                 }
                 catch (Exception ex)
                 {
@@ -225,6 +230,33 @@ namespace RPChecker.Forms
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
             ChangeClipDisplay(cbFileList.SelectedIndex);
+        }
+
+        private bool _useOriginPath;
+
+        private bool UseOriginPath => _useOriginPath || !(_coreProcess is VsPipePSNRProcess);
+
+        private void AnalyseClipLink(string file1, string file2)
+        {
+            Debug.Assert(file1 != null);
+            Debug.Assert(file2 != null);
+            if (!UseOriginPath)
+            {
+                var linkedFile1 = Path.Combine(Path.GetPathRoot(file1), Guid.NewGuid().ToString());
+                var linkedFile2 = Path.Combine(Path.GetPathRoot(file2), Guid.NewGuid().ToString());
+                NativeMethods.CreateHardLinkCMD(linkedFile1, file1);
+                NativeMethods.CreateHardLinkCMD(linkedFile2, file2);
+                Debug.WriteLine($"HardLink: {file1} => {linkedFile1}");
+                Debug.WriteLine($"HardLink: {file2} => {linkedFile2}");
+                AnalyseClip(linkedFile1, linkedFile2);
+                File.Delete(linkedFile1);
+                File.Delete(linkedFile2);
+                RemoveScript(new KeyValuePair<string, string>(linkedFile1, linkedFile2));
+            }
+            else
+            {
+                AnalyseClip(file1, file2);
+            }
         }
 
         private void AnalyseClip(string file1, string file2)
@@ -286,13 +318,15 @@ namespace RPChecker.Forms
         private void btnLog_Click(object sender, EventArgs e)
         {
             if (_fullData[cbFileList.SelectedIndex].Logs.IsEmpty()) return;
-            new FormLog(_fullData[cbFileList.SelectedIndex]).Show();
+            var log = new FormLog(_fullData[cbFileList.SelectedIndex]);
+            log.Show();
+            log.NormalizePosition();
         }
 
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress)) return;
-            _currentBuffer.Log(progress);
+            _currentBuffer.Log("err|" + progress);
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
                 .Match<FFmpegProcess>(_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
@@ -302,6 +336,7 @@ namespace RPChecker.Forms
         private void ValueUpdated(string data)
         {
             if (string.IsNullOrEmpty(data)) return;
+            _currentBuffer.Log("std|" + data);
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
                 .Match<FFmpegProcess>(self => Invoke(new Action(() => self.UpdateValue(data, ref _tempData))))
@@ -315,12 +350,19 @@ namespace RPChecker.Forms
         private void VsUpdateProgress(string progress)
         {
             toolStripStatusStdError.Text = progress;
-            if (Regex.IsMatch(progress, "Failed", RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(progress, "Failed|Error", RegexOptions.IgnoreCase))
             {
                 _currentBuffer.Inf = true;
             }
             if (_currentBuffer.Inf)
             {
+                if (!_errorDialogShowed && progress.Contains("No attribute with the name lsmas exists"))
+                {
+                    _errorDialogShowed = true;
+                    new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                        buttons: MessageBoxButtons.OK,
+                        text: $"尚未安装 'L-SMASH' 滤镜{Environment.NewLine}大概的位置是在VapourSynth\\plugins64")).Start();
+                }
                 if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
                 {
                     _errorDialogShowed = true;
@@ -380,7 +422,7 @@ namespace RPChecker.Forms
                 return;
             }
             var ret = FFmpegProgressRegex.Match(progress);
-            if (!ret.Success) return;
+            if (!ret.Success || _ffmpegTotalFrame == int.MaxValue) return;
             var processed = int.Parse(ret.Groups["processed"].Value);
             if (processed <= _ffmpegTotalFrame)
             {
@@ -395,11 +437,12 @@ namespace RPChecker.Forms
         private void btnChart_Click(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
-            string type = _coreProcess is VsPipePSNRProcess || _coreProcess is FFmpegPSNRProcess ? "PSNR" : "SSIM";
-            FrmChart chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
+            var type = _coreProcess is VsPipePSNRProcess || _coreProcess is FFmpegPSNRProcess ? "PSNR" : "SSIM";
+            var chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;
             chart.Show();
+            chart.NormalizePosition();
         }
         #endregion
 
@@ -421,8 +464,15 @@ namespace RPChecker.Forms
         private bool _remainFile;
         private void toolStripDropDownButton1_Click(object sender, EventArgs e)
         {
-            _remainFile = !_remainFile;
-            toolStripDropDownButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
+            if (UseOriginPath)
+            {
+                _remainFile = !_remainFile;
+                toolStripDropDownButton1.Image = _remainFile ? Resources.Checked : Resources.Unchecked;
+            }
+            else
+            {
+                Notification.ShowInfo("在硬链模式下该功能已被禁用", MessageBoxButtons.OK);
+            }
         }
 
         private void toolStripDropDownButton1_MouseEnter(object sender, EventArgs e)
@@ -468,8 +518,9 @@ namespace RPChecker.Forms
             if (_poi[0] < _poi[1]) return;
             if (MessageBox.Show(@"是否打开关于界面", @"RPCheckerについて", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                Form2 version = new Form2();
+                var version = new Form2();
                 version.Show();
+                version.NormalizePosition();
             }
             else
             {
