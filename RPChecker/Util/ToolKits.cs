@@ -79,6 +79,13 @@ namespace RPChecker.Util
             return new Point(x, y);
         }
 
+        public static void NormalizePosition(this System.Windows.Forms.Form form)
+        {
+            if (form.Location.X + form.Width < 0 ||
+                form.Location.Y + form.Height < 0)
+                form.Location = Point.Empty;
+        }
+
         /// <summary>
         /// Returns the path from VapourSynth.
         /// It tries to find it via the registry keys.

@@ -30,6 +30,7 @@ namespace RPChecker.Forms
 
             var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "location"));
             if (saved != new Point(-32000, -32000)) Location = saved;
+            this.NormalizePosition();
             RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Count");
 
             cbFPS.SelectedIndex = 0;
@@ -126,6 +127,7 @@ namespace RPChecker.Forms
                 _loadFormOpened = false;
             };
             flf.Show();
+            flf.NormalizePosition();
         }
         #endregion
 
@@ -324,7 +326,9 @@ namespace RPChecker.Forms
         private void btnLog_Click(object sender, EventArgs e)
         {
             if (_fullData[cbFileList.SelectedIndex].Logs.IsEmpty()) return;
-            new FormLog(_fullData[cbFileList.SelectedIndex]).Show();
+            var log = new FormLog(_fullData[cbFileList.SelectedIndex]);
+            log.Show();
+            log.NormalizePosition();
         }
 
         private void ProgressUpdated(string progress)
@@ -445,6 +449,7 @@ namespace RPChecker.Forms
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;
             chart.Show();
+            chart.NormalizePosition();
         }
         #endregion
 
@@ -522,6 +527,7 @@ namespace RPChecker.Forms
             {
                 var version = new Form2();
                 version.Show();
+                version.NormalizePosition();
             }
             else
             {
