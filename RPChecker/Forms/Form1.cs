@@ -119,7 +119,6 @@ namespace RPChecker.Forms
                 _loadFormOpened = false;
             };
             flf.Show();
-            flf.NormalizePosition();
         }
         #endregion
 

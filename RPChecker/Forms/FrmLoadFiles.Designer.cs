@@ -62,10 +62,10 @@
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.ItemActivate += new System.EventHandler(this.listView1_ItemActivate);
-            this.listView1.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.listView1_ItemDrag);
-            this.listView1.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
-            this.listView1.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
-            this.listView1.DragOver += new System.Windows.Forms.DragEventHandler(this.listView1_DragOver);
+            this.listView1.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.listView_ItemDrag);
+            this.listView1.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView_DragDrop);
+            this.listView1.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView_DragEnter);
+            this.listView1.DragOver += new System.Windows.Forms.DragEventHandler(this.listView_DragOver);
             // 
             // columnHeader1
             // 
@@ -91,10 +91,10 @@
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
             this.listView2.ItemActivate += new System.EventHandler(this.listView2_ItemActivate);
-            this.listView2.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.listView2_ItemDrag);
-            this.listView2.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView2_DragDrop);
-            this.listView2.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView2_DragEnter);
-            this.listView2.DragOver += new System.Windows.Forms.DragEventHandler(this.listView2_DragOver);
+            this.listView2.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.listView_ItemDrag);
+            this.listView2.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView_DragDrop);
+            this.listView2.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView_DragEnter);
+            this.listView2.DragOver += new System.Windows.Forms.DragEventHandler(this.listView_DragOver);
             // 
             // columnHeader2
             // 
@@ -190,7 +190,7 @@
             this.textBox1.TabStop = false;
             this.textBox1.Text = "请将文件拖到此处以向对照框载入";
             this.textBox1.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBox1_DragDrop);
-            this.textBox1.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBox1_DragEnter);
+            this.textBox1.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBox_DragEnter);
             // 
             // textBox2
             // 
@@ -208,7 +208,7 @@
             this.textBox2.TabStop = false;
             this.textBox2.Text = "请将文件拖到此处以向成品框载入";
             this.textBox2.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBox2_DragDrop);
-            this.textBox2.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBox2_DragEnter);
+            this.textBox2.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBox_DragEnter);
             // 
             // FrmLoadFiles
             // 
