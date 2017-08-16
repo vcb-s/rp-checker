@@ -51,17 +51,17 @@ namespace RPChecker.Forms
             var interval = (int) Math.Round(_fps) * 30;
             var task = new Task(() =>
             {
-                foreach(var frame in _info.Data.OrderBy(item => item.Key))
+                foreach(var frame in _info.Data.OrderBy(item => item.index))
                 {
-                    series1.Points.AddXY(frame.Key, frame.Value);
-                    if ((frame.Key + 1) % interval == 0)
+                    series1.Points.AddXY(frame.index, frame.value);
+                    if ((frame.index + 1) % interval == 0)
                     {
-                        Invoke(new Action(() => chart1.ChartAreas[0].AxisX.CustomLabels.Add(frame.Key - 20, frame.Key + 20,
-                            $"{TimeSpan.FromSeconds(Math.Round(frame.Key / _fps)):mm\\:ss}")));
+                        Invoke(new Action(() => chart1.ChartAreas[0].AxisX.CustomLabels.Add(frame.index - 20, frame.index + 20,
+                            $"{TimeSpan.FromSeconds(Math.Round(frame.index / _fps)):mm\\:ss}")));
                     }
-                    if (frame.Value < _threshold)
+                    if (frame.value < _threshold)
                     {
-                        series2.Points.AddXY(frame.Key, frame.Value);
+                        series2.Points.AddXY(frame.index, frame.value);
                     }
                 }
             });
@@ -90,7 +90,7 @@ namespace RPChecker.Forms
 
         private void btnSaveAsImage_Click(object sender, EventArgs e)
         {
-            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.Key) ?? "", $"{Guid.NewGuid()}.png");
+            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.opt) ?? "", $"{Guid.NewGuid()}.png");
             chart1.SaveImage(fileName, ChartImageFormat.Png);
         }
     }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace RPChecker.Util.FilterProcess
 {
@@ -25,6 +27,8 @@ namespace RPChecker.Util.FilterProcess
         public string ValueText => "峰值信噪比阈值";
 
         public string Title => "VapourSynth PSNR";
+
+        private static readonly Regex PSNRDataFormatRegex = new Regex(@"(?<frame>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
 
         public void GenerateLog(params string[] inputFiles)
         {
@@ -98,6 +102,13 @@ namespace RPChecker.Util.FilterProcess
 
             _consoleProcess.Close();
             _consoleProcess.Exited -= ExitedHandler;
+        }
+
+        public void UpdateValue(string data, ref List<(int index, double value)> tempData)
+        {
+            var rawData = PSNRDataFormatRegex.Match(data);
+            if (!rawData.Success) return;
+            tempData.Add((int.Parse(rawData.Groups["frame"].Value), double.Parse(rawData.Groups["PSNR"].Value)));
         }
     }
 }

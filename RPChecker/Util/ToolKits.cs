@@ -45,7 +45,7 @@ namespace RPChecker.Util
             return new TimeSpan(0, hour, minute, second, millisecond);
         }
 
-        public static void GenerateVpyFile(string file1, string file2, string outputFile, string selectedFile)
+        public static void GenerateVpyFile((string src, string opt) item, string outputFile, string selectedFile)
         {
             var template = Properties.Resources.vpyTemplate;
             if (selectedFile != "Default")
@@ -57,13 +57,13 @@ namespace RPChecker.Util
                 }
                 template = temp;
             }
-            if (Path.GetDirectoryName(file1) == Path.GetDirectoryName(file2))
+            if (Path.GetDirectoryName(item.src) == Path.GetDirectoryName(item.opt))
             {
-                file1 = Path.GetFileName(file1);
-                file2 = Path.GetFileName(file2);
+                item.src = Path.GetFileName(item.src);
+                item.opt = Path.GetFileName(item.opt);
             }
-            template = template.Replace(@"%File1%", file1);
-            template = template.Replace(@"%File2%", file2);
+            template = template.Replace(@"%File1%", item.src);
+            template = template.Replace(@"%File2%", item.opt);
             File.WriteAllText(outputFile, template, Encoding.UTF8);
         }
 

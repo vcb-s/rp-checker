@@ -13,14 +13,14 @@ namespace RPChecker.Util.FilterProcess
 
         private static readonly Regex SSIMDataFormatRegex = new Regex($@"n:(?<frame>\d+) Y:(?<Y>{Number}) U:(?<U>{Number}) V:(?<V>{Number}) All:(?<All>{Number})", RegexOptions.Compiled);
 
-        public override void UpdateValue(string data, ref Dictionary<int, double> tempData)
+        public override void UpdateValue(string data, ref List<(int index, double value)> tempData)
         {
             //format sample: n:946 Y:1.000000 U:0.999978 V:0.999984 All:0.999994 (51.994140|inf)
             var rawData = SSIMDataFormatRegex.Match(data);
             if (!rawData.Success) return;
             var ssim = rawData.Groups["All"].Value;
             var ssimValue = double.Parse(ssim) * 100;
-            tempData[int.Parse(rawData.Groups["frame"].Value)] = ssimValue;
+            tempData.Add((int.Parse(rawData.Groups["frame"].Value), ssimValue));
         }
     }
 }

@@ -103,6 +103,6 @@ namespace RPChecker.Util.FilterProcess
 
         protected const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
 
-        public abstract void UpdateValue(string data, ref Dictionary<int, double> tempData);
+        public abstract void UpdateValue(string data, ref List<(int index, double value)> tempData);
     }
 }

@@ -51,7 +51,7 @@ namespace RPChecker.Forms
         }
         #endregion
 
-        public readonly List<KeyValuePair<string, string>> FilePathsPair = new List<KeyValuePair<string, string>>();
+        public readonly List<(string src, string opt)> FilePathsPair = new List<(string src, string opt)>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
         private int _threshold = 30;
         private readonly double[] _frameRate = { 24000 / 1001.0, 24, 25, 30000 / 1001.0, 50, 60000 / 1001.0 };
@@ -143,7 +143,7 @@ namespace RPChecker.Forms
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 if(row.Tag == null) continue;
-                var temp = ToolKits.Second2Time(((KeyValuePair<int, double>)row.Tag).Key / frameRate);
+                var temp = ToolKits.Second2Time((((int, double))row.Tag).Item1 / frameRate);
                 row.Cells[2].Value = temp.Time2String();
             }
         }
@@ -181,12 +181,12 @@ namespace RPChecker.Forms
             dataGridView1.Rows.Clear();
             foreach (var item in info.Data)
             {
-                if ((item.Value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
+                if ((item.value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
 
                 var newRow = new DataGridViewRow {Tag = item};
-                var temp = ToolKits.Second2Time(item.Key / frameRate);
-                newRow.CreateCells(dataGridView1, item.Key, $"{item.Value:F4}", temp.Time2String());
-                newRow.DefaultCellStyle.BackColor = item.Value < _threshold
+                var temp = ToolKits.Second2Time(item.index / frameRate);
+                newRow.CreateCells(dataGridView1, item.index, $"{item.value:F4}", temp.Time2String());
+                newRow.DefaultCellStyle.BackColor = item.value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
                 Application.DoEvents();
@@ -196,7 +196,7 @@ namespace RPChecker.Forms
 
         private bool _errorDialogShowed;
         private LogBuffer _currentBuffer;
-        private Dictionary<int, double> _tempData;
+        private List<(int index, double value)> _data;
 
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
@@ -208,10 +208,10 @@ namespace RPChecker.Forms
                 {
                     _errorDialogShowed = false;
                     _currentBuffer = new LogBuffer();
-                    _tempData = new Dictionary<int, double>();
+                    _data = new List<(int index, double value)>();
 
-                    AnalyseClipLink(item.Key, item.Value);
-                    var data = _tempData.ToList().OrderBy(a => a.Value).ThenBy(b => b.Key).ToList();
+                    AnalyseClipLink(item);
+                    var data = _data.OrderBy(a => a.value).ThenBy(a => a.index).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue; AddStatic();
                     if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || !UseOriginPath) continue;
@@ -220,11 +220,11 @@ namespace RPChecker.Forms
                 catch (Exception ex)
                 {
                     new Task(() => MessageBox.Show(
-                                $"{item.Key}{Environment.NewLine}{item.Value}{Environment.NewLine}{ex.Message}",
+                                $"{item.src}{Environment.NewLine}{item.opt}{Environment.NewLine}{ex.Message}",
                                 @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error)).Start();
                 }
             }
-            _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.Key) ?? ""));
+            _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? ""));
             //btnLog.Enabled = _errorMessageBuilder.ToString().Split('\n').Length > FilePathsPair.Count + 1;
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
@@ -235,30 +235,30 @@ namespace RPChecker.Forms
 
         private bool UseOriginPath => _useOriginPath || !(_coreProcess is VsPipePSNRProcess);
 
-        private void AnalyseClipLink(string file1, string file2)
+        private void AnalyseClipLink((string src, string opt) item)
         {
-            Debug.Assert(file1 != null);
-            Debug.Assert(file2 != null);
+            Debug.Assert(item.src != null);
+            Debug.Assert(item.opt != null);
             if (!UseOriginPath)
             {
-                var linkedFile1 = Path.Combine(Path.GetPathRoot(file1), Guid.NewGuid().ToString());
-                var linkedFile2 = Path.Combine(Path.GetPathRoot(file2), Guid.NewGuid().ToString());
-                NativeMethods.CreateHardLinkCMD(linkedFile1, file1);
-                NativeMethods.CreateHardLinkCMD(linkedFile2, file2);
-                Debug.WriteLine($"HardLink: {file1} => {linkedFile1}");
-                Debug.WriteLine($"HardLink: {file2} => {linkedFile2}");
-                AnalyseClip(linkedFile1, linkedFile2);
+                var linkedFile1 = Path.Combine(Path.GetPathRoot(item.src), Guid.NewGuid().ToString());
+                var linkedFile2 = Path.Combine(Path.GetPathRoot(item.opt), Guid.NewGuid().ToString());
+                NativeMethods.CreateHardLinkCMD(linkedFile1, item.src);
+                NativeMethods.CreateHardLinkCMD(linkedFile2, item.opt);
+                Debug.WriteLine($"HardLink: {item.src} => {linkedFile1}");
+                Debug.WriteLine($"HardLink: {item.opt} => {linkedFile2}");
+                AnalyseClip((linkedFile1, linkedFile2));
                 File.Delete(linkedFile1);
                 File.Delete(linkedFile2);
-                RemoveScript(new KeyValuePair<string, string>(linkedFile1, linkedFile2));
+                RemoveScript((linkedFile1, linkedFile2));
             }
             else
             {
-                AnalyseClip(file1, file2);
+                AnalyseClip(item);
             }
         }
 
-        private void AnalyseClip(string file1, string file2)
+        private void AnalyseClip((string src, string opt) item)
         {
             _coreProcess.ProgressUpdated += ProgressUpdated;
             _coreProcess.ValueUpdated += ValueUpdated;
@@ -271,13 +271,13 @@ namespace RPChecker.Forms
                 Thread coreThread;
                 if (_coreProcess is VsPipePSNRProcess)
                 {
-                    string vsFile = $"{file2}.vpy";
-                    ToolKits.GenerateVpyFile(file1, file2, vsFile, cbVpyFile.SelectedItem.ToString());
+                    string vsFile = $"{item.opt}.vpy";
+                    ToolKits.GenerateVpyFile(item, vsFile, cbVpyFile.SelectedItem.ToString());
                     coreThread = new Thread(() => _coreProcess.GenerateLog(vsFile));
                 }
                 else
                 {
-                    coreThread = new Thread(() => _coreProcess.GenerateLog(file1, file2));
+                    coreThread = new Thread(() => _coreProcess.GenerateLog(item.src, item.opt));
                 }
                 coreThread.Start();
                 while (coreThread.ThreadState != System.Threading.ThreadState.Stopped) Application.DoEvents();
@@ -326,9 +326,10 @@ namespace RPChecker.Forms
         {
             if (string.IsNullOrEmpty(progress)) return;
             _currentBuffer.Log("err|" + progress);
+            toolStripStatusStdError.Text = progress;
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
-                .Match<FFmpegProcess>(_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
+                .Match<FFmpegProcess>    (_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
                 ;
         }
 
@@ -337,8 +338,8 @@ namespace RPChecker.Forms
             if (string.IsNullOrEmpty(data)) return;
             _currentBuffer.Log("std|" + data);
             _coreProcess
-                .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => UpdatePSNR(data))))
-                .Match<FFmpegProcess>(self => Invoke(new Action(() => self.UpdateValue(data, ref _tempData))))
+                .Match<VsPipePSNRProcess>(self => Invoke(new Action(() => self.UpdateValue(data, ref _data))))
+                .Match<FFmpegProcess>    (self => Invoke(new Action(() => self.UpdateValue(data, ref _data))))
                 ;
         }
         #endregion
@@ -348,7 +349,6 @@ namespace RPChecker.Forms
 
         private void VsUpdateProgress(string progress)
         {
-            toolStripStatusStdError.Text = progress;
             if (Regex.IsMatch(progress, "Failed|Error", RegexOptions.IgnoreCase))
             {
                 _currentBuffer.Inf = true;
@@ -389,15 +389,6 @@ namespace RPChecker.Forms
             }
             Application.DoEvents();
         }
-
-        private static readonly Regex PSNRDataFormatRegex = new Regex(@"(?<frame>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
-
-        private void UpdatePSNR(string data)
-        {
-            var rawData = PSNRDataFormatRegex.Match(data);
-            if (!rawData.Success) return;
-            _tempData[int.Parse(rawData.Groups["frame"].Value)] = double.Parse(rawData.Groups["PSNR"].Value);
-        }
         #endregion
 
         #region ffmpeg
@@ -408,7 +399,6 @@ namespace RPChecker.Forms
         {
             // NUMBER_OF_FRAMES: 960
             //frame=  287 fps= 57 q=-0.0 size=N/A time=00:00:04.78 bitrate=N/A speed=0.953x
-            toolStripStatusStdError.Text = progress;
             if (progress.StartsWith("[Parsed_"))
             {
                 _currentBuffer.Inf = true;
@@ -446,13 +436,13 @@ namespace RPChecker.Forms
         #endregion
 
         #region cleanUpOption
-        private static void RemoveScript(KeyValuePair<string, string> item)
+        private static void RemoveScript((string src, string opt) item)
         {
             try
             {
-                File.Delete($"{item.Key}.lwi");
-                File.Delete($"{item.Value}.lwi");
-                File.Delete($"{item.Value}.vpy");
+                File.Delete($"{item.src}.lwi");
+                File.Delete($"{item.opt}.lwi");
+                File.Delete($"{item.opt}.vpy");
             }
             catch (Exception ex)
             {
@@ -538,8 +528,8 @@ namespace RPChecker.Forms
 
     public struct ReSulT
     {
-        public List<KeyValuePair<int, double>> Data { get; set; }
-        public KeyValuePair<string, string> FileNamePair { get; set; }
+        public List<(int index, double value)> Data { get; set; }
+        public (string src, string opt) FileNamePair { get; set; }
         public LogBuffer Logs { get; set; }
     }
 }

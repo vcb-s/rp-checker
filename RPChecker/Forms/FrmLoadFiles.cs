@@ -101,7 +101,7 @@ namespace RPChecker.Forms
                 _mainWindow.FilePathsPair.Clear();
                 _mainWindow.FilePathsPair.AddRange(listView1.Items.Cast<ListViewItem>()
                     .Zip(listView2.Items.Cast<ListViewItem>(),
-                        (item1, item2) => new KeyValuePair<string, string>(item1.Tag as string, item2.Tag as string)));
+                        (item1, item2) => (item1.Tag as string, item2.Tag as string)));
                 Close();
                 return;
             }
