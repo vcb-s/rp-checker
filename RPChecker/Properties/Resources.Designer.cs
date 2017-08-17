@@ -81,24 +81,26 @@ namespace RPChecker.Properties {
         }
         
         /// <summary>
-        ///   查找类似 import sys
-        ///import vapoursynth as vs
+        ///   查找类似 import vapoursynth as vs
         ///import mvsfunc as mvf
         ///import functools
         ///
-        ///core=vs.get_core(accept_lowercase=True)
+        ///core=vs.get_core()
         ///core.max_cache_size=5000
         ///
-        ///srcPath=r&quot;%File1%&quot;
-        ///optPath=r&quot;%File2%&quot;
+        ///src=r&quot;%File1%&quot;
+        ///opt=r&quot;%File2%&quot;
         ///fmt=&quot;yuv420p16&quot;
         ///
-        ///source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt) if path.lower().endswith(&quot;mp4&quot;) else core.lsmas.LWLibavSource(path,format=fmt)
+        ///source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt)if path.lower().endswith(&quot;mp4&quot;)else core.lsmas.LWLibavSource(path,format=fmt)
         ///
-        ///src=mvf.GetPlane(source(srcPath))
-        ///opt=mvf.GetPlane(source(optPath))
+        ///src=mvf.GetPlane(source(src))
+        ///opt=mvf.GetPlane(source(opt))
         ///
-        ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,form [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
+        ///
+        ///def callback(n,f,clip):
+        ///  print(n [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string vpyTemplate {
             get {
