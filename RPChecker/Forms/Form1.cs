@@ -165,15 +165,15 @@ namespace RPChecker.Forms
         {
             set
             {
-                btnAnalyze.Enabled = value;
-                btnLoad.Enabled = value;
-                btnLog.Enabled = value;
-                btnChart.Enabled = value;
-                cbFileList.Enabled = value;
-                cbFPS.Enabled = value;
-                cbVpyFile.Enabled = value;
+                btnAnalyze.Enabled     = value;
+                btnLoad.Enabled        = value;
+                btnLog.Enabled         = value;
+                btnChart.Enabled       = value;
+                cbFileList.Enabled     = value;
+                cbFPS.Enabled          = value;
+                cbVpyFile.Enabled      = value;
                 numericUpDown1.Enabled = value;
-                btnAbort.Enabled = !value;
+                btnAbort.Enabled       = !value;
             }
         }
         private void UpdataGridView(ReSulT info, double frameRate)
@@ -326,7 +326,7 @@ namespace RPChecker.Forms
         {
             if (string.IsNullOrEmpty(progress)) return;
             _currentBuffer.Log("err|" + progress);
-            toolStripStatusStdError.Text = progress;
+            Invoke(new Action(() => toolStripStatusStdError.Text = progress));
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
                 .Match<FFmpegProcess>    (_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
@@ -464,15 +464,9 @@ namespace RPChecker.Forms
             }
         }
 
-        private void toolStripDropDownButton1_MouseEnter(object sender, EventArgs e)
-        {
-            toolTip1.Show("保留中间文件", statusStrip1);
-        }
+        private void toolStripDropDownButton1_MouseEnter(object sender, EventArgs e) => toolTip1.Show("保留中间文件", statusStrip1);
 
-        private void toolStripDropDownButton1_MouseLeave(object sender, EventArgs e)
-        {
-            toolTip1.RemoveAll();
-        }
+        private void toolStripDropDownButton1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
         #endregion
 
         #region statistics
