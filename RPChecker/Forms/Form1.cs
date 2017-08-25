@@ -213,7 +213,7 @@ namespace RPChecker.Forms
                     AnalyseClipLink(item);
                     var data = _data.OrderBy(a => a.value).ThenBy(a => a.index).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
-                    if (_currentBuffer.Inf) continue; AddStatic();
+                    if (_currentBuffer.Inf) continue;
                     if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || !UseOriginPath) continue;
                     RemoveScript(item);
                 }
@@ -469,26 +469,7 @@ namespace RPChecker.Forms
         private void toolStripDropDownButton1_MouseLeave(object sender, EventArgs e) => toolTip1.RemoveAll();
         #endregion
 
-        #region statistics
-        private void AddStatic()
-        {
-            if (_coreProcess is FFmpegProcess) return;
-            try
-            {
-                RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"CheckedCount");
-                var result = Regex.Match(toolStripStatusStdError.Text, @"Output (?<frame>\d+) frames in (?<second>[0-9]*\.?[0-9]+) seconds");
-                if (!result.Success) return;
-                var timespam = ToolKits.Second2Time(double.Parse(result.Groups["second"].Value));
-                var frame = int.Parse(result.Groups["frame"].Value);
-                RegistryStorage.RegistryAddTime(@"Software\RPChecker\Statistics", @"Time", timespam);
-                RegistryStorage.RegistryAddCount(@"Software\RPChecker\Statistics", @"Frame", frame);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
+        #region about
         private readonly int[] _poi = { 0, 10 };
 
         private void toolStripProgressBar1_Click(object sender, EventArgs e)
@@ -501,18 +482,7 @@ namespace RPChecker.Forms
             if (_poi[0] < _poi[1]) return;
             if (MessageBox.Show(@"是否打开关于界面", @"RPCheckerについて", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                var version = new Form2();
-                version.Show();
-                version.NormalizePosition();
-            }
-            else
-            {
-                var frame = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Frame");
-                var time  = RegistryStorage.Load(@"Software\RPChecker\Statistics", @"Time");
-                new Task(() => MessageBox.Show(caption: @"Statistics",
-                    text: $"总计帧数->[{frame}]<-{Environment.NewLine}" +
-                          $"总计时间->[{time}]<-{Environment.NewLine}" +
-                          $"平均帧率->{int.Parse(frame) / time.ToTimeSpan().TotalSeconds:F3}fps<-")).Start();
+                new Form2().Show();
             }
             _poi[0]  = 00;
             _poi[1] += 10;
