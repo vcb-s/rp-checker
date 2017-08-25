@@ -27,6 +27,7 @@ namespace RPChecker.Forms
         private void FrmChart_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Text = $"{_type} Chart";
             var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
             DrawChart();
