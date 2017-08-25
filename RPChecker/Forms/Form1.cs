@@ -55,6 +55,9 @@ namespace RPChecker.Forms
         private readonly double[] _frameRate = { 24000 / 1001.0, 24, 25, 30000 / 1001.0, 50, 60000 / 1001.0 };
         private IProcess _coreProcess = new FFmpegPSNRProcess();
 
+        private ReSulT CurrentData => _fullData[cbFileList.SelectedIndex];
+        private double FrameRate   => _frameRate[cbFPS.SelectedIndex];
+
         #region SystemMenu
         private SystemMenu _systemMenu;
 
@@ -123,26 +126,25 @@ namespace RPChecker.Forms
         #endregion
 
         #region switch
-        private void ChangeClipDisplay(int index)
+        private void ChangeClipDisplay()
         {
-            if (index < 0 || index > _fullData.Count) return;
-            btnChart.Enabled = _fullData[index].Data.Count > 0;
-            UpdataGridView(_fullData[index], _frameRate[cbFPS.SelectedIndex]);
+            if (cbFileList.SelectedIndex < 0 || cbFileList.SelectedIndex > _fullData.Count) return;
+            btnChart.Enabled = CurrentData.Data.Count > 0;
+            UpdataGridView(CurrentData, FrameRate);
         }
 
         private void cbFileList_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            ChangeClipDisplay(cbFileList.SelectedIndex);
+            ChangeClipDisplay();
             toolStripStatusStdError.Text = cbFileList.SelectedItem?.ToString();
         }
 
         private void cbFPS_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbFileList.SelectedIndex < 0) return;
-            var frameRate = _frameRate[cbFPS.SelectedIndex];
+            var frameRate = FrameRate;
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
-                if(row.Tag == null) continue;
+                if (row.Tag == null) continue;
                 var temp = ToolKits.Second2Time((((int, double))row.Tag).Item1 / frameRate);
                 row.Cells[2].Value = temp.Time2String();
             }
@@ -153,7 +155,7 @@ namespace RPChecker.Forms
             var threshold = Convert.ToInt32(numericUpDown1.Value);
             if (threshold == _threshold) return;
             if (_fullData == null || _fullData.Count == 0) return;
-            UpdataGridView(_fullData[cbFileList.SelectedIndex], _frameRate[cbFPS.SelectedIndex]);
+            UpdataGridView(CurrentData, FrameRate);
         }
 
         private void cbFileList_MouseEnter(object sender, EventArgs e) => toolTip1.Show(cbFileList.SelectedItem?.ToString(), (IWin32Window)sender);
@@ -183,7 +185,6 @@ namespace RPChecker.Forms
             foreach (var item in info.Data)
             {
                 if ((item.value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
-
                 var newRow = new DataGridViewRow {Tag = item};
                 var temp = ToolKits.Second2Time(item.index / frameRate);
                 newRow.CreateCells(dataGridView1, item.index, $"{item.value:F4}", temp.Time2String());
@@ -228,7 +229,7 @@ namespace RPChecker.Forms
             _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? ""));
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
-            ChangeClipDisplay(cbFileList.SelectedIndex);
+            ChangeClipDisplay();
         }
 
         private bool _useOriginPath;
@@ -316,8 +317,8 @@ namespace RPChecker.Forms
 
         private void btnLog_Click(object sender, EventArgs e)
         {
-            if (_fullData[cbFileList.SelectedIndex].Logs.IsEmpty()) return;
-            var log = new FormLog(_fullData[cbFileList.SelectedIndex]);
+            if (CurrentData.Logs.IsEmpty()) return;
+            var log = new FormLog(CurrentData);
             log.Show();
             log.NormalizePosition();
         }
@@ -427,7 +428,7 @@ namespace RPChecker.Forms
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
             var type = _coreProcess is VsPipePSNRProcess || _coreProcess is FFmpegPSNRProcess ? "PSNR" : "SSIM";
-            var chart = new FrmChart(_fullData[cbFileList.SelectedIndex], _threshold, _frameRate[cbFPS.SelectedIndex], type);
+            var chart = new FrmChart(CurrentData, _threshold, FrameRate, type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;
             chart.Show();
