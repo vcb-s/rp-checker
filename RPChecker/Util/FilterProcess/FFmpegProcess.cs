@@ -23,11 +23,13 @@ namespace RPChecker.Util.FilterProcess
 
         public Exception Exceptions { get; set; }
 
-        public virtual string ValueText => null;
+        public abstract string ValueText { get; }
 
-        public virtual string Title => null;
+        public virtual int Threshold => 30;
 
-        protected virtual string Arguments => null;
+        public abstract string Title { get; }
+
+        protected abstract string Arguments { get; }
 
         public void GenerateLog(params string[] inputFiles)
         {

@@ -65,6 +65,8 @@ namespace RPChecker.Forms
             label1.Text = _coreProcess.ValueText;
             cbVpyFile.Enabled = _coreProcess is VsPipePSNRProcess;
             Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version} [{_coreProcess.Title}][{(UseOriginPath ? "ORG" : "LINK")}]";
+            _threshold = _coreProcess.Threshold;
+            numericUpDown1.Value = _threshold;
         }
 
         private void AddCommand()

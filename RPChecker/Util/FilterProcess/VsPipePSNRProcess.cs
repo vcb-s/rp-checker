@@ -26,6 +26,8 @@ namespace RPChecker.Util.FilterProcess
 
         public string ValueText => "峰值信噪比阈值";
 
+        public int Threshold => 30;
+
         public string Title => "VapourSynth PSNR";
 
         private static readonly Regex PSNRDataFormatRegex = new Regex(@"(?<frame>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);

@@ -7,6 +7,8 @@ namespace RPChecker.Util.FilterProcess
     {
         public override string ValueText => "结构相似性阈值";
 
+        public override int Threshold => 60;
+
         public override string Title => "FFmpeg SSIM";
 
         protected override string Arguments => "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex ssim=\"stats_file=-\" -an -f null -";
