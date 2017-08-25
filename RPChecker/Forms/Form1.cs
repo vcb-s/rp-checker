@@ -36,10 +36,8 @@ namespace RPChecker.Forms
             cbFPS.SelectedIndex = 0;
             cbVpyFile.SelectedIndex = 0;
             var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
-            foreach (var item in current.GetFiles().Where(item => item.Extension.ToLower() == ".vpy"))
-            {
-                cbVpyFile.Items.Add(item);
-            }
+
+            cbVpyFile.Items.AddRange(current.GetFiles("*.vpy").ToArray<object>());
             btnAnalyze.Enabled = false;
 
             Updater.CheckUpdateWeekly("RPChecker");
@@ -152,7 +150,8 @@ namespace RPChecker.Forms
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            _threshold = Convert.ToInt32(numericUpDown1.Value);
+            var threshold = Convert.ToInt32(numericUpDown1.Value);
+            if (threshold == _threshold) return;
             if (_fullData == null || _fullData.Count == 0) return;
             UpdataGridView(_fullData[cbFileList.SelectedIndex], _frameRate[cbFPS.SelectedIndex]);
         }
@@ -227,7 +226,6 @@ namespace RPChecker.Forms
                 }
             }
             _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? ""));
-            //btnLog.Enabled = _errorMessageBuilder.ToString().Split('\n').Length > FilePathsPair.Count + 1;
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
             ChangeClipDisplay(cbFileList.SelectedIndex);
@@ -274,7 +272,7 @@ namespace RPChecker.Forms
                 if (_coreProcess is VsPipePSNRProcess)
                 {
                     string vsFile = $"{item.opt}.vpy";
-                    ToolKits.GenerateVpyFile(item, vsFile, cbVpyFile.SelectedItem.ToString());
+                    ToolKits.GenerateVpyFile(item, vsFile, (cbVpyFile.SelectedItem as FileInfo)?.FullName);
                     coreThread = new Thread(() => _coreProcess.GenerateLog(vsFile));
                 }
                 else

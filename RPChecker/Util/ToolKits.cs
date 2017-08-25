@@ -48,7 +48,7 @@ namespace RPChecker.Util
         public static void GenerateVpyFile((string src, string opt) item, string outputFile, string selectedFile)
         {
             var template = Properties.Resources.vpyTemplate;
-            if (selectedFile != "Default")
+            if (selectedFile != null)
             {
                 var temp = GetUTF8String(File.ReadAllBytes(selectedFile));
                 if (!temp.Contains(@"%File1%") || !temp.Contains(@"%File2%"))
