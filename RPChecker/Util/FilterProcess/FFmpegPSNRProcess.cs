@@ -13,7 +13,7 @@ namespace RPChecker.Util.FilterProcess
 
         private static readonly string NumberOrInf = $"{Number}|inf";
 
-        private static readonly Regex PSNRDataFormatRegex = new Regex($@"n:(?<frame>\d+) .*? psnr_avg:(?<avg>{Number}) psnr_y:(?<y>{NumberOrInf}) psnr_u:(?<u>{NumberOrInf}) psnr_v:(?<v>{NumberOrInf})", RegexOptions.Compiled);
+        private static readonly Regex PSNRDataFormatRegex = new Regex($@"n:(?<frame>\d+) .*? psnr_avg:(?<avg>{NumberOrInf}) psnr_y:(?<y>{NumberOrInf}) psnr_u:(?<u>{NumberOrInf}) psnr_v:(?<v>{NumberOrInf})", RegexOptions.Compiled);
 
         public override void UpdateValue(string data, ref List<(int index, double value)> tempData)
         {
@@ -21,8 +21,13 @@ namespace RPChecker.Util.FilterProcess
             var rawData = PSNRDataFormatRegex.Match(data);
             if (!rawData.Success) return;
             var psnr = rawData.Groups["avg"].Value;
-            var psnrValue = double.Parse(psnr);
+            var psnrValue = TryParse(psnr);
             tempData.Add((int.Parse(rawData.Groups["frame"].Value), psnrValue));
+        }
+
+        private static double TryParse(string s, double defaultValue = 100)
+        {
+            return double.TryParse(s, out double result) ? result : defaultValue;
         }
     }
 }
