@@ -55,7 +55,7 @@ namespace RPChecker.Forms
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
         private int _threshold = 30;
         private readonly double[] _frameRate = { 24000 / 1001.0, 24, 25, 30000 / 1001.0, 50, 60000 / 1001.0 };
-        private IProcess _coreProcess = new VsPipePSNRProcess();
+        private IProcess _coreProcess = new FFmpegPSNRProcess();
 
         #region SystemMenu
         private SystemMenu _systemMenu;
