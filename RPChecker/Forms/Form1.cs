@@ -242,8 +242,8 @@ namespace RPChecker.Forms
             Debug.Assert(item.opt != null);
             if (!UseOriginPath)
             {
-                var linkedFile1 = Path.Combine(Path.GetPathRoot(item.src), Guid.NewGuid().ToString());
-                var linkedFile2 = Path.Combine(Path.GetPathRoot(item.opt), Guid.NewGuid().ToString());
+                var linkedFile1 = Path.Combine(Path.GetPathRoot(item.src), Guid.NewGuid() + Path.GetExtension(item.src));
+                var linkedFile2 = Path.Combine(Path.GetPathRoot(item.opt), Guid.NewGuid() + Path.GetExtension(item.opt));
                 NativeMethods.CreateHardLinkCMD(linkedFile1, item.src);
                 NativeMethods.CreateHardLinkCMD(linkedFile2, item.opt);
                 Debug.WriteLine($"HardLink: {item.src} => {linkedFile1}");
@@ -383,7 +383,7 @@ namespace RPChecker.Forms
             var ret = VsProgressRegex.Match(progress);
             if (!ret.Success) return;
             var processed = int.Parse(ret.Groups["processed"].Value);
-            var total = int.Parse(ret.Groups["total"].Value);
+            var total     = int.Parse(ret.Groups["total"].Value);
             if (processed <= total)
             {
                 toolStripProgressBar1.Value = (int)Math.Floor(processed * 100.0 / total);
@@ -405,10 +405,12 @@ namespace RPChecker.Forms
                 _currentBuffer.Inf = true;
             }
             if (_currentBuffer.Inf) return;
-            var frameRet = FFmpegFrameRegex.Match(progress);
-            if (_ffmpegTotalFrame == int.MaxValue && frameRet.Success)
+
+            if (_ffmpegTotalFrame == int.MaxValue)
             {
-                _ffmpegTotalFrame = int.Parse(frameRet.Groups["frame"].Value);
+                var frameRet = FFmpegFrameRegex.Match(progress);
+                if (frameRet.Success)
+                    _ffmpegTotalFrame = int.Parse(frameRet.Groups["frame"].Value);
                 return;
             }
             var ret = FFmpegProgressRegex.Match(progress);
