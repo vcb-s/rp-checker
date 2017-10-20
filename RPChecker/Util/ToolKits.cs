@@ -98,7 +98,8 @@ namespace RPChecker.Util
             var subKeyFound            = false;
             var valueFound             = false;
             // First check Win32 registry
-            using (var regUninstall32 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+            using (var regUninstall32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                .OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
             {
                 if (regUninstall32 == null) throw new Exception("Failed to create a RegistryKey variable");
                 if (regUninstall32.GetSubKeyNames().Any(subKeyName => subKeyName.ToLower().Equals("VapourSynth_is1".ToLower())))
@@ -122,7 +123,8 @@ namespace RPChecker.Util
             if (!valueFound)
             {
                 subKeyFound = false;
-                using (var regUninstall64 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"))
+                using (var regUninstall64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+                    .OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
                 {
                     if (regUninstall64 == null) throw new Exception("Failed to create a RegistryKey variable");
                     if (regUninstall64.GetSubKeyNames().Any(subKeyName => subKeyName.ToLower().Equals("VapourSynth_is1".ToLower())))
