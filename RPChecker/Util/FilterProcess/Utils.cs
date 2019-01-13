@@ -15,19 +15,23 @@ namespace RPChecker.Util.FilterProcess
                 vspipePath = RegistryStorage.Load();
                 if (vspipePath == null || !File.Exists(Path.Combine(vspipePath, "vspipe.exe")))
                 {
-                    vspipePath = ToolKits.GetVapourSynthPathViaRegistry();
-                    RegistryStorage.Save(vspipePath);
+                    vspipePath = ToolKits.GetFullPathFromWindows("vspipe.exe") ??
+                                 ToolKits.GetVapourSynthPathViaRegistry();
+                    if (vspipePath != null)
+                    {
+                        RegistryStorage.Save(vspipePath);
+                    }
+                    else
+                    {
+
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 vspipePath = string.Empty;
-                if (!File.Exists("vspipe.exe"))
-                {
-                    exception = ex;
-                    return null;
-                }
+                exception = ex;
             }
             return vspipePath;
         }
