@@ -18,7 +18,7 @@ namespace RPChecker.Util
 
         public static Tuple<object, bool> Match<T1, T2>(this Tuple<object, bool> target, Action<T1, T2> action)
         {
-            //just simplely support two-tuple
+            //just simply support two-tuple
 
             if (target.Item2)
             {
@@ -35,10 +35,10 @@ namespace RPChecker.Util
                 values[i] = props[i].GetValue(target.Item1);
             }
 
-            if (values[0] is T1 && values[1] is T2)
+            if (values[0] is T1 variable && values[1] is T2 variable1)
             {
                 isMatchCompleted = true;
-                action((T1)values[0], (T2)values[1]);
+                action(variable, variable1);
             }
 
             return new Tuple<object, bool>(target.Item1, isMatchCompleted);
@@ -52,10 +52,10 @@ namespace RPChecker.Util
             }
 
             var isMatchCompleted = false;
-            if (target.Item1 is T1)
+            if (target.Item1 is T1 variable)
             {
                 isMatchCompleted = true;
-                action((T1)target.Item1);
+                action(variable);
             }
 
             return new Tuple<object, bool>(target.Item1, isMatchCompleted);

@@ -130,7 +130,7 @@ namespace RPChecker.Forms
         {
             if (cbFileList.SelectedIndex < 0 || cbFileList.SelectedIndex > _fullData.Count) return;
             btnChart.Enabled = CurrentData.Data.Count > 0;
-            UpdataGridView(CurrentData, FrameRate);
+            UpdateGridView(CurrentData, FrameRate);
         }
 
         private void cbFileList_SelectionChangeCommitted(object sender, EventArgs e)
@@ -155,7 +155,7 @@ namespace RPChecker.Forms
             var threshold = Convert.ToInt32(numericUpDown1.Value);
             if (threshold == _threshold) return;
             if (_fullData == null || _fullData.Count == 0) return;
-            UpdataGridView(CurrentData, FrameRate);
+            UpdateGridView(CurrentData, FrameRate);
         }
 
         private void cbFileList_MouseEnter(object sender, EventArgs e) => toolTip1.Show(cbFileList.SelectedItem?.ToString(), (IWin32Window)sender);
@@ -179,7 +179,7 @@ namespace RPChecker.Forms
                 btnAbort.Enabled       = !value;
             }
         }
-        private void UpdataGridView(ReSulT info, double frameRate)
+        private void UpdateGridView(ReSulT info, double frameRate)
         {
             dataGridView1.Rows.Clear();
             foreach (var item in info.Data)
@@ -212,7 +212,7 @@ namespace RPChecker.Forms
                     _currentBuffer = new LogBuffer();
                     _data = new List<(int index, double value)>();
 
-                    AnalyseClipLink(item);
+                    AnalyzeClipLink(item);
                     var data = _data.OrderBy(a => a.value).ThenBy(a => a.index).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue;
@@ -236,7 +236,7 @@ namespace RPChecker.Forms
 
         private bool UseOriginPath => _useOriginPath || !(_coreProcess is VsPipePSNRProcess);
 
-        private void AnalyseClipLink((string src, string opt) item)
+        private void AnalyzeClipLink((string src, string opt) item)
         {
             Debug.Assert(item.src != null);
             Debug.Assert(item.opt != null);
@@ -248,18 +248,18 @@ namespace RPChecker.Forms
                 NativeMethods.CreateHardLinkCMD(linkedFile2, item.opt);
                 Debug.WriteLine($"HardLink: {item.src} => {linkedFile1}");
                 Debug.WriteLine($"HardLink: {item.opt} => {linkedFile2}");
-                AnalyseClip((linkedFile1, linkedFile2));
+                AnalyzeClip((linkedFile1, linkedFile2));
                 File.Delete(linkedFile1);
                 File.Delete(linkedFile2);
                 RemoveScript((linkedFile1, linkedFile2));
             }
             else
             {
-                AnalyseClip(item);
+                AnalyzeClip(item);
             }
         }
 
-        private void AnalyseClip((string src, string opt) item)
+        private void AnalyzeClip((string src, string opt) item)
         {
             _coreProcess.ProgressUpdated += ProgressUpdated;
             _coreProcess.ValueUpdated += ValueUpdated;

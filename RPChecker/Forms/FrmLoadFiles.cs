@@ -4,7 +4,6 @@ using System.Linq;
 using RPChecker.Util;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 
 namespace RPChecker.Forms

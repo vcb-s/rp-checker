@@ -40,7 +40,7 @@ namespace RPChecker.Util
         #region Constructors
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="SystemMenu"/> class for the specified
+        /// Initializes a new instance of the <see cref="SystemMenu"/> class for the specified
         /// <see cref="Form"/>.
         /// </summary>
         /// <param name="form">The window for which the system menu is expanded.</param>
