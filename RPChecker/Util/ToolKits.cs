@@ -45,11 +45,10 @@ namespace RPChecker.Util
             return new TimeSpan(0, hour, minute, second, millisecond);
         }
 
-        public static void GenerateVpyFile(string file1, string file2, string outputFile, string selectedFile)
+        public static void GenerateVpyFile((string src, string opt) item, string outputFile, string selectedFile)
         {
-            //"import sys\r\nimport vapoursynth as vs \r\nimport mvsfunc as mvf\r\nimport functools\r\ncore = vs.get_core(accept_lowercase = True)\r\ncore.max_cache_size = 5000\r\nsrc = core.lsmas.LWLibavSource(r\"%File1%\", format = \"yuv420p16\")\r\nopt = core.lsmas.LWLibavSource(r\"%File2%\", format = \"yuv420p16\")\r\ncmp = mvf.PlaneCompare(opt, src, mae = False, rmse = False, cov = False, corr = False)\r\ndef callback(n, clip, f):\r\n    print(n, f.props.PlanePSNR)\r\n    return clip\r\ncmp = core.std.FrameEval(cmp, functools.partial(callback, clip = cmp), prop_src =[cmp])\r\ncmp.set_output()\r\n";
             var template = Properties.Resources.vpyTemplate;
-            if (selectedFile != "Default")
+            if (selectedFile != null)
             {
                 var temp = GetUTF8String(File.ReadAllBytes(selectedFile));
                 if (!temp.Contains(@"%File1%") || !temp.Contains(@"%File2%"))
@@ -58,13 +57,13 @@ namespace RPChecker.Util
                 }
                 template = temp;
             }
-            if (Path.GetDirectoryName(file1) == Path.GetDirectoryName(file2))
+            if (Path.GetDirectoryName(item.src) == Path.GetDirectoryName(item.opt))
             {
-                file1 = Path.GetFileName(file1);
-                file2 = Path.GetFileName(file2);
+                item.src = Path.GetFileName(item.src);
+                item.opt = Path.GetFileName(item.opt);
             }
-            template = template.Replace(@"%File1%", file1);
-            template = template.Replace(@"%File2%", file2);
+            template = template.Replace(@"%File1%", item.src);
+            template = template.Replace(@"%File2%", item.opt);
             File.WriteAllText(outputFile, template, Encoding.UTF8);
         }
 
@@ -99,7 +98,8 @@ namespace RPChecker.Util
             var subKeyFound            = false;
             var valueFound             = false;
             // First check Win32 registry
-            using (var regUninstall32 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+            using (var regUninstall32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
+                .OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
             {
                 if (regUninstall32 == null) throw new Exception("Failed to create a RegistryKey variable");
                 if (regUninstall32.GetSubKeyNames().Any(subKeyName => subKeyName.ToLower().Equals("VapourSynth_is1".ToLower())))
@@ -123,7 +123,8 @@ namespace RPChecker.Util
             if (!valueFound)
             {
                 subKeyFound = false;
-                using (var regUninstall64 = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"))
+                using (var regUninstall64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+                    .OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
                 {
                     if (regUninstall64 == null) throw new Exception("Failed to create a RegistryKey variable");
                     if (regUninstall64.GetSubKeyNames().Any(subKeyName => subKeyName.ToLower().Equals("VapourSynth_is1".ToLower())))

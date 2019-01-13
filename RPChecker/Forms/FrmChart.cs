@@ -12,7 +12,7 @@ namespace RPChecker.Forms
     public partial class FrmChart : Form
     {
         private readonly ReSulT _info;
-        private readonly int _threshold;
+        private readonly double _threshold;
         private readonly double _fps;
         private readonly string _type;
         public FrmChart(ReSulT info, int threshold, double fps, string type)
@@ -27,6 +27,7 @@ namespace RPChecker.Forms
         private void FrmChart_Load(object sender, EventArgs e)
         {
             Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Text = $"{_type} Chart";
             var saved = ToolKits.String2Point(RegistryStorage.Load(@"Software\RPChecker", "ChartLocation"));
             if (saved != new Point(-32000, -32000)) Location = saved;
             DrawChart();
@@ -41,39 +42,41 @@ namespace RPChecker.Forms
                 ChartType = SeriesChartType.Line,
                 IsValueShownAsLabel = false
             };
-
             var series2 = new Series("frame")
             {
                 Color = Color.FromArgb(255, 010, 050),
                 ChartType = SeriesChartType.Point,
                 IsValueShownAsLabel = false
             };
+
             var interval = (int) Math.Round(_fps) * 30;
-            var task = new Task(() =>
+            var totleFrame = _info.Data.Count;
+            var labelCount = totleFrame / interval;
+
+            void AddLabel(int position, TimeSpan time) => chart1.ChartAreas[0].AxisX.CustomLabels
+                .Add(position - 20, position + 20, $"{time:mm\\:ss}");
+            for (var i = 1; i <= labelCount; i++)
             {
-                foreach(var frame in _info.Data.OrderBy(item => item.Key))
+                AddLabel(i * interval, TimeSpan.FromSeconds(i * 30));
+            }
+            AddLabel(totleFrame, TimeSpan.FromSeconds(totleFrame / _fps));
+
+            new Task(() =>
+            {
+                foreach(var frame in _info.Data.OrderBy(item => item.index))
                 {
-                    series1.Points.AddXY(frame.Key, frame.Value);
-                    if ((frame.Key + 1) % interval == 0)
+                    series1.Points.AddXY(frame.index, frame.value);
+                    if (frame.value < _threshold)
                     {
-                        Invoke(new Action(() => chart1.ChartAreas[0].AxisX.CustomLabels.Add(frame.Key - 20, frame.Key + 20,
-                            $"{TimeSpan.FromSeconds(Math.Round(frame.Key / _fps)):mm\\:ss}")));
-                    }
-                    if (frame.Value < _threshold)
-                    {
-                        series2.Points.AddXY(frame.Key, frame.Value);
+                        series2.Points.AddXY(frame.index, frame.value);
                     }
                 }
-            });
-            task.ContinueWith(t =>
-            {
                 Invoke(new Action(() =>
                 {
                     chart1.Series.Add(series1);
                     chart1.Series.Add(series2);
                 }));
-            });
-            task.Start();
+            }).Start();
         }
 
         private void FrmChart_FormClosing(object sender, FormClosingEventArgs e)
@@ -90,7 +93,7 @@ namespace RPChecker.Forms
 
         private void btnSaveAsImage_Click(object sender, EventArgs e)
         {
-            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.Key) ?? "", $"{Guid.NewGuid()}.png");
+            var fileName = Path.Combine(Path.GetDirectoryName(_info.FileNamePair.opt) ?? "", $"{Guid.NewGuid()}.png");
             chart1.SaveImage(fileName, ChartImageFormat.Png);
         }
     }

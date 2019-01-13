@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RPChecker</RootNamespace>
     <AssemblyName>RPChecker</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -181,7 +181,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -199,9 +201,6 @@
     <Content Include="Icon\Rp.ico" />
     <None Include="Resources\ic_check_box_outline_blank_black_24dp.png" />
     <None Include="Resources\ic_check_box_black_24dp.png" />
-    <None Include="Image\ic_check_box_outline_blank_black_24dp.png" />
-    <None Include="Image\ic_check_box_black_24dp.png" />
-    <None Include="Resources\Checked.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

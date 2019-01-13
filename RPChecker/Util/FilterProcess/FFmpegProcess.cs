@@ -23,11 +23,13 @@ namespace RPChecker.Util.FilterProcess
 
         public Exception Exceptions { get; set; }
 
-        public virtual string ValueText => null;
+        public abstract string ValueText { get; }
 
-        public virtual string Title => null;
+        public virtual int Threshold => 30;
 
-        protected virtual string Arguments => null;
+        public abstract string Title { get; }
+
+        protected abstract string Arguments { get; }
 
         public void GenerateLog(params string[] inputFiles)
         {
@@ -103,6 +105,6 @@ namespace RPChecker.Util.FilterProcess
 
         protected const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
 
-        public abstract void UpdateValue(string data, ref Dictionary<int, double> tempData);
+        public abstract void UpdateValue(string data, ref List<(int index, double value)> tempData);
     }
 }
