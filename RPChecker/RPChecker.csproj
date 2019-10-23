@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RPChecker</RootNamespace>
     <AssemblyName>RPChecker</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -38,6 +38,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,6 +48,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Icon\Rp.ico</ApplicationIcon>
@@ -139,7 +141,6 @@
     <Compile Include="Util\FilterProcess\IProcess.cs" />
     <Compile Include="Util\RegistryStorage.cs" />
     <Compile Include="Util\SystemMenu.cs" />
-    <Compile Include="Util\Updater.cs" />
     <Compile Include="Util\FilterProcess\VsPipePSNRProcess.cs" />
     <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
@@ -201,6 +202,12 @@
     <Content Include="Icon\Rp.ico" />
     <None Include="Resources\ic_check_box_outline_blank_black_24dp.png" />
     <None Include="Resources\ic_check_box_black_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Updater\Updater.csproj">
+      <Project>{ee682a3c-2283-4c5d-806b-7ddc6774657d}</Project>
+      <Name>Updater</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
