@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Windows.Forms;
 using RPChecker.Forms;
 
@@ -14,6 +15,9 @@ namespace RPChecker
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Updater.Utils.SoftwareName = "RPChecker";
+            Updater.Utils.RepoName = "vcb-s/rp-checker";
+            Updater.Utils.CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version;
             Application.Run(new Form1());
         }
     }

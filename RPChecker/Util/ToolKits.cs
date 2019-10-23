@@ -85,6 +85,23 @@ namespace RPChecker.Util
                 form.Location = Point.Empty;
         }
 
+        private const int MAX_PATH = 260;
+        /// <summary>
+        /// Gets the full path of the given executable filename as if the user had entered this
+        /// executable in a shell. So, for example, the Windows PATH environment variable will
+        /// be examined. If the filename can't be found by Windows, null is returned.</summary>
+        /// <param name="exeName"></param>
+        /// <returns>The full path if successful, or null otherwise.</returns>
+        public static string GetFullPathFromWindows(string exeName)
+        {
+            if (exeName.Length >= MAX_PATH)
+                throw new ArgumentException($"The executable name '{exeName}' must have less than {MAX_PATH} characters.",
+                    nameof(exeName));
+
+            var sb = new StringBuilder(exeName, MAX_PATH);
+            return NativeMethods.PathFindOnPath(sb, new []{ Environment.CurrentDirectory, null }) ? sb.ToString() : null;
+        }
+
         /// <summary>
         /// Returns the path from VapourSynth.
         /// It tries to find it via the registry keys.

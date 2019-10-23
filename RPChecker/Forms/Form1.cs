@@ -40,7 +40,7 @@ namespace RPChecker.Forms
             cbVpyFile.Items.AddRange(current.GetFiles("*.vpy").ToArray<object>());
             btnAnalyze.Enabled = false;
 
-            Updater.CheckUpdateWeekly("RPChecker");
+            Updater.Utils.CheckUpdateWeekly("RPChecker");
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -73,7 +73,7 @@ namespace RPChecker.Forms
         private void AddCommand()
         {
             _systemMenu = new SystemMenu(this);
-            _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
+            _systemMenu.AddCommand("检查更新(&U)", () => { Updater.Utils.CheckUpdate(true); }, true);
             _systemMenu.AddCommand("使用PSNR(VS)", () =>
             {
                 _coreProcess = _coreProcess as VsPipePSNRProcess ?? new VsPipePSNRProcess();
@@ -94,6 +94,44 @@ namespace RPChecker.Forms
                 _useOriginPath = true;
                 UpdateText();
             }, true);
+            _systemMenu.AddCommand("导出结果", () =>
+            {
+                var ret = Jil.JSON.Serialize(_fullData);
+                try
+                {
+                    File.WriteAllText($"[RPCR] {DateTime.Now:yyyyMMddHHmmssffff}.rpc", ret);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"导出失败：{e.Message}", @"RPChecker Error");
+                }
+                
+            }, true);
+            _systemMenu.AddCommand("载入结果", () =>
+            {
+                var openFileDialog1 = new OpenFileDialog
+                {
+                    InitialDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                    Filter = "RPC files (*.rpc)|*.rpc|Any files (*.*)|*.*",
+                    FilterIndex = 0,
+                    RestoreDirectory = true
+                };
+
+                if (openFileDialog1.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+                var json = File.ReadAllText(openFileDialog1.FileName);
+                _fullData.Clear();
+                cbFileList.Items.Clear();
+                _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? ""));
+                if (_fullData.Count > 0)
+                {
+                    cbFileList.SelectedIndex = 0;
+                    ChangeClipDisplay();
+                }
+            }, false);
         }
 
         protected override void WndProc(ref Message msg)
@@ -130,7 +168,7 @@ namespace RPChecker.Forms
         {
             if (cbFileList.SelectedIndex < 0 || cbFileList.SelectedIndex > _fullData.Count) return;
             btnChart.Enabled = CurrentData.Data.Count > 0;
-            UpdataGridView(CurrentData, FrameRate);
+            UpdateGridView(CurrentData, FrameRate);
         }
 
         private void cbFileList_SelectionChangeCommitted(object sender, EventArgs e)
@@ -155,7 +193,7 @@ namespace RPChecker.Forms
             var threshold = Convert.ToInt32(numericUpDown1.Value);
             if (threshold == _threshold) return;
             if (_fullData == null || _fullData.Count == 0) return;
-            UpdataGridView(CurrentData, FrameRate);
+            UpdateGridView(CurrentData, FrameRate);
         }
 
         private void cbFileList_MouseEnter(object sender, EventArgs e) => toolTip1.Show(cbFileList.SelectedItem?.ToString(), (IWin32Window)sender);
@@ -179,7 +217,7 @@ namespace RPChecker.Forms
                 btnAbort.Enabled       = !value;
             }
         }
-        private void UpdataGridView(ReSulT info, double frameRate)
+        private void UpdateGridView(ReSulT info, double frameRate)
         {
             dataGridView1.Rows.Clear();
             foreach (var item in info.Data)
@@ -191,8 +229,8 @@ namespace RPChecker.Forms
                 newRow.DefaultCellStyle.BackColor = item.value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
-                Application.DoEvents();
             }
+            Application.DoEvents();
             Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines");
         }
 
@@ -212,7 +250,7 @@ namespace RPChecker.Forms
                     _currentBuffer = new LogBuffer();
                     _data = new List<(int index, double value)>();
 
-                    AnalyseClipLink(item);
+                    AnalyzeClipLink(item);
                     var data = _data.OrderBy(a => a.value).ThenBy(a => a.index).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue;
@@ -236,7 +274,7 @@ namespace RPChecker.Forms
 
         private bool UseOriginPath => _useOriginPath || !(_coreProcess is VsPipePSNRProcess);
 
-        private void AnalyseClipLink((string src, string opt) item)
+        private void AnalyzeClipLink((string src, string opt) item)
         {
             Debug.Assert(item.src != null);
             Debug.Assert(item.opt != null);
@@ -248,18 +286,18 @@ namespace RPChecker.Forms
                 NativeMethods.CreateHardLinkCMD(linkedFile2, item.opt);
                 Debug.WriteLine($"HardLink: {item.src} => {linkedFile1}");
                 Debug.WriteLine($"HardLink: {item.opt} => {linkedFile2}");
-                AnalyseClip((linkedFile1, linkedFile2));
+                AnalyzeClip((linkedFile1, linkedFile2));
                 File.Delete(linkedFile1);
                 File.Delete(linkedFile2);
                 RemoveScript((linkedFile1, linkedFile2));
             }
             else
             {
-                AnalyseClip(item);
+                AnalyzeClip(item);
             }
         }
 
-        private void AnalyseClip((string src, string opt) item)
+        private void AnalyzeClip((string src, string opt) item)
         {
             _coreProcess.ProgressUpdated += ProgressUpdated;
             _coreProcess.ValueUpdated += ValueUpdated;
@@ -384,9 +422,10 @@ namespace RPChecker.Forms
             if (!ret.Success) return;
             var processed = int.Parse(ret.Groups["processed"].Value);
             var total     = int.Parse(ret.Groups["total"].Value);
-            if (processed <= total)
+            var newProgressValue = (int)Math.Floor(processed * 100.0 / total);
+            if (processed <= total && toolStripProgressBar1.Value != newProgressValue)
             {
-                toolStripProgressBar1.Value = (int)Math.Floor(processed * 100.0 / total);
+                toolStripProgressBar1.Value = newProgressValue;
             }
             Application.DoEvents();
         }

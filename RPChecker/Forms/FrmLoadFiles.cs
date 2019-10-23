@@ -4,7 +4,6 @@ using System.Linq;
 using RPChecker.Util;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 
 namespace RPChecker.Forms
@@ -37,8 +36,7 @@ namespace RPChecker.Forms
 
         private void listView_DragOver(object sender, DragEventArgs e)
         {
-            var listView = sender as ListView;
-            if (listView == null) return;
+            if (!(sender is ListView listView)) return;
             var ptScreen = new Point(e.X, e.Y);
             var pt       = listView.PointToClient(ptScreen);
             var item     = listView.GetItemAt(pt.X, pt.Y);
@@ -48,8 +46,7 @@ namespace RPChecker.Forms
 
         private void listView_DragDrop(object sender, DragEventArgs e)
         {
-            var listView = sender as ListView;
-            if (listView == null) return;
+            if (!(sender is ListView listView)) return;
             var draggedItem = (ListViewItem)e.Data.GetData(typeof(ListViewItem));
             var ptScreen    = new Point(e.X, e.Y);
             var pt          = listView.PointToClient(ptScreen);
@@ -105,7 +102,7 @@ namespace RPChecker.Forms
                 Close();
                 return;
             }
-            MessageBox.Show(@"个数都不对应，确定个屁啊");
+            MessageBox.Show(@"个数都不对应，确定个屁啊", @"RPChecker Warning");
         }
 
         private void btnClear_MouseUp(object sender, MouseEventArgs e)

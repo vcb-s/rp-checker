@@ -50,8 +50,8 @@ namespace RPChecker.Forms
             };
 
             var interval = (int) Math.Round(_fps) * 30;
-            var totleFrame = _info.Data.Count;
-            var labelCount = totleFrame / interval;
+            var totalFrame = _info.Data.Count;
+            var labelCount = totalFrame / interval;
 
             void AddLabel(int position, TimeSpan time) => chart1.ChartAreas[0].AxisX.CustomLabels
                 .Add(position - 20, position + 20, $"{time:mm\\:ss}");
@@ -59,7 +59,7 @@ namespace RPChecker.Forms
             {
                 AddLabel(i * interval, TimeSpan.FromSeconds(i * 30));
             }
-            AddLabel(totleFrame, TimeSpan.FromSeconds(totleFrame / _fps));
+            AddLabel(totalFrame, TimeSpan.FromSeconds(totalFrame / _fps));
 
             new Task(() =>
             {

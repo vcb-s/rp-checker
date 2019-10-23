@@ -9,6 +9,10 @@ namespace RPChecker.Util
 
         private readonly int _count;
 
+        public LogBuffer()
+        {
+        }
+
         public LogBuffer(int count = 1024)
         {
             _content = new LinkedList<string>();

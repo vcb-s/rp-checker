@@ -7,7 +7,7 @@ namespace RPChecker.Util.FilterProcess
     {
         public override string ValueText => "结构相似性阈值";
 
-        public override int Threshold => 60;
+        public override int Threshold => 90;
 
         public override string Title => "FFmpeg SSIM";
 
