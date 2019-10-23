@@ -94,6 +94,44 @@ namespace RPChecker.Forms
                 _useOriginPath = true;
                 UpdateText();
             }, true);
+            _systemMenu.AddCommand("导出结果", () =>
+            {
+                var ret = Jil.JSON.Serialize(_fullData);
+                try
+                {
+                    File.WriteAllText($"[RPCR] {DateTime.Now:yyyyMMddHHmmssffff}.rpc", ret);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"导出失败：{e.Message}", @"RPChecker Error");
+                }
+                
+            }, true);
+            _systemMenu.AddCommand("载入结果", () =>
+            {
+                var openFileDialog1 = new OpenFileDialog
+                {
+                    InitialDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                    Filter = "RPC files (*.rpc)|*.rpc|Any files (*.*)|*.*",
+                    FilterIndex = 0,
+                    RestoreDirectory = true
+                };
+
+                if (openFileDialog1.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+                var json = File.ReadAllText(openFileDialog1.FileName);
+                _fullData.Clear();
+                cbFileList.Items.Clear();
+                _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? ""));
+                if (_fullData.Count > 0)
+                {
+                    cbFileList.SelectedIndex = 0;
+                    ChangeClipDisplay();
+                }
+            }, false);
         }
 
         protected override void WndProc(ref Message msg)
@@ -191,8 +229,8 @@ namespace RPChecker.Forms
                 newRow.DefaultCellStyle.BackColor = item.value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
-                Application.DoEvents();
             }
+            Application.DoEvents();
             Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines");
         }
 
@@ -384,9 +422,10 @@ namespace RPChecker.Forms
             if (!ret.Success) return;
             var processed = int.Parse(ret.Groups["processed"].Value);
             var total     = int.Parse(ret.Groups["total"].Value);
-            if (processed <= total)
+            var newProgressValue = (int)Math.Floor(processed * 100.0 / total);
+            if (processed <= total && toolStripProgressBar1.Value != newProgressValue)
             {
-                toolStripProgressBar1.Value = (int)Math.Floor(processed * 100.0 / total);
+                toolStripProgressBar1.Value = newProgressValue;
             }
             Application.DoEvents();
         }
