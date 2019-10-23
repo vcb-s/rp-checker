@@ -40,7 +40,7 @@ namespace RPChecker.Forms
             cbVpyFile.Items.AddRange(current.GetFiles("*.vpy").ToArray<object>());
             btnAnalyze.Enabled = false;
 
-            Updater.CheckUpdateWeekly("RPChecker");
+            Updater.Utils.CheckUpdateWeekly("RPChecker");
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -73,7 +73,7 @@ namespace RPChecker.Forms
         private void AddCommand()
         {
             _systemMenu = new SystemMenu(this);
-            _systemMenu.AddCommand("检查更新(&U)", Updater.CheckUpdate, true);
+            _systemMenu.AddCommand("检查更新(&U)", () => { Updater.Utils.CheckUpdate(true); }, true);
             _systemMenu.AddCommand("使用PSNR(VS)", () =>
             {
                 _coreProcess = _coreProcess as VsPipePSNRProcess ?? new VsPipePSNRProcess();
