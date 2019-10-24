@@ -96,16 +96,14 @@ namespace RPChecker.Forms
             }, true);
             _systemMenu.AddCommand("导出结果", () =>
             {
-                var ret = Jil.JSON.Serialize(_fullData);
                 try
                 {
-                    File.WriteAllText($"[RPCR] {DateTime.Now:yyyyMMddHHmmssffff}.rpc", ret);
+                    File.WriteAllText($"[RPCR] {DateTime.Now:yyyyMMddHHmmssffff}.rpc", Jil.JSON.Serialize(_fullData));
                 }
                 catch (Exception e)
                 {
                     MessageBox.Show($"导出失败：{e.Message}", @"RPChecker Error");
                 }
-                
             }, true);
             _systemMenu.AddCommand("载入结果", () =>
             {
@@ -268,6 +266,14 @@ namespace RPChecker.Forms
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
             ChangeClipDisplay();
+            try
+            {
+                File.WriteAllText($"[RPCR] {DateTime.Now:yyyyMMddHHmmssffff}.rpc", Jil.JSON.Serialize(_fullData));
+            }
+            catch (Exception exception)
+            {
+                _currentBuffer.Log($"{exception.GetType()}: {exception.Message}");
+            }
         }
 
         private bool _useOriginPath;
