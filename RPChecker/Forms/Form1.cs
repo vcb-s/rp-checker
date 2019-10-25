@@ -45,6 +45,7 @@ namespace RPChecker.Forms
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            _coreProcess.Kill();
             RegistryStorage.Save(Location.ToString(), @"Software\RPChecker", "Location");
         }
         #endregion
@@ -130,6 +131,11 @@ namespace RPChecker.Forms
                     ChangeClipDisplay();
                 }
             }, false);
+            _systemMenu.AddCommand("重置路径", () =>
+            {
+                RegistryStorage.Save("");
+                RegistryStorage.Save("", name: "FFmpegPath");
+            }, true);
         }
 
         protected override void WndProc(ref Message msg)
@@ -262,6 +268,8 @@ namespace RPChecker.Forms
                                 @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error)).Start();
                 }
             }
+            if (!IsHandleCreated || IsDisposed) return;
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
             _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? ""));
             if (cbFileList.Items.Count <= 0) return;
             cbFileList.SelectedIndex = 0;
@@ -316,12 +324,14 @@ namespace RPChecker.Forms
                 Thread coreThread;
                 if (_coreProcess is VsPipePSNRProcess)
                 {
-                    string vsFile = $"{item.opt}.vpy";
+                    toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+                    var vsFile = $"{item.opt}.vpy";
                     ToolKits.GenerateVpyFile(item, vsFile, (cbVpyFile.SelectedItem as FileInfo)?.FullName);
                     coreThread = new Thread(() => _coreProcess.GenerateLog(vsFile));
                 }
                 else
                 {
+                    toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
                     coreThread = new Thread(() => _coreProcess.GenerateLog(item.src, item.opt));
                 }
                 coreThread.Start();
@@ -370,21 +380,40 @@ namespace RPChecker.Forms
         private void ProgressUpdated(string progress)
         {
             if (string.IsNullOrEmpty(progress)) return;
+            if (!IsHandleCreated || IsDisposed) return;
+
             _currentBuffer.Log("err|" + progress);
             Invoke(new Action(() => toolStripStatusStdError.Text = progress));
             _coreProcess
-                .Match<VsPipePSNRProcess>(_ => Invoke(new Action(() => VsUpdateProgress(progress))))
-                .Match<FFmpegProcess>    (_ => Invoke(new Action(() => FFmpegUpdateProgress(progress))))
+                .Match<VsPipePSNRProcess>(_ =>
+                {
+                    if (IsHandleCreated && IsDisposed)
+                        Invoke(new Action(() => VsUpdateProgress(progress)));
+                })
+                .Match<FFmpegProcess>(_ =>
+                {
+                    if (IsHandleCreated && IsDisposed)
+                        Invoke(new Action(() => FFmpegUpdateProgress(progress)));
+                })
                 ;
         }
 
         private void ValueUpdated(string data)
         {
             if (string.IsNullOrEmpty(data)) return;
+
             _currentBuffer.Log("std|" + data);
             _coreProcess
-                .Match<VsPipePSNRProcess>(self => Invoke(new Action(() => self.UpdateValue(data, ref _data))))
-                .Match<FFmpegProcess>    (self => Invoke(new Action(() => self.UpdateValue(data, ref _data))))
+                .Match<VsPipePSNRProcess>(self =>
+                {
+                    if (IsHandleCreated && IsDisposed)
+                        Invoke(new Action(() => self.UpdateValue(data, ref _data)));
+                })
+                .Match<FFmpegProcess>(self =>
+                {
+                    if (IsHandleCreated && IsDisposed)
+                        Invoke(new Action(() => self.UpdateValue(data, ref _data)));
+                })
                 ;
         }
         #endregion
@@ -455,15 +484,19 @@ namespace RPChecker.Forms
             {
                 var frameRet = FFmpegFrameRegex.Match(progress);
                 if (frameRet.Success)
+                {
                     _ffmpegTotalFrame = int.Parse(frameRet.Groups["frame"].Value);
+                    toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+                }
                 return;
             }
             var ret = FFmpegProgressRegex.Match(progress);
             if (!ret.Success || _ffmpegTotalFrame == int.MaxValue) return;
             var processed = int.Parse(ret.Groups["processed"].Value);
-            if (processed <= _ffmpegTotalFrame)
+            var newProgressValue = (int)Math.Floor(processed * 100.0 / _ffmpegTotalFrame);
+            if (processed <= _ffmpegTotalFrame && toolStripProgressBar1.Value != newProgressValue)
             {
-                toolStripProgressBar1.Value = (int)Math.Floor(processed * 100.0 / _ffmpegTotalFrame);
+                toolStripProgressBar1.Value = newProgressValue;
             }
         }
         #endregion

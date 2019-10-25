@@ -112,5 +112,9 @@ namespace RPChecker.Util.FilterProcess
             if (!rawData.Success) return;
             tempData.Add((int.Parse(rawData.Groups["frame"].Value), double.Parse(rawData.Groups["PSNR"].Value)));
         }
+        public void Kill()
+        {
+            _consoleProcess.Kill();
+        }
     }
 }

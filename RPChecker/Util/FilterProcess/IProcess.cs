@@ -17,6 +17,8 @@ namespace RPChecker.Util.FilterProcess
 
         void ExitedHandler(object sender, EventArgs e);
 
+        void Kill();
+
         event Action<string> ProgressUpdated;
 
         event Action<string> ValueUpdated;
