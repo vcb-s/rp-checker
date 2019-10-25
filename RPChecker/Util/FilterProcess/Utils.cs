@@ -15,15 +15,11 @@ namespace RPChecker.Util.FilterProcess
                 vspipePath = RegistryStorage.Load();
                 if (vspipePath == null || !File.Exists(Path.Combine(vspipePath, "vspipe.exe")))
                 {
-                    vspipePath = ToolKits.GetFullPathFromWindows("vspipe.exe") ??
+                    vspipePath = Path.GetDirectoryName(ToolKits.GetFullPathFromWindows("vspipe.exe")) ??
                                  ToolKits.GetVapourSynthPathViaRegistry();
                     if (vspipePath != null)
                     {
                         RegistryStorage.Save(vspipePath);
-                    }
-                    else
-                    {
-
                     }
                 }
             }
@@ -40,33 +36,28 @@ namespace RPChecker.Util.FilterProcess
         public static string GetFFmpegPath(this IProcess process, out Exception exception)
         {
             exception = null;
-            string ffmpegPath;
+            var ffmpegInReg = RegistryStorage.Load(name: "FFmpegPath");
             try
             {
-                ffmpegPath = RegistryStorage.Load(name: "FFmpegPath") ?? "";
-                if (!File.Exists(Path.Combine(ffmpegPath, "ffmpeg.exe")))//the file has been moved
+                var ffmpegInPath = Path.GetDirectoryName(ToolKits.GetFullPathFromWindows("ffmpeg.exe"));
+                if (!string.IsNullOrEmpty(ffmpegInPath))
                 {
-                    ffmpegPath = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
-                    RegistryStorage.Save(Path.GetDirectoryName(ffmpegPath), name: "FFmpegPath");
+                    if (ffmpegInReg != ffmpegInPath)
+                        RegistryStorage.Save(ffmpegInPath, name: "FFmpegPath");
+                    return ffmpegInPath;
+                }
+
+                if (!File.Exists(Path.Combine(ffmpegInReg, "ffmpeg.exe")))
+                {
+                    ffmpegInReg = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
+                    RegistryStorage.Save(Path.GetDirectoryName(ffmpegInReg), name: "FFmpegPath");
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                ffmpegPath = string.Empty;
-                if (!File.Exists("ffmpeg.exe"))
-                {
-                    ffmpegPath = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
-                    if (!File.Exists(ffmpegPath))
-                    {
-                        exception = new Exception(process.FileNotFind);
-                        return null;
-                    }
-                    ffmpegPath = Path.GetDirectoryName(ffmpegPath) ?? "";
-                    RegistryStorage.Save(ffmpegPath, name: "FFmpegPath");
-                }
             }
-            return ffmpegPath;
+            return ffmpegInReg;
         }
     }
 }

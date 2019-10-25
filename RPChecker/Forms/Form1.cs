@@ -130,6 +130,11 @@ namespace RPChecker.Forms
                     ChangeClipDisplay();
                 }
             }, false);
+            _systemMenu.AddCommand("重置路径", () =>
+            {
+                RegistryStorage.Save("");
+                RegistryStorage.Save("", name: "FFmpegPath");
+            }, true);
         }
 
         protected override void WndProc(ref Message msg)
