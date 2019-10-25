@@ -103,6 +103,11 @@ namespace RPChecker.Util.FilterProcess
             _consoleProcess.Exited -= ExitedHandler;
         }
 
+        public void Kill()
+        {
+            _consoleProcess.Kill();
+        }
+
         protected const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
 
         public abstract void UpdateValue(string data, ref List<(int index, double value)> tempData);
