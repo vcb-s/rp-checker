@@ -11,7 +11,7 @@ namespace RPChecker.Util.FilterProcess
 
         public override string Title => "FFmpeg SSIM";
 
-        protected override string Arguments => "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex ssim=\"stats_file=-\" -an -f null -";
+        protected override string Arguments => "-hwaccel dxva2 -i \"{0}\" -i \"{1}\" -hide_banner -filter_complex ssim=\"stats_file=-\" -an -f null -";
 
         private static readonly Regex SSIMDataFormatRegex = new Regex($@"n:(?<frame>\d+) Y:(?<Y>{Number}) U:(?<U>{Number}) V:(?<V>{Number}) All:(?<All>{Number})", RegexOptions.Compiled);
 
