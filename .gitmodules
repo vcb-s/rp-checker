@@ -1,0 +1,3 @@
+[submodule "Updater"]
+	path = Updater
+	url = https://github.com/vcb-s/updater.git
