@@ -105,7 +105,14 @@ namespace RPChecker.Util.FilterProcess
 
         public void Kill()
         {
-            _consoleProcess.Kill();
+            try
+            {
+                _consoleProcess?.Kill();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         protected const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
