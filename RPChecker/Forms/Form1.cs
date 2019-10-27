@@ -387,12 +387,12 @@ namespace RPChecker.Forms
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ =>
                 {
-                    if (IsHandleCreated && IsDisposed)
+                    if (IsHandleCreated && !IsDisposed)
                         Invoke(new Action(() => VsUpdateProgress(progress)));
                 })
                 .Match<FFmpegProcess>(_ =>
                 {
-                    if (IsHandleCreated && IsDisposed)
+                    if (IsHandleCreated && !IsDisposed)
                         Invoke(new Action(() => FFmpegUpdateProgress(progress)));
                 })
                 ;
@@ -406,12 +406,12 @@ namespace RPChecker.Forms
             _coreProcess
                 .Match<VsPipePSNRProcess>(self =>
                 {
-                    if (IsHandleCreated && IsDisposed)
+                    if (IsHandleCreated && !IsDisposed)
                         Invoke(new Action(() => self.UpdateValue(data, ref _data)));
                 })
                 .Match<FFmpegProcess>(self =>
                 {
-                    if (IsHandleCreated && IsDisposed)
+                    if (IsHandleCreated && !IsDisposed)
                         Invoke(new Action(() => self.UpdateValue(data, ref _data)));
                 })
                 ;
