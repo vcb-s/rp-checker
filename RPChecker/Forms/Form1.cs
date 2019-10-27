@@ -196,6 +196,7 @@ namespace RPChecker.Forms
         {
             var threshold = Convert.ToInt32(numericUpDown1.Value);
             if (threshold == _threshold) return;
+            _threshold = threshold;
             if (_fullData == null || _fullData.Count == 0) return;
             UpdateGridView(CurrentData, FrameRate);
         }
@@ -326,7 +327,8 @@ namespace RPChecker.Forms
                 {
                     toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
                     var vsFile = $"{item.opt}.vpy";
-                    ToolKits.GenerateVpyFile(item, vsFile, (cbVpyFile.SelectedItem as FileInfo)?.FullName);
+                    ToolKits.GenerateVpyFile(item, vsFile,
+                        cbVpyFile.SelectedItem is FileInfo info ? info.FullName : cbVpyFile.SelectedItem as string);
                     coreThread = new Thread(() => _coreProcess.GenerateLog(vsFile));
                 }
                 else
@@ -387,12 +389,12 @@ namespace RPChecker.Forms
             _coreProcess
                 .Match<VsPipePSNRProcess>(_ =>
                 {
-                    if (IsHandleCreated && IsDisposed)
+                    if (IsHandleCreated && !IsDisposed)
                         Invoke(new Action(() => VsUpdateProgress(progress)));
                 })
                 .Match<FFmpegProcess>(_ =>
                 {
-                    if (IsHandleCreated && IsDisposed)
+                    if (IsHandleCreated && !IsDisposed)
                         Invoke(new Action(() => FFmpegUpdateProgress(progress)));
                 })
                 ;
@@ -406,12 +408,12 @@ namespace RPChecker.Forms
             _coreProcess
                 .Match<VsPipePSNRProcess>(self =>
                 {
-                    if (IsHandleCreated && IsDisposed)
+                    if (IsHandleCreated && !IsDisposed)
                         Invoke(new Action(() => self.UpdateValue(data, ref _data)));
                 })
                 .Match<FFmpegProcess>(self =>
                 {
-                    if (IsHandleCreated && IsDisposed)
+                    if (IsHandleCreated && !IsDisposed)
                         Invoke(new Action(() => self.UpdateValue(data, ref _data)));
                 })
                 ;
@@ -420,10 +422,11 @@ namespace RPChecker.Forms
 
         #region vapoursynth
         private static readonly Regex VsProgressRegex = new Regex(@"Frame: (?<processed>\d+)/(?<total>\d+)", RegexOptions.Compiled);
+        private static readonly Regex VsErrorRegex = new Regex("Failed|Error", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private void VsUpdateProgress(string progress)
         {
-            if (Regex.IsMatch(progress, "Failed|Error", RegexOptions.IgnoreCase))
+            if (VsErrorRegex.IsMatch(progress))
             {
                 _currentBuffer.Inf = true;
             }
@@ -441,14 +444,21 @@ namespace RPChecker.Forms
                     _errorDialogShowed = true;
                     new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python36\\Lib\\site-packages")).Start();
+                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python3X\\Lib\\site-packages")).Start();
                 }
                 else if (!_errorDialogShowed && progress.EndsWith("There is no function named PlaneAverage"))
                 {
                     _errorDialogShowed = true;
                     new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python36\\Lib\\site-packages")).Start();
+                        text: $"请升级 'mvsfunc' 至少至 r6{Environment.NewLine}大概的位置是在Python3X\\Lib\\site-packages")).Start();
+                }
+                else if (!_errorDialogShowed && progress.EndsWith("ModuleNotFoundError: No module named 'muvsfunc'"))
+                {
+                    _errorDialogShowed = true;
+                    new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
+                        buttons: MessageBoxButtons.OK,
+                        text: $"尚未正确放置滤镜库 'muvsfunc'{Environment.NewLine}大概的位置是在Python3X\\Lib\\site-packages")).Start();
                 }
                 return;
             }
@@ -507,7 +517,7 @@ namespace RPChecker.Forms
         private void btnChart_Click(object sender, EventArgs e)
         {
             if (cbFileList.SelectedIndex < 0 || _chartFormOpened) return;
-            var type = _coreProcess is VsPipePSNRProcess || _coreProcess is FFmpegPSNRProcess ? "PSNR" : "SSIM";
+            var type = _coreProcess.ValueText;
             var chart = new FrmChart(CurrentData, _threshold, FrameRate, type);
             chart.Load   += (o, args) => _chartFormOpened = true;
             chart.Closed += (o, args) => _chartFormOpened = false;

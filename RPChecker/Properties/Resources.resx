@@ -121,12 +121,10 @@
   <data name="Checked" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ic_check_box_black_24dp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Unchecked" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ic_check_box_outline_blank_black_24dp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="vpyTemplate" xml:space="preserve">
+  <data name="Default" xml:space="preserve">
     <value>import vapoursynth as vs
 import mvsfunc as mvf
+import muvsfunc as muf
 import functools
 
 core=vs.get_core()
@@ -144,14 +142,46 @@ opt=mvf.GetPlane(source(opt))
 if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
 
 def callback(n,f,clip):
-  print(n,f.props.PlanePSNR,flush=True)
-  #clip=core.text.Text(clip,str(n)+" "+str(f.props.PlanePSNR))
+  print(n,(1-min(1,float(f.props.PlaneGMSD)))*100,flush=True)
+  #clip=core.text.Text(clip,str(n)+" "+str(f.props.PlaneGMSD))
   return clip
 
-cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
+cmp=muf.GMSD(opt,src)
 cmp=core.std.FrameEval(cmp,functools.partial(callback,clip=cmp),prop_src=[cmp])
-cmp.set_output()
-</value>
+cmp.set_output()</value>
     <comment>默认的vpy模板</comment>
+  </data>
+  <data name="GMSD" xml:space="preserve">
+    <value>import vapoursynth as vs
+import mvsfunc as mvf
+import muvsfunc as muf
+import functools
+
+core=vs.get_core()
+core.max_cache_size=5000
+
+src=r"%File1%"
+opt=r"%File2%"
+fmt="yuv420p16"
+
+source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt)if path.lower().endswith("mp4")else core.lsmas.LWLibavSource(path,format=fmt)
+
+src=mvf.GetPlane(source(src))
+opt=mvf.GetPlane(source(opt))
+
+if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
+
+def callback(n,f,clip):
+  print(n,(1-min(1,float(f.props.PlaneGMSD)))*100,flush=True)
+  #clip=core.text.Text(clip,str(n)+" "+str(f.props.PlaneGMSD))
+  return clip
+
+cmp=muf.GMSD(opt,src)
+cmp=core.std.FrameEval(cmp,functools.partial(callback,clip=cmp),prop_src=[cmp])
+cmp.set_output()</value>
+    <comment>计算GMSD的vpy模板</comment>
+  </data>
+  <data name="Unchecked" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ic_check_box_outline_blank_black_24dp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

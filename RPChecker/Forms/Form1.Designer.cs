@@ -198,7 +198,7 @@ namespace RPChecker.Forms
             this.cbVpyFile.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbVpyFile.FormattingEnabled = true;
             this.cbVpyFile.Items.AddRange(new object[] {
-            "Default"});
+            "Default", "GMSD"});
             this.cbVpyFile.Location = new System.Drawing.Point(409, 110);
             this.cbVpyFile.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.cbVpyFile.Name = "cbVpyFile";
