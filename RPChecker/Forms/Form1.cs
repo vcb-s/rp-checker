@@ -420,10 +420,11 @@ namespace RPChecker.Forms
 
         #region vapoursynth
         private static readonly Regex VsProgressRegex = new Regex(@"Frame: (?<processed>\d+)/(?<total>\d+)", RegexOptions.Compiled);
+        private static readonly Regex VsErrorRegex = new Regex("Failed|Error", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private void VsUpdateProgress(string progress)
         {
-            if (Regex.IsMatch(progress, "Failed|Error", RegexOptions.IgnoreCase))
+            if (VsErrorRegex.IsMatch(progress))
             {
                 _currentBuffer.Inf = true;
             }
