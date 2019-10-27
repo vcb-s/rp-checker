@@ -47,15 +47,25 @@ namespace RPChecker.Util
 
         public static void GenerateVpyFile((string src, string opt) item, string outputFile, string selectedFile)
         {
-            var template = Properties.Resources.vpyTemplate;
-            if (selectedFile != null)
+            string template;
+            switch (selectedFile)
             {
-                var temp = GetUTF8String(File.ReadAllBytes(selectedFile));
-                if (!temp.Contains(@"%File1%") || !temp.Contains(@"%File2%"))
+                case "Default":
+                    template = Properties.Resources.Default;
+                    break;
+                case "GMSD":
+                    template = Properties.Resources.GMSD;
+                    break;
+                default:
                 {
-                    throw new FormatException("无效的模板文件");
+                    var temp = GetUTF8String(File.ReadAllBytes(selectedFile));
+                    if (!temp.Contains(@"%File1%") || !temp.Contains(@"%File2%"))
+                    {
+                        throw new FormatException("无效的模板文件");
+                    }
+                    template = temp;
+                    break;
                 }
-                template = temp;
             }
             if (Path.GetDirectoryName(item.src) == Path.GetDirectoryName(item.opt))
             {

@@ -71,18 +71,9 @@ namespace RPChecker.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap Unchecked {
-            get {
-                object obj = ResourceManager.GetObject("Unchecked", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 import vapoursynth as vs
         ///import mvsfunc as mvf
+        ///import muvsfunc as muf
         ///import functools
         ///
         ///core=vs.get_core()
@@ -99,12 +90,49 @@ namespace RPChecker.Properties {
         ///
         ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
         ///
-        ///def callback(n,f,clip):
-        ///  print(n [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///def callba [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string vpyTemplate {
+        internal static string Default {
             get {
-                return ResourceManager.GetString("vpyTemplate", resourceCulture);
+                return ResourceManager.GetString("Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 import vapoursynth as vs
+        ///import mvsfunc as mvf
+        ///import muvsfunc as muf
+        ///import functools
+        ///
+        ///core=vs.get_core()
+        ///core.max_cache_size=5000
+        ///
+        ///src=r&quot;%File1%&quot;
+        ///opt=r&quot;%File2%&quot;
+        ///fmt=&quot;yuv420p16&quot;
+        ///
+        ///source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt)if path.lower().endswith(&quot;mp4&quot;)else core.lsmas.LWLibavSource(path,format=fmt)
+        ///
+        ///src=mvf.GetPlane(source(src))
+        ///opt=mvf.GetPlane(source(opt))
+        ///
+        ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
+        ///
+        ///def callba [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string GMSD {
+            get {
+                return ResourceManager.GetString("GMSD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap Unchecked {
+            get {
+                object obj = ResourceManager.GetObject("Unchecked", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }
