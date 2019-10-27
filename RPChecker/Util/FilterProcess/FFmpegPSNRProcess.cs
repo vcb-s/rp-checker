@@ -9,7 +9,7 @@ namespace RPChecker.Util.FilterProcess
 
         public override string Title => "FFmpeg PSNR";
 
-        protected override string Arguments => "-hwaccel dxva2 -i \"{0}\" -i \"{1}\" -hide_banner -filter_complex psnr=\"stats_file=-\" -an -f null -";
+        protected override string Arguments => "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex psnr=\"stats_file=-\" -an -f null -";
 
         private static readonly string NumberOrInf = $"{Number}|inf";
 
