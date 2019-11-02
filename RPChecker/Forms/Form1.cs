@@ -103,7 +103,7 @@ namespace RPChecker.Forms
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show($"导出失败：{e.Message}", @"RPChecker Error");
+                    MessageBox.Show($"导出失败：\n{e.Message}", @"RPChecker Error");
                 }
             }, true);
             _systemMenu.AddCommand("载入结果", () =>
@@ -297,14 +297,24 @@ namespace RPChecker.Forms
             {
                 var linkedFile1 = Path.Combine(Path.GetPathRoot(item.src), Guid.NewGuid() + Path.GetExtension(item.src));
                 var linkedFile2 = Path.Combine(Path.GetPathRoot(item.opt), Guid.NewGuid() + Path.GetExtension(item.opt));
-                NativeMethods.CreateHardLinkCMD(linkedFile1, item.src);
-                NativeMethods.CreateHardLinkCMD(linkedFile2, item.opt);
-                Debug.WriteLine($"HardLink: {item.src} => {linkedFile1}");
-                Debug.WriteLine($"HardLink: {item.opt} => {linkedFile2}");
-                AnalyzeClip((linkedFile1, linkedFile2));
-                File.Delete(linkedFile1);
-                File.Delete(linkedFile2);
-                RemoveScript((linkedFile1, linkedFile2));
+                var exitCode = 0;
+                exitCode |= NativeMethods.CreateHardLinkCMD(linkedFile1, item.src);
+                exitCode |= NativeMethods.CreateHardLinkCMD(linkedFile2, item.opt);
+                if (exitCode != 0)
+                {
+                    _useOriginPath = true;
+                    UpdateText();
+                    AnalyzeClip(item);
+                }
+                else
+                {
+                    Debug.WriteLine($"HardLink: {item.src} => {linkedFile1}");
+                    Debug.WriteLine($"HardLink: {item.opt} => {linkedFile2}");
+                    AnalyzeClip((linkedFile1, linkedFile2));
+                    File.Delete(linkedFile1);
+                    File.Delete(linkedFile2);
+                    RemoveScript((linkedFile1, linkedFile2));
+                }
             }
             else
             {
@@ -346,7 +356,7 @@ namespace RPChecker.Forms
             }
             catch (Exception ex)
             {
-                new Task(() => MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
+                new Task(() => MessageBox.Show($"校验过程中出现异常: \n{ex.Message}", @"RPChecker ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
             }
             finally
             {
@@ -529,15 +539,16 @@ namespace RPChecker.Forms
         #region cleanUpOption
         private static void RemoveScript((string src, string opt) item)
         {
+            var (src, opt) = item;
             try
             {
-                File.Delete($"{item.src}.lwi");
-                File.Delete($"{item.opt}.lwi");
-                File.Delete($"{item.opt}.vpy");
+                File.Delete($"{src}.lwi");
+                File.Delete($"{opt}.lwi");
+                File.Delete($"{opt}.vpy");
             }
             catch (Exception ex)
             {
-                new Task(() => MessageBox.Show(ex.Message, @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
+                new Task(() => MessageBox.Show($"删除临时文件时出现异常: \n{ex.Message}", @"RPChecker Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)).Start();
             }
         }
 
@@ -573,7 +584,10 @@ namespace RPChecker.Forms
             if (_poi[0] < _poi[1]) return;
             if (MessageBox.Show(@"是否打开关于界面", @"RPCheckerについて", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                new Form2().Show();
+                using (var about = new Form2())
+                {
+                    about.Show();
+                }
             }
             _poi[0]  = 00;
             _poi[1] += 10;

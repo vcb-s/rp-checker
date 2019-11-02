@@ -27,7 +27,7 @@ namespace RPChecker.Util.FilterProcess
 
         private static double TryParse(string s, double defaultValue = 100)
         {
-            return double.TryParse(s, out double result) ? result : defaultValue;
+            return double.TryParse(s, out var result) ? result : defaultValue;
         }
     }
 }
