@@ -124,7 +124,6 @@
   <data name="Default" xml:space="preserve">
     <value>import vapoursynth as vs
 import mvsfunc as mvf
-import muvsfunc as muf
 import functools
 
 core=vs.get_core()
@@ -142,14 +141,14 @@ opt=mvf.GetPlane(source(opt))
 if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
 
 def callback(n,f,clip):
-  print(n,(1-min(1,float(f.props.PlaneGMSD)))*100,flush=True)
-  #clip=core.text.Text(clip,str(n)+" "+str(f.props.PlaneGMSD))
+  print(n,f.props.PlanePSNR,flush=True)
+  #clip=core.text.Text(clip,str(n)+" "+str(f.props.PlanePSNR))
   return clip
 
-cmp=muf.GMSD(opt,src)
+cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
 cmp=core.std.FrameEval(cmp,functools.partial(callback,clip=cmp),prop_src=[cmp])
 cmp.set_output()</value>
-    <comment>默认的vpy模板</comment>
+    <comment>计算PSNR的vpy模板</comment>
   </data>
   <data name="GMSD" xml:space="preserve">
     <value>import vapoursynth as vs

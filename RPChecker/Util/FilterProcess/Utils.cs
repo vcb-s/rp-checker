@@ -56,6 +56,7 @@ namespace RPChecker.Util.FilterProcess
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                exception = ex;
             }
             return ffmpegInReg;
         }

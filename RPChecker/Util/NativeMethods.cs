@@ -23,9 +23,9 @@ namespace RPChecker.Util
             return CreateHardLink(lpFileName, lpExistingFileName, IntPtr.Zero);
         }
 
-        public static void CreateHardLinkCMD(string lpFileName, string lpExistingFileName)
+        public static int CreateHardLinkCMD(string lpFileName, string lpExistingFileName)
         {
-            var process = new Process
+            using (var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -35,9 +35,12 @@ namespace RPChecker.Util
                     UseShellExecute = false,
                     CreateNoWindow = true
                 }
-            };
-            process.Start();
-            process.WaitForExit();
+            })
+            {
+                process.Start();
+                process.WaitForExit();
+                return process.ExitCode;
+            }
         }
     }
 }

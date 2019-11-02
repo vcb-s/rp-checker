@@ -33,7 +33,7 @@ namespace RPChecker.Util.FilterProcess
 
         public void GenerateLog(params string[] inputFiles)
         {
-            var ffmpegPath = this.GetFFmpegPath(out Exception exception);
+            var ffmpegPath = this.GetFFmpegPath(out var exception);
             if (exception != null || ffmpegPath == null)
             {
                 Exceptions = exception;

@@ -9,7 +9,7 @@ namespace RPChecker.Util.FilterProcess
 
         public override string Title => "FFmpeg PSNR";
 
-        protected override string Arguments => "-hwaccel dxva2 -i \"{0}\" -i \"{1}\" -hide_banner -filter_complex psnr=\"stats_file=-\" -an -f null -";
+        protected override string Arguments => "-i \"{0}\" -i \"{1}\" -hide_banner -filter_complex psnr=\"stats_file=-\" -an -f null -";
 
         private static readonly string NumberOrInf = $"{Number}|inf";
 
@@ -27,7 +27,7 @@ namespace RPChecker.Util.FilterProcess
 
         private static double TryParse(string s, double defaultValue = 100)
         {
-            return double.TryParse(s, out double result) ? result : defaultValue;
+            return double.TryParse(s, out var result) ? result : defaultValue;
         }
     }
 }

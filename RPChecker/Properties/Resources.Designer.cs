@@ -73,7 +73,6 @@ namespace RPChecker.Properties {
         /// <summary>
         ///   查找类似 import vapoursynth as vs
         ///import mvsfunc as mvf
-        ///import muvsfunc as muf
         ///import functools
         ///
         ///core=vs.get_core()
@@ -90,7 +89,8 @@ namespace RPChecker.Properties {
         ///
         ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
         ///
-        ///def callba [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///def callback(n,f,clip):
+        ///  print(n [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Default {
             get {
