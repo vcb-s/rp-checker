@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using RPChecker.Util;
@@ -125,7 +126,9 @@ namespace RPChecker.Forms
 
         private void textBox1_DragDrop(object sender, DragEventArgs e)
         {
-            foreach (var item in (string[]) e.Data.GetData(DataFormats.FileDrop))
+            var list = (string[]) e.Data.GetData(DataFormats.FileDrop);
+            Array.Sort(list);
+            foreach (var item in list)
             {
                 listView1.Items.Add(Path.GetFileName(item)).Tag = item;
             }
@@ -133,7 +136,9 @@ namespace RPChecker.Forms
 
         private void textBox2_DragDrop(object sender, DragEventArgs e)
         {
-            foreach (var item in (string[]) e.Data.GetData(DataFormats.FileDrop))
+            var list = (string[])e.Data.GetData(DataFormats.FileDrop);
+            Array.Sort(list);
+            foreach (var item in list)
             {
                 listView2.Items.Add(Path.GetFileName(item)).Tag = item;
             }

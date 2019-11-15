@@ -28,13 +28,13 @@ namespace RPChecker.Util.FilterProcess
 
         public int Threshold => 30;
 
-        public string Title => "VapourSynth PSNR";
+        public string Title => "VapourSynth";
 
         private static readonly Regex PSNRDataFormatRegex = new Regex(@"(?<frame>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
 
         public void GenerateLog(params string[] inputFiles)
         {
-            var vspipePath = this.GetVsPipePath(out Exception exception);
+            var vspipePath = this.GetVsPipePath(out var exception);
             if (exception != null || vspipePath == null)
             {
                 Exceptions = exception;

@@ -62,39 +62,60 @@ namespace RPChecker.Forms
         #region SystemMenu
         private SystemMenu _systemMenu;
 
-        private void UpdateText()
+        private void UpdateText(string value = null)
         {
-            label1.Text = _coreProcess.ValueText;
+            label1.Text = value ?? _coreProcess.ValueText;
             cbVpyFile.Enabled = _coreProcess is VsPipePSNRProcess;
-            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version} [{_coreProcess.Title}][{(UseOriginPath ? "ORG" : "LINK")}]";
+            Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version} [{_coreProcess.Title}][{(UseOriginPath ? "O" : "L")}]";
             _threshold = _coreProcess.Threshold;
             numericUpDown1.Value = _threshold;
         }
+
+        void SwitchPath()
+        {
+            _useOriginPath = !_useOriginPath;
+            Text = Text.Substring(0, Text.Length - 3) + $"[{(UseOriginPath ? "O" : "L")}]";
+        }
+
+        void Set2VSPSNR()
+        {
+            _coreProcess = _coreProcess as VsPipePSNRProcess ?? new VsPipePSNRProcess();
+            cbVpyFile.SelectedIndex = 0;
+            UpdateText();
+        }
+
+        void Set2VSGMSD()
+        {
+            _coreProcess = _coreProcess as VsPipePSNRProcess ?? new VsPipePSNRProcess();
+            cbVpyFile.SelectedIndex = 1;
+            UpdateText("梯度幅度相似性");
+            cbVpyFile_SelectedIndexChanged(cbVpyFile, null);
+        }
+
+        void Set2FFPSNR()
+        {
+            _coreProcess = _coreProcess as FFmpegPSNRProcess ?? new FFmpegPSNRProcess();
+            cbVpyFile.SelectedIndex = 0;
+            UpdateText();
+        }
+
+        void Set2FFSSIM()
+        {
+            _coreProcess = _coreProcess as FFmpegSSIMProcess ?? new FFmpegSSIMProcess();
+            cbVpyFile.SelectedIndex = 0;
+            UpdateText();
+        }
+
 
         private void AddCommand()
         {
             _systemMenu = new SystemMenu(this);
             _systemMenu.AddCommand("检查更新(&U)", () => { Updater.Utils.CheckUpdate(true); }, true);
-            _systemMenu.AddCommand("使用PSNR(VS)", () =>
-            {
-                _coreProcess = _coreProcess as VsPipePSNRProcess ?? new VsPipePSNRProcess();
-                UpdateText();
-            }, true);
-            _systemMenu.AddCommand("使用PSNR(FF)", () =>
-            {
-                _coreProcess = _coreProcess as FFmpegPSNRProcess ?? new FFmpegPSNRProcess();
-                UpdateText();
-            }, false);
-            _systemMenu.AddCommand("使用SSIM(FF)", () =>
-            {
-                _coreProcess = _coreProcess as FFmpegSSIMProcess ?? new FFmpegSSIMProcess();
-                UpdateText();
-            }, false);
-            _systemMenu.AddCommand("使用原始路径", () =>
-            {
-                _useOriginPath = true;
-                UpdateText();
-            }, true);
+            _systemMenu.AddCommand("使用 PSNR(VS)", Set2VSPSNR, true);
+            _systemMenu.AddCommand("使用 GMSD(VS)", Set2VSGMSD, false);
+            _systemMenu.AddCommand("使用 PSNR(FF)", Set2FFPSNR, false);
+            _systemMenu.AddCommand("使用 SSIM(FF)", Set2FFSSIM, false);
+            _systemMenu.AddCommand("使用原始路径", SwitchPath, true);
             _systemMenu.AddCommand("导出结果", () =>
             {
                 try
@@ -146,6 +167,38 @@ namespace RPChecker.Forms
             // (This method is inlined)
             _systemMenu.HandleMessage(ref msg);
         }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Alt | Keys.NumPad1:
+                case Keys.Alt | Keys.D1:
+                    Set2VSPSNR();
+                    return true;
+                case Keys.Alt | Keys.NumPad2:
+                case Keys.Alt | Keys.D2:
+                    Set2VSGMSD();
+                    return true;
+                case Keys.Alt | Keys.NumPad3:
+                case Keys.Alt | Keys.D3:
+                    Set2FFPSNR();
+                    return true;
+                case Keys.Alt | Keys.NumPad4:
+                case Keys.Alt | Keys.D4:
+                    Set2FFSSIM();
+                    return true;
+                case Keys.Control | Keys.O:
+                    btnLoad_Click(btnLoad, null);
+                    return true;
+                case Keys.Alt | Keys.Oem3:
+                    SwitchPath();
+                    return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
         #endregion
 
         #region LoadFile
@@ -593,6 +646,12 @@ namespace RPChecker.Forms
             _poi[1] += 10;
         }
         #endregion
+
+        private void cbVpyFile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _threshold = ((ComboBox) sender).SelectedIndex == 1 ? 80 : 30;
+            numericUpDown1.Value = _threshold;
+        }
     }
 
     public struct ReSulT

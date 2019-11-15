@@ -60,10 +60,10 @@ namespace RPChecker.Forms
             // btnAnalyze
             // 
             this.btnAnalyze.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAnalyze.Location = new System.Drawing.Point(408, 391);
-            this.btnAnalyze.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnAnalyze.Location = new System.Drawing.Point(816, 782);
+            this.btnAnalyze.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.btnAnalyze.Name = "btnAnalyze";
-            this.btnAnalyze.Size = new System.Drawing.Size(34, 63);
+            this.btnAnalyze.Size = new System.Drawing.Size(68, 126);
             this.btnAnalyze.TabIndex = 1;
             this.btnAnalyze.Text = "分析";
             this.btnAnalyze.UseVisualStyleBackColor = true;
@@ -84,41 +84,48 @@ namespace RPChecker.Forms
             this.PSNR,
             this.Time});
             this.dataGridView1.GridColor = System.Drawing.SystemColors.Highlight;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 13);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.dataGridView1.Location = new System.Drawing.Point(24, 26);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
+            this.dataGridView1.RowHeadersWidth = 82;
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(388, 440);
+            this.dataGridView1.Size = new System.Drawing.Size(776, 880);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.TabStop = false;
             // 
             // frams
             // 
             this.frams.HeaderText = "帧数";
+            this.frams.MinimumWidth = 10;
             this.frams.Name = "frams";
             this.frams.ReadOnly = true;
+            this.frams.Width = 200;
             // 
             // PSNR
             // 
             this.PSNR.HeaderText = "指标";
+            this.PSNR.MinimumWidth = 10;
             this.PSNR.Name = "PSNR";
             this.PSNR.ReadOnly = true;
+            this.PSNR.Width = 200;
             // 
             // Time
             // 
             this.Time.HeaderText = "时间";
+            this.Time.MinimumWidth = 10;
             this.Time.Name = "Time";
             this.Time.ReadOnly = true;
+            this.Time.Width = 200;
             // 
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(408, 349);
-            this.btnLoad.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnLoad.Location = new System.Drawing.Point(816, 698);
+            this.btnLoad.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(152, 35);
+            this.btnLoad.Size = new System.Drawing.Size(304, 70);
             this.btnLoad.TabIndex = 0;
             this.btnLoad.Text = "载入";
             this.btnLoad.UseVisualStyleBackColor = true;
@@ -129,10 +136,10 @@ namespace RPChecker.Forms
             this.cbFileList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbFileList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbFileList.FormattingEnabled = true;
-            this.cbFileList.Location = new System.Drawing.Point(409, 13);
-            this.cbFileList.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cbFileList.Location = new System.Drawing.Point(818, 26);
+            this.cbFileList.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.cbFileList.Name = "cbFileList";
-            this.cbFileList.Size = new System.Drawing.Size(150, 25);
+            this.cbFileList.Size = new System.Drawing.Size(296, 39);
             this.cbFileList.TabIndex = 4;
             this.cbFileList.SelectionChangeCommitted += new System.EventHandler(this.cbFileList_SelectionChangeCommitted);
             this.cbFileList.MouseEnter += new System.EventHandler(this.cbFileList_MouseEnter);
@@ -150,18 +157,18 @@ namespace RPChecker.Forms
             "30000 / 1001",
             "50000 / 1000",
             "60000 / 1001"});
-            this.cbFPS.Location = new System.Drawing.Point(409, 46);
-            this.cbFPS.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cbFPS.Location = new System.Drawing.Point(818, 92);
+            this.cbFPS.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.cbFPS.Name = "cbFPS";
-            this.cbFPS.Size = new System.Drawing.Size(150, 25);
+            this.cbFPS.Size = new System.Drawing.Size(296, 39);
             this.cbFPS.TabIndex = 5;
             this.cbFPS.SelectedIndexChanged += new System.EventHandler(this.cbFPS_SelectedIndexChanged);
             // 
             // numericUpDown1
             // 
             this.numericUpDown1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.numericUpDown1.Location = new System.Drawing.Point(506, 79);
-            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.numericUpDown1.Location = new System.Drawing.Point(1012, 158);
+            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             200,
             0,
@@ -173,7 +180,7 @@ namespace RPChecker.Forms
             0,
             0});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(53, 23);
+            this.numericUpDown1.Size = new System.Drawing.Size(106, 39);
             this.numericUpDown1.TabIndex = 6;
             this.numericUpDown1.Value = new decimal(new int[] {
             30,
@@ -186,9 +193,10 @@ namespace RPChecker.Forms
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(409, 81);
+            this.label1.Location = new System.Drawing.Point(818, 162);
+            this.label1.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(92, 17);
+            this.label1.Size = new System.Drawing.Size(182, 31);
             this.label1.TabIndex = 7;
             this.label1.Text = "峰值信噪比阈值";
             // 
@@ -198,20 +206,23 @@ namespace RPChecker.Forms
             this.cbVpyFile.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbVpyFile.FormattingEnabled = true;
             this.cbVpyFile.Items.AddRange(new object[] {
-            "Default", "GMSD"});
-            this.cbVpyFile.Location = new System.Drawing.Point(409, 110);
-            this.cbVpyFile.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            "Default",
+            "GMSD"});
+            this.cbVpyFile.Location = new System.Drawing.Point(818, 220);
+            this.cbVpyFile.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.cbVpyFile.Name = "cbVpyFile";
-            this.cbVpyFile.Size = new System.Drawing.Size(150, 25);
+            this.cbVpyFile.Size = new System.Drawing.Size(296, 39);
             this.cbVpyFile.TabIndex = 7;
+            this.cbVpyFile.SelectedIndexChanged += new System.EventHandler(this.cbVpyFile_SelectedIndexChanged);
             // 
             // btnLog
             // 
             this.btnLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnLog.Enabled = false;
-            this.btnLog.Location = new System.Drawing.Point(490, 424);
+            this.btnLog.Location = new System.Drawing.Point(980, 848);
+            this.btnLog.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnLog.Name = "btnLog";
-            this.btnLog.Size = new System.Drawing.Size(70, 30);
+            this.btnLog.Size = new System.Drawing.Size(140, 60);
             this.btnLog.TabIndex = 10;
             this.btnLog.Text = "LOG";
             this.btnLog.UseVisualStyleBackColor = true;
@@ -221,9 +232,10 @@ namespace RPChecker.Forms
             // 
             this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAbort.Enabled = false;
-            this.btnAbort.Location = new System.Drawing.Point(449, 391);
+            this.btnAbort.Location = new System.Drawing.Point(898, 782);
+            this.btnAbort.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnAbort.Name = "btnAbort";
-            this.btnAbort.Size = new System.Drawing.Size(34, 63);
+            this.btnAbort.Size = new System.Drawing.Size(68, 126);
             this.btnAbort.TabIndex = 11;
             this.btnAbort.Text = "中断";
             this.btnAbort.UseVisualStyleBackColor = true;
@@ -233,9 +245,10 @@ namespace RPChecker.Forms
             // 
             this.btnChart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnChart.Enabled = false;
-            this.btnChart.Location = new System.Drawing.Point(490, 391);
+            this.btnChart.Location = new System.Drawing.Point(980, 782);
+            this.btnChart.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnChart.Name = "btnChart";
-            this.btnChart.Size = new System.Drawing.Size(70, 30);
+            this.btnChart.Size = new System.Drawing.Size(140, 60);
             this.btnChart.TabIndex = 12;
             this.btnChart.Text = "图表";
             this.btnChart.UseVisualStyleBackColor = true;
@@ -244,20 +257,22 @@ namespace RPChecker.Forms
             // statusStrip1
             // 
             this.statusStrip1.Font = new System.Drawing.Font("Consolas", 9F);
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusStdError,
             this.toolStripProgressBar1,
             this.toolStripDropDownButton1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 463);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 930);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(569, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 28, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1138, 40);
             this.statusStrip1.TabIndex = 13;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // toolStripStatusStdError
             // 
             this.toolStripStatusStdError.Name = "toolStripStatusStdError";
-            this.toolStripStatusStdError.Size = new System.Drawing.Size(432, 17);
+            this.toolStripStatusStdError.Size = new System.Drawing.Size(868, 30);
             this.toolStripStatusStdError.Spring = true;
             this.toolStripStatusStdError.Text = "   ";
             this.toolStripStatusStdError.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -265,7 +280,7 @@ namespace RPChecker.Forms
             // toolStripProgressBar1
             // 
             this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
+            this.toolStripProgressBar1.Size = new System.Drawing.Size(200, 28);
             this.toolStripProgressBar1.Step = 1;
             this.toolStripProgressBar1.Click += new System.EventHandler(this.toolStripProgressBar1_Click);
             // 
@@ -276,7 +291,7 @@ namespace RPChecker.Forms
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
             this.toolStripDropDownButton1.ShowDropDownArrow = false;
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(20, 20);
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(36, 36);
             this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
             this.toolStripDropDownButton1.Click += new System.EventHandler(this.toolStripDropDownButton1_Click);
             this.toolStripDropDownButton1.MouseEnter += new System.EventHandler(this.toolStripDropDownButton1_MouseEnter);
@@ -284,9 +299,9 @@ namespace RPChecker.Forms
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(192F, 192F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(569, 485);
+            this.ClientSize = new System.Drawing.Size(1138, 970);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnChart);
             this.Controls.Add(this.btnAbort);
@@ -301,8 +316,8 @@ namespace RPChecker.Forms
             this.Controls.Add(this.btnAnalyze);
             this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.MinimumSize = new System.Drawing.Size(585, 524);
+            this.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+            this.MinimumSize = new System.Drawing.Size(1144, 977);
             this.Name = "Form1";
             this.Text = "RP Checker";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
