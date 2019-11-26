@@ -18,10 +18,15 @@ namespace RPChecker.Forms
     public partial class Form1 : Form
     {
         #region Form init
-        public Form1()
+        public Form1(IReadOnlyCollection<string> args)
         {
             InitializeComponent();
             AddCommand();
+
+            if (args.Any())
+            {
+                LoadRPCFile(args.First());
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -57,7 +62,7 @@ namespace RPChecker.Forms
         private IProcess _coreProcess = new FFmpegPSNRProcess();
 
         private ReSulT CurrentData => _fullData[cbFileList.SelectedIndex];
-        private double FrameRate   => _frameRate[cbFPS.SelectedIndex];
+        private double FrameRate   => _frameRate[cbFPS.SelectedIndex < 0 ? 0 : cbFPS.SelectedIndex];
 
         #region SystemMenu
         private SystemMenu _systemMenu;
@@ -106,6 +111,35 @@ namespace RPChecker.Forms
             UpdateText();
         }
 
+        void LoadRPCFile(string path)
+        {
+            try
+            {
+                var json = File.ReadAllText(path);
+                _fullData.Clear();
+                cbFileList.Items.Clear();
+                _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                _fullData.ForEach(item =>
+                {
+                    cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? "");
+                    item.Data = item.Data.OrderBy(a => a.value).ThenBy(a => a.index).ToList();
+                });
+                if (_fullData.Count > 0)
+                {
+                    cbFileList.SelectedIndex = 0;
+                    ChangeClipDisplay();
+                }
+            }
+            catch (Jil.DeserializationException ex)
+            {
+                MessageBox.Show($"JSON解析失败：\n{ex.Message}", @"RPChecker Error");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"载入失败：{ex.GetType()}\n{ex.Message}", @"RPChecker Error");
+            }
+            
+        }
 
         private void AddCommand()
         {
@@ -141,16 +175,7 @@ namespace RPChecker.Forms
                 {
                     return;
                 }
-                var json = File.ReadAllText(openFileDialog1.FileName);
-                _fullData.Clear();
-                cbFileList.Items.Clear();
-                _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
-                _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? ""));
-                if (_fullData.Count > 0)
-                {
-                    cbFileList.SelectedIndex = 0;
-                    ChangeClipDisplay();
-                }
+                LoadRPCFile(openFileDialog1.FileName);
             }, false);
             _systemMenu.AddCommand("重置路径", () =>
             {
