@@ -40,6 +40,7 @@ namespace RPChecker.Util.FilterProcess
             try
             {
                 var ffmpegInPath = Path.GetDirectoryName(ToolKits.GetFullPathFromWindows("ffmpeg.exe"));
+
                 if (!string.IsNullOrEmpty(ffmpegInPath))
                 {
                     if (ffmpegInReg != ffmpegInPath)
@@ -47,10 +48,13 @@ namespace RPChecker.Util.FilterProcess
                     return ffmpegInPath;
                 }
 
-                if (!File.Exists(Path.Combine(ffmpegInReg, "ffmpeg.exe")))
+                if (ffmpegInReg == null || !File.Exists(Path.Combine(ffmpegInReg, "ffmpeg.exe")))
                 {
                     ffmpegInReg = Notification.InputBox("请输入FFmpeg的地址", "注意不要带上多余的引号", "C:\\FFmpeg\\ffmpeg.exe");
-                    RegistryStorage.Save(Path.GetDirectoryName(ffmpegInReg), name: "FFmpegPath");
+                    if (!string.IsNullOrEmpty(ffmpegInReg))
+                    {
+                        RegistryStorage.Save(Path.GetDirectoryName(ffmpegInReg), name: "FFmpegPath");
+                    }
                 }
             }
             catch (Exception ex)
