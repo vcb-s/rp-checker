@@ -18,15 +18,15 @@ namespace RPChecker.Forms
     public partial class Form1 : Form
     {
         #region Form init
+
+        private readonly IReadOnlyCollection<string> _rpcCollection;
+
         public Form1(IReadOnlyCollection<string> args)
         {
             InitializeComponent();
             AddCommand();
 
-            if (args.Any())
-            {
-                LoadRPCFile(args.First());
-            }
+            _rpcCollection = args;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -46,6 +46,10 @@ namespace RPChecker.Forms
             btnAnalyze.Enabled = false;
 
             Updater.Utils.CheckUpdateWeekly("RPChecker");
+            if (_rpcCollection.Any())
+            {
+                LoadRPCFile(_rpcCollection);
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -111,18 +115,31 @@ namespace RPChecker.Forms
             UpdateText();
         }
 
-        void LoadRPCFile(string path)
+        void LoadRPCFile(IEnumerable<string> rpcCollection)
         {
+            _fullData.Clear();
+            cbFileList.Items.Clear();
             try
             {
-                var json = File.ReadAllText(path);
-                _fullData.Clear();
-                cbFileList.Items.Clear();
-                _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                foreach (var rpc in rpcCollection)
+                {
+                    var json = File.ReadAllText(rpc);
+
+                    _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                }
+
                 _fullData.ForEach(item =>
                 {
                     cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? "");
-                    item.Data = item.Data.OrderBy(a => a.value).ThenBy(a => a.index).ToList();
+                    item.Data.Sort(delegate((int, double) lhs, (int, double) rhs)
+                    {
+                        if (Math.Abs(lhs.Item2 - rhs.Item2) > 1e-5)
+                        {
+                            return lhs.Item2 - rhs.Item2 < 0 ? -1 : 1;
+                        }
+
+                        return lhs.Item1 - rhs.Item1;
+                    });
                 });
                 if (_fullData.Count > 0)
                 {
@@ -175,7 +192,7 @@ namespace RPChecker.Forms
                 {
                     return;
                 }
-                LoadRPCFile(openFileDialog1.FileName);
+                LoadRPCFile(new []{ openFileDialog1.FileName });
             }, false);
             _systemMenu.AddCommand("重置路径", () =>
             {
