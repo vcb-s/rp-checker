@@ -325,7 +325,7 @@ namespace RPChecker.Forms
                 if ((item.value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
                 var newRow = new DataGridViewRow {Tag = item};
                 var temp = ToolKits.Second2Time(item.index / frameRate);
-                newRow.CreateCells(dataGridView1, item.index, $"{item.value:F4}", temp.Time2String());
+                newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value, 4), temp.Time2String());
                 newRow.DefaultCellStyle.BackColor = item.value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
