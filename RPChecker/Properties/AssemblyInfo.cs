@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RPChecker")]
 [assembly: AssemblyDescription("RP checker for ripper")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("VCB-Studio")]
 [assembly: AssemblyProduct("RPChecker")]
-[assembly: AssemblyCopyright("Copyright ©  2019 TautCony")]
+[assembly: AssemblyCopyright("Copyright ©  2020 TautCony")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 //可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”: :
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.6.4")]
-[assembly: AssemblyFileVersion("1.0.6.4")]
+[assembly: AssemblyVersion("1.0.6.5")]
+[assembly: AssemblyFileVersion("1.0.6.5")]
