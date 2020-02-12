@@ -18,10 +18,15 @@ namespace RPChecker.Forms
     public partial class Form1 : Form
     {
         #region Form init
-        public Form1()
+
+        private readonly IReadOnlyCollection<string> _rpcCollection;
+
+        public Form1(IReadOnlyCollection<string> args)
         {
             InitializeComponent();
             AddCommand();
+
+            _rpcCollection = args;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -41,6 +46,10 @@ namespace RPChecker.Forms
             btnAnalyze.Enabled = false;
 
             Updater.Utils.CheckUpdateWeekly("RPChecker");
+            if (_rpcCollection.Any())
+            {
+                LoadRPCFile(_rpcCollection);
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -57,7 +66,7 @@ namespace RPChecker.Forms
         private IProcess _coreProcess = new FFmpegPSNRProcess();
 
         private ReSulT CurrentData => _fullData[cbFileList.SelectedIndex];
-        private double FrameRate   => _frameRate[cbFPS.SelectedIndex];
+        private double FrameRate   => _frameRate[cbFPS.SelectedIndex < 0 ? 0 : cbFPS.SelectedIndex];
 
         #region SystemMenu
         private SystemMenu _systemMenu;
@@ -106,6 +115,48 @@ namespace RPChecker.Forms
             UpdateText();
         }
 
+        void LoadRPCFile(IEnumerable<string> rpcCollection)
+        {
+            _fullData.Clear();
+            cbFileList.Items.Clear();
+            try
+            {
+                foreach (var rpc in rpcCollection)
+                {
+                    var json = File.ReadAllText(rpc);
+
+                    _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                }
+
+                _fullData.ForEach(item =>
+                {
+                    cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? "");
+                    item.Data.Sort(delegate((int, double) lhs, (int, double) rhs)
+                    {
+                        if (Math.Abs(lhs.Item2 - rhs.Item2) > 1e-5)
+                        {
+                            return lhs.Item2 - rhs.Item2 < 0 ? -1 : 1;
+                        }
+
+                        return lhs.Item1 - rhs.Item1;
+                    });
+                });
+                if (_fullData.Count > 0)
+                {
+                    cbFileList.SelectedIndex = 0;
+                    ChangeClipDisplay();
+                }
+            }
+            catch (Jil.DeserializationException ex)
+            {
+                MessageBox.Show($"JSON解析失败：\n{ex.Message}", @"RPChecker Error");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"载入失败：{ex.GetType()}\n{ex.Message}", @"RPChecker Error");
+            }
+            
+        }
 
         private void AddCommand()
         {
@@ -141,16 +192,7 @@ namespace RPChecker.Forms
                 {
                     return;
                 }
-                var json = File.ReadAllText(openFileDialog1.FileName);
-                _fullData.Clear();
-                cbFileList.Items.Clear();
-                _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
-                _fullData.ForEach(item => cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? ""));
-                if (_fullData.Count > 0)
-                {
-                    cbFileList.SelectedIndex = 0;
-                    ChangeClipDisplay();
-                }
+                LoadRPCFile(new []{ openFileDialog1.FileName });
             }, false);
             _systemMenu.AddCommand("重置路径", () =>
             {
@@ -283,7 +325,7 @@ namespace RPChecker.Forms
                 if ((item.value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
                 var newRow = new DataGridViewRow {Tag = item};
                 var temp = ToolKits.Second2Time(item.index / frameRate);
-                newRow.CreateCells(dataGridView1, item.index, $"{item.value:F4}", temp.Time2String());
+                newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value, 4), temp.Time2String());
                 newRow.DefaultCellStyle.BackColor = item.value < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
