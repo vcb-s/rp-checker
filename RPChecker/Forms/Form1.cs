@@ -63,7 +63,7 @@ namespace RPChecker.Forms
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
         private int _threshold = 30;
         private readonly double[] _frameRate = { 24000 / 1001.0, 24, 25, 30000 / 1001.0, 50, 60000 / 1001.0 };
-        private IProcess _coreProcess = new FFmpegPSNRProcess();
+        private IProcess _coreProcess = new VsPipePSNRProcess();
 
         private ReSulT CurrentData => _fullData[cbFileList.SelectedIndex];
         private double FrameRate   => _frameRate[cbFPS.SelectedIndex < 0 ? 0 : cbFPS.SelectedIndex];
