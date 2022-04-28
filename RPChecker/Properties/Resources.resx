@@ -123,11 +123,9 @@
   </data>
   <data name="Default" xml:space="preserve">
     <value>import vapoursynth as vs
+from vapoursynth import core
 import mvsfunc as mvf
 import functools
-
-core=vs.get_core()
-core.max_cache_size=5000
 
 src=r"%File1%"
 opt=r"%File2%"
@@ -152,12 +150,10 @@ cmp.set_output()</value>
   </data>
   <data name="GMSD" xml:space="preserve">
     <value>import vapoursynth as vs
+from vapoursynth import core
 import mvsfunc as mvf
 import muvsfunc as muf
 import functools
-
-core=vs.get_core()
-core.max_cache_size=5000
 
 src=r"%File1%"
 opt=r"%File2%"
