@@ -123,30 +123,40 @@
   </data>
   <data name="Default" xml:space="preserve">
     <value>import vapoursynth as vs
-import mvsfunc as mvf
 import functools
+from vapoursynth import core
 
-core=vs.get_core()
-core.max_cache_size=5000
+srcpath = R"%File1"
+rippath = R"%File2"
+src = core.lsmas.LWLibavSource(srcpath)
+rip = core.lsmas.LWLibavSource(rippath)
 
-src=r"%File1%"
-opt=r"%File2%"
-fmt="yuv420p16"
+if rip.format.subsampling_h == 1 and rip.format.subsampling_w == 1:
+    format = vs.YUV420P8
+elif rip.format.subsampling_h == 0 and rip.format.subsampling_w == 0:
+    format = vs.YUV444P8
+else:
+    assert False, "Only Support YUV420 and YUV444 format!"
+    
+if not (rip.format.bits_per_sample == 8): rip = rip.resize.Spline64(format=format, dither_type='none')
+if not (src.format.bits_per_sample == 8): src = src.resize.Spline64(format=format, dither_type='none')
 
-source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt)if path.lower().endswith("mp4")else core.lsmas.LWLibavSource(path,format=fmt)
+if src.width != rip.width or src.height != rip.height:
+    src = src.resize.Spline36(rip.width, rip.height)
 
-src=mvf.GetPlane(source(src))
-opt=mvf.GetPlane(source(opt))
+srcy, srcu, srcv = src.std.SplitPlanes()
+ripy, ripu, ripv = rip.std.SplitPlanes()
 
-if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
+# runtime function to print psnr value to console.
+def callback(n, f, clip):
+    print(f"RPCOUT: {n} {f[0].props.PlanePSNR} {f[1].props.PlanePSNR} {f[2].props.PlanePSNR}", flush=True)
+    return clip
 
-def callback(n,f,clip):
-  print(n,f.props.PlanePSNR,flush=True)
-  #clip=core.text.Text(clip,str(n)+" "+str(f.props.PlanePSNR))
-  return clip
+cmpy = core.complane.PSNR(ripy, srcy)
+cmpu = core.complane.PSNR(ripu, srcu)
+cmpv = core.complane.PSNR(ripv, srcv)
 
-cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
-cmp=core.std.FrameEval(cmp,functools.partial(callback,clip=cmp),prop_src=[cmp])
+cmp = core.std.FrameEval(rip,functools.partial(callback, clip=rip), prop_src=[cmpy, cmpu, cmpv], clip_src=[cmpy, cmpu, cmpv])
 cmp.set_output()</value>
     <comment>计算PSNR的vpy模板</comment>
   </data>

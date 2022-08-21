@@ -19,7 +19,7 @@ namespace RPChecker.Properties {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -47,8 +47,8 @@ namespace RPChecker.Properties {
         }
         
         /// <summary>
-        ///   重写当前线程的 CurrentUICulture 属性
-        ///   重写当前线程的 CurrentUICulture 属性。
+        ///   重写当前线程的 CurrentUICulture 属性，对
+        ///   使用此强类型资源类的所有资源查找执行重写。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Globalization.CultureInfo Culture {
@@ -72,25 +72,22 @@ namespace RPChecker.Properties {
         
         /// <summary>
         ///   查找类似 import vapoursynth as vs
-        ///import mvsfunc as mvf
         ///import functools
+        ///from vapoursynth import core
         ///
-        ///core=vs.get_core()
-        ///core.max_cache_size=5000
+        ///srcpath = R&quot;%File1&quot;
+        ///rippath = R&quot;%File2&quot;
+        ///src = core.lsmas.LWLibavSource(srcpath)
+        ///rip = core.lsmas.LWLibavSource(rippath)
         ///
-        ///src=r&quot;%File1%&quot;
-        ///opt=r&quot;%File2%&quot;
-        ///fmt=&quot;yuv420p16&quot;
-        ///
-        ///source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt)if path.lower().endswith(&quot;mp4&quot;)else core.lsmas.LWLibavSource(path,format=fmt)
-        ///
-        ///src=mvf.GetPlane(source(src))
-        ///opt=mvf.GetPlane(source(opt))
-        ///
-        ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
-        ///
-        ///def callback(n,f,clip):
-        ///  print(n [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///if rip.format.subsampling_h == 1 and rip.format.subsampling_w == 1:
+        ///    format = vs.YUV420P8
+        ///elif rip.format.subsampling_h == 0 and rip.format.subsampling_w == 0:
+        ///    format = vs.YUV444P8
+        ///else:
+        ///    assert False, &quot;Only Support YUV420 and YUV444 format!&quot;
+        ///    
+        ///if not (rip.format.bits_per_sample == 8): rip [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Default {
             get {
@@ -118,7 +115,8 @@ namespace RPChecker.Properties {
         ///
         ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
         ///
-        ///def callba [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///def callback(n,f,clip):
+        ///  pri [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string GMSD {
             get {

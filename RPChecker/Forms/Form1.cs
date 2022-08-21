@@ -131,7 +131,7 @@ namespace RPChecker.Forms
                 _fullData.ForEach(item =>
                 {
                     cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? "");
-                    item.Data.Sort(delegate((int, double) lhs, (int, double) rhs)
+                    item.Data.Sort(delegate((int, double, double, double) lhs, (int, double, double, double) rhs)
                     {
                         if (Math.Abs(lhs.Item2 - rhs.Item2) > 1e-5)
                         {
@@ -322,11 +322,11 @@ namespace RPChecker.Forms
             dataGridView1.Rows.Clear();
             foreach (var item in info.Data)
             {
-                if ((item.value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
+                if ((item.value_y > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
                 var newRow = new DataGridViewRow {Tag = item};
                 var temp = ToolKits.Second2Time(item.index / frameRate);
-                newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value, 4), temp.Time2String());
-                newRow.DefaultCellStyle.BackColor = item.value < _threshold
+                newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value_y, 4), Math.Round(item.value_u, 4), Math.Round(item.value_v, 4), temp.Time2String());
+                newRow.DefaultCellStyle.BackColor = item.value_y < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
             }
@@ -336,7 +336,7 @@ namespace RPChecker.Forms
 
         private bool _errorDialogShowed;
         private LogBuffer _currentBuffer;
-        private List<(int index, double value)> _data;
+        private List<(int index, double value_y, double value_u, double value_v)> _data;
 
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
@@ -348,10 +348,10 @@ namespace RPChecker.Forms
                 {
                     _errorDialogShowed = false;
                     _currentBuffer = new LogBuffer();
-                    _data = new List<(int index, double value)>();
+                    _data = new List<(int index, double value_y, double value_u, double value_v)>();
 
                     AnalyzeClipLink(item);
-                    var data = _data.OrderBy(a => a.value).ThenBy(a => a.index).ToList();
+                    var data = _data.OrderBy(a => a.value_y).ThenBy(a => a.index).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue;
                     if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || !UseOriginPath) continue;
@@ -698,7 +698,7 @@ namespace RPChecker.Forms
 
     public struct ReSulT
     {
-        public List<(int index, double value)> Data { get; set; }
+        public List<(int index, double value_y, double value_u, double value_v)> Data { get; set; }
         public (string src, string opt) FileNamePair { get; set; }
         public LogBuffer Logs { get; set; }
     }
