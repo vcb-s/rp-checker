@@ -75,8 +75,8 @@ namespace RPChecker.Properties {
         ///import functools
         ///from vapoursynth import core
         ///
-        ///srcpath = R&quot;%File1&quot;
-        ///rippath = R&quot;%File2&quot;
+        ///srcpath = R&quot;%File1%&quot;
+        ///rippath = R&quot;%File2%&quot;
         ///src = core.lsmas.LWLibavSource(srcpath)
         ///rip = core.lsmas.LWLibavSource(rippath)
         ///
@@ -87,7 +87,7 @@ namespace RPChecker.Properties {
         ///else:
         ///    assert False, &quot;Only Support YUV420 and YUV444 format!&quot;
         ///    
-        ///if not (rip.format.bits_per_sample == 8): rip [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///if not (rip.format.bits_per_sample == 8): r [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Default {
             get {

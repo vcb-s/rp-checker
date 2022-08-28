@@ -126,8 +126,8 @@
 import functools
 from vapoursynth import core
 
-srcpath = R"%File1"
-rippath = R"%File2"
+srcpath = R"%File1%"
+rippath = R"%File2%"
 src = core.lsmas.LWLibavSource(srcpath)
 rip = core.lsmas.LWLibavSource(rippath)
 

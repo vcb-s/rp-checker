@@ -42,13 +42,13 @@ namespace RPChecker.Forms
                 ChartType = SeriesChartType.Line,
                 IsValueShownAsLabel = false
             };
-            var series_u = new Series(_type)
+            var series_u = new Series("U Series")
             {
                 Color = Color.FromArgb(31, 70, 144),
                 ChartType = SeriesChartType.Line,
                 IsValueShownAsLabel = false
             };
-            var series_v = new Series(_type)
+            var series_v = new Series("V Series")
             {
                 Color = Color.FromArgb(232, 170, 66),
                 ChartType = SeriesChartType.Line,
