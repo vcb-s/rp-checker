@@ -35,6 +35,11 @@ namespace RPChecker.Forms
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnAnalyze = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.frams = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value_y = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value_u = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value_v = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnLoad = new System.Windows.Forms.Button();
             this.cbFileList = new System.Windows.Forms.ComboBox();
             this.cbFPS = new System.Windows.Forms.ComboBox();
@@ -49,11 +54,6 @@ namespace RPChecker.Forms
             this.toolStripStatusStdError = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.frams = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.value_y = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.value_u = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.value_v = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -98,6 +98,46 @@ namespace RPChecker.Forms
             this.dataGridView1.Size = new System.Drawing.Size(388, 440);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.TabStop = false;
+            // 
+            // frams
+            // 
+            this.frams.HeaderText = "帧数";
+            this.frams.MinimumWidth = 10;
+            this.frams.Name = "frams";
+            this.frams.ReadOnly = true;
+            this.frams.Width = 200;
+            // 
+            // value_y
+            // 
+            this.value_y.HeaderText = "指标1";
+            this.value_y.MinimumWidth = 10;
+            this.value_y.Name = "value_y";
+            this.value_y.ReadOnly = true;
+            this.value_y.Width = 150;
+            // 
+            // value_u
+            // 
+            this.value_u.HeaderText = "指标2";
+            this.value_u.MinimumWidth = 10;
+            this.value_u.Name = "value_u";
+            this.value_u.ReadOnly = true;
+            this.value_u.Width = 150;
+            // 
+            // value_v
+            // 
+            this.value_v.HeaderText = "指标3";
+            this.value_v.MinimumWidth = 10;
+            this.value_v.Name = "value_v";
+            this.value_v.ReadOnly = true;
+            this.value_v.Width = 150;
+            // 
+            // Time
+            // 
+            this.Time.HeaderText = "时间";
+            this.Time.MinimumWidth = 10;
+            this.Time.Name = "Time";
+            this.Time.ReadOnly = true;
+            this.Time.Width = 150;
             // 
             // btnLoad
             // 
@@ -246,7 +286,7 @@ namespace RPChecker.Forms
             // toolStripStatusStdError
             // 
             this.toolStripStatusStdError.Name = "toolStripStatusStdError";
-            this.toolStripStatusStdError.Size = new System.Drawing.Size(397, 23);
+            this.toolStripStatusStdError.Size = new System.Drawing.Size(432, 23);
             this.toolStripStatusStdError.Spring = true;
             this.toolStripStatusStdError.Text = "   ";
             this.toolStripStatusStdError.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -265,54 +305,15 @@ namespace RPChecker.Forms
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
             this.toolStripDropDownButton1.ShowDropDownArrow = false;
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(24, 26);
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(20, 26);
             this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
             this.toolStripDropDownButton1.Click += new System.EventHandler(this.toolStripDropDownButton1_Click);
             this.toolStripDropDownButton1.MouseEnter += new System.EventHandler(this.toolStripDropDownButton1_MouseEnter);
             this.toolStripDropDownButton1.MouseLeave += new System.EventHandler(this.toolStripDropDownButton1_MouseLeave);
             // 
-            // frams
-            // 
-            this.frams.HeaderText = "帧数";
-            this.frams.MinimumWidth = 10;
-            this.frams.Name = "frams";
-            this.frams.ReadOnly = true;
-            this.frams.Width = 200;
-            // 
-            // value_y
-            // 
-            this.value_y.HeaderText = "指标1";
-            this.value_y.MinimumWidth = 10;
-            this.value_y.Name = "value_y";
-            this.value_y.ReadOnly = true;
-            this.value_y.Width = 150;
-            // 
-            // value_u
-            // 
-            this.value_u.HeaderText = "指标2";
-            this.value_u.MinimumWidth = 10;
-            this.value_u.Name = "value_u";
-            this.value_u.ReadOnly = true;
-            this.value_u.Width = 150;
-            // 
-            // value_v
-            // 
-            this.value_v.HeaderText = "指标3";
-            this.value_v.MinimumWidth = 10;
-            this.value_v.Name = "value_v";
-            this.value_v.ReadOnly = true;
-            this.value_v.Width = 150;
-            // 
-            // Time
-            // 
-            this.Time.HeaderText = "时间";
-            this.Time.MinimumWidth = 10;
-            this.Time.Name = "Time";
-            this.Time.ReadOnly = true;
-            this.Time.Width = 150;
-            // 
             // Form1
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(569, 485);
@@ -336,6 +337,8 @@ namespace RPChecker.Forms
             this.Text = "RP Checker";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.statusStrip1.ResumeLayout(false);
