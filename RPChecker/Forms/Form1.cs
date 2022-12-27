@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using RPChecker.Util.FilterProcess;
 using System.Text.RegularExpressions;
+using Jil;
 
 namespace RPChecker.Forms
 {
@@ -124,8 +125,21 @@ namespace RPChecker.Forms
                 foreach (var rpc in rpcCollection)
                 {
                     var json = File.ReadAllText(rpc);
-
-                    _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                    try
+                    {
+                        _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                    }
+                    catch (Jil.DeserializationException)
+                    {
+                        try
+                        {
+                            _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ResultV1>>(json).Select(x => (ReSulT)x));
+                        }
+                        catch (Jil.DeserializationException)
+                        {
+                            _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ResultV2>>(json).Select(x => (ReSulT)x));
+                        }
+                    }
                 }
 
                 _fullData.ForEach(item =>
@@ -696,10 +710,60 @@ namespace RPChecker.Forms
         }
     }
 
+    
     public struct ReSulT
     {
         public List<(int index, double value_y, double value_u, double value_v)> Data { get; set; }
         public (string src, string opt) FileNamePair { get; set; }
+        [JilDirective(Ignore = true)]
+        public LogBuffer Logs { get; set; }
+
+        public static implicit operator ReSulT(ResultV1 result)
+        {
+            return new ReSulT
+            {
+                Data = result.Data.Select(item => (item.index, item.value, 0.0, 0.0)).ToList(),
+                FileNamePair = result.FileNamePair,
+                Logs = result.Logs
+            };
+        }
+
+        public static implicit operator ReSulT(ResultV2 result)
+        {
+            var data = new List<(int index, double value_y, double value_u, double value_v)>();
+            foreach (var item in result.Data)
+            {
+                if (item.Count == 3)
+                {
+                    data.Add((item[0].index, item[0].value, item[1].value, item[2].value));
+                }
+                else
+                {
+                    data.Add((item[0].index, item[0].value, 0, 0));
+                }
+            }
+            return new ReSulT
+            {
+                Data = data,
+                FileNamePair = result.FileNamePair,
+                Logs = result.Logs
+            };
+        }
+    }
+
+    public struct ResultV1
+    {
+        public List<(int index, double value)> Data { get; set; }
+        public (string src, string opt) FileNamePair { get; set; }
+        [JilDirective(Ignore = true)]
+        public LogBuffer Logs { get; set; }
+    }
+
+    public struct ResultV2
+    {
+        public List<List<(int index, double value)>> Data { get; set; }
+        public (string src, string opt) FileNamePair { get; set; }
+        [JilDirective(Ignore = true)]
         public LogBuffer Logs { get; set; }
     }
 }
