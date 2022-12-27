@@ -76,6 +76,7 @@ namespace RPChecker.Forms
 
             new Task(() =>
             {
+                bool valid_u = false, valid_v = false;
                 foreach(var (index, value_y, value_u, value_v) in _info.Data.OrderBy(item => item.index))
                 {
                     series_y.Points.AddXY(index, value_y);
@@ -84,23 +85,31 @@ namespace RPChecker.Forms
                         series2.Points.AddXY(index, value_y);
                     }
 
-                    series_u.Points.AddXY(index, value_u);
-                    if (value_u < _threshold)
+                    if (value_u > 1e-5)
                     {
-                        series2.Points.AddXY(index, value_u);
+                        valid_u = true;
+                        series_u.Points.AddXY(index, value_u);
+                        if (value_u < _threshold)
+                        {
+                            series2.Points.AddXY(index, value_u);
+                        }
                     }
-
-                    series_v.Points.AddXY(index, value_v);
-                    if (value_v < _threshold)
+                    
+                    if (value_v > 1e-5)
                     {
-                        series2.Points.AddXY(index, value_v);
+                        valid_v = true;
+                        series_v.Points.AddXY(index, value_v);
+                        if (value_v < _threshold)
+                        {
+                            series2.Points.AddXY(index, value_v);
+                        }
                     }
                 }
                 Invoke(new Action(() =>
                 {
                     chart1.Series.Add(series_y);
-                    chart1.Series.Add(series_u);
-                    chart1.Series.Add(series_v);
+                    if (valid_u) chart1.Series.Add(series_u);
+                    if (valid_v) chart1.Series.Add(series_v);
                     chart1.Series.Add(series2);
                 }));
             }).Start();
