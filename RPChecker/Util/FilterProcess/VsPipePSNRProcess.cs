@@ -30,7 +30,7 @@ namespace RPChecker.Util.FilterProcess
 
         public string Title => "VapourSynth";
 
-        private static readonly Regex PSNRDataFormatRegex = new Regex(@"(?<frame>\d+) (?<PSNR>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
+        private static readonly Regex PSNRDataFormatRegex = new Regex(@"(?<frame>\d+) (?<PSNR_Y>[-+]?[0-9]*\.?[0-9]+) (?<PSNR_U>[-+]?[0-9]*\.?[0-9]+) (?<PSNR_V>[-+]?[0-9]*\.?[0-9]+)", RegexOptions.Compiled);
 
         public void GenerateLog(params string[] inputFiles)
         {
@@ -106,11 +106,17 @@ namespace RPChecker.Util.FilterProcess
             _consoleProcess.Exited -= ExitedHandler;
         }
 
-        public void UpdateValue(string data, ref List<(int index, double value)> tempData)
+        public void UpdateValue(string data, ref List<(int index, double value_y, double value_u, double value_v)> tempData)
         {
             var rawData = PSNRDataFormatRegex.Match(data);
             if (!rawData.Success) return;
-            tempData.Add((int.Parse(rawData.Groups["frame"].Value), double.Parse(rawData.Groups["PSNR"].Value)));
+            tempData.Add(
+                (
+                int.Parse(rawData.Groups["frame"].Value),
+                double.Parse(rawData.Groups["PSNR_Y"].Value),
+                double.Parse(rawData.Groups["PSNR_U"].Value),
+                double.Parse(rawData.Groups["PSNR_V"].Value)
+                ));
         }
         public void Kill()
         {
