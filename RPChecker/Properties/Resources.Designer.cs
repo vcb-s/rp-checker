@@ -72,22 +72,21 @@ namespace RPChecker.Properties {
         
         /// <summary>
         ///   查找类似 import vapoursynth as vs
-        ///import functools
+        ///import sys
         ///from vapoursynth import core
         ///
-        ///srcpath = R&quot;%File1%&quot;
-        ///rippath = R&quot;%File2%&quot;
+        ///# Load source &amp; ripped files.
+        ///srcpath = r&quot;%File1%&quot;
+        ///rippath = r&quot;%File2%&quot;
         ///src = core.lsmas.LWLibavSource(srcpath)
         ///rip = core.lsmas.LWLibavSource(rippath)
+        ///assert rip.format.color_family in [vs.YUV, vs.GRAY], &quot;only support YUV or Gray input&quot;
         ///
-        ///if rip.format.subsampling_h == 1 and rip.format.subsampling_w == 1:
-        ///    format = vs.YUV420P8
-        ///elif rip.format.subsampling_h == 0 and rip.format.subsampling_w == 0:
-        ///    format = vs.YUV444P8
-        ///else:
-        ///    assert False, &quot;Only Support YUV420 and YUV444 format!&quot;
-        ///    
-        ///if not (rip.format.bits_per_sample == 8): r [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///def force8bit(clip):
+        ///    if clip.format.bits_per_sample == 8:
+        ///        return clip
+        ///    return clip.resize.Spline64(format=clip.format.replace(bits_per_sample=8).id, dither_type=&apos;none&apos;)
+        ///src = fo [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Default {
             get {
@@ -97,26 +96,21 @@ namespace RPChecker.Properties {
         
         /// <summary>
         ///   查找类似 import vapoursynth as vs
-        ///import mvsfunc as mvf
+        ///import sys
+        ///from vapoursynth import core
         ///import muvsfunc as muf
-        ///import functools
         ///
-        ///core=vs.get_core()
-        ///core.max_cache_size=5000
+        ///# Load source &amp; ripped files.
+        ///srcpath = r&quot;%File1%&quot;
+        ///rippath = r&quot;%File2%&quot;
+        ///src = core.lsmas.LWLibavSource(srcpath)
+        ///rip = core.lsmas.LWLibavSource(rippath)
+        ///assert rip.format.color_family in [vs.YUV, vs.GRAY], &quot;only support YUV or Gray input&quot;
         ///
-        ///src=r&quot;%File1%&quot;
-        ///opt=r&quot;%File2%&quot;
-        ///fmt=&quot;yuv420p16&quot;
-        ///
-        ///source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt)if path.lower().endswith(&quot;mp4&quot;)else core.lsmas.LWLibavSource(path,format=fmt)
-        ///
-        ///src=mvf.GetPlane(source(src))
-        ///opt=mvf.GetPlane(source(opt))
-        ///
-        ///if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
-        ///
-        ///def callback(n,f,clip):
-        ///  pri [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///def force8bit(clip):
+        ///    if clip.format.bits_per_sample == 8:
+        ///        return clip
+        ///    return clip.resize.Spline64(format=clip.format.replace(bits_per_sample=8).id, dithe [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string GMSD {
             get {

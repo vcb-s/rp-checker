@@ -394,7 +394,7 @@ namespace RPChecker.Forms
             }
         }
 
-        private bool _useOriginPath;
+        private bool _useOriginPath = true;
 
         private bool UseOriginPath => _useOriginPath || !(_coreProcess is VsPipePSNRProcess);
 
