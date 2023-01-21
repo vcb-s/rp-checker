@@ -36,12 +36,25 @@ namespace RPChecker.Forms
         private void DrawChart()
         {
             chart1.Series.Clear();
-            var series1 = new Series(_type)
+            var series_y = new Series(_type)
             {
-                Color = Color.FromArgb(078, 079, 251),
+                Color = Color.FromArgb(35, 25, 85),
                 ChartType = SeriesChartType.Line,
                 IsValueShownAsLabel = false
             };
+            var series_u = new Series("U Series")
+            {
+                Color = Color.FromArgb(31, 70, 144),
+                ChartType = SeriesChartType.Line,
+                IsValueShownAsLabel = false
+            };
+            var series_v = new Series("V Series")
+            {
+                Color = Color.FromArgb(232, 170, 66),
+                ChartType = SeriesChartType.Line,
+                IsValueShownAsLabel = false
+            };
+
             var series2 = new Series("frame")
             {
                 Color = Color.FromArgb(255, 010, 050),
@@ -63,17 +76,40 @@ namespace RPChecker.Forms
 
             new Task(() =>
             {
-                foreach(var frame in _info.Data.OrderBy(item => item.index))
+                bool valid_u = false, valid_v = false;
+                foreach(var (index, value_y, value_u, value_v) in _info.Data.OrderBy(item => item.index))
                 {
-                    series1.Points.AddXY(frame.index, frame.value);
-                    if (frame.value < _threshold)
+                    series_y.Points.AddXY(index, value_y);
+                    if (value_y < _threshold)
                     {
-                        series2.Points.AddXY(frame.index, frame.value);
+                        series2.Points.AddXY(index, value_y);
+                    }
+
+                    if (value_u > 1e-5)
+                    {
+                        valid_u = true;
+                        series_u.Points.AddXY(index, value_u);
+                        if (value_u < _threshold)
+                        {
+                            series2.Points.AddXY(index, value_u);
+                        }
+                    }
+                    
+                    if (value_v > 1e-5)
+                    {
+                        valid_v = true;
+                        series_v.Points.AddXY(index, value_v);
+                        if (value_v < _threshold)
+                        {
+                            series2.Points.AddXY(index, value_v);
+                        }
                     }
                 }
                 Invoke(new Action(() =>
                 {
-                    chart1.Series.Add(series1);
+                    chart1.Series.Add(series_y);
+                    if (valid_u) chart1.Series.Add(series_u);
+                    if (valid_v) chart1.Series.Add(series_v);
                     chart1.Series.Add(series2);
                 }));
             }).Start();

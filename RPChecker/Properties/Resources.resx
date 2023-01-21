@@ -123,60 +123,76 @@
   </data>
   <data name="Default" xml:space="preserve">
     <value>import vapoursynth as vs
-import mvsfunc as mvf
-import functools
+import sys
+from vapoursynth import core
 
-core=vs.get_core()
-core.max_cache_size=5000
+# Load source &amp; ripped files.
+srcpath = r"%File1%"
+rippath = r"%File2%"
+src = core.lsmas.LWLibavSource(srcpath)
+rip = core.lsmas.LWLibavSource(rippath)
+assert rip.format.color_family in [vs.YUV, vs.GRAY], "only support YUV or Gray input"
 
-src=r"%File1%"
-opt=r"%File2%"
-fmt="yuv420p16"
+def force8bit(clip):
+    if clip.format.bits_per_sample == 8:
+        return clip
+    return clip.resize.Spline64(format=clip.format.replace(bits_per_sample=8).id, dither_type='none')
+src = force8bit(src)
+rip = force8bit(rip)
 
-source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt)if path.lower().endswith("mp4")else core.lsmas.LWLibavSource(path,format=fmt)
+# Get the clips in same dimention.
+if src.width != rip.width or src.height != rip.height:
+    src = src.resize.Bicubic(rip.width, rip.height)
 
-src=mvf.GetPlane(source(src))
-opt=mvf.GetPlane(source(opt))
+src_planes = [ src.std.ShufflePlanes(i, vs.GRAY) for i in range(src.format.num_planes) ]
+rip_planes = [ rip.std.ShufflePlanes(i, vs.GRAY) for i in range(rip.format.num_planes) ]
 
-if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
+# runtime function to print psnr value to console.
+def callback(n, f):
+    print("RPCOUT:", n, ' '.join([ str(p.props.PlanePSNR) for p in f ]), flush=True, file=sys.stdout)
+    return rip
 
-def callback(n,f,clip):
-  print(n,f.props.PlanePSNR,flush=True)
-  #clip=core.text.Text(clip,str(n)+" "+str(f.props.PlanePSNR))
-  return clip
-
-cmp=mvf.PlaneCompare(opt,src,mae=False,rmse=False,cov=False,corr=False)
-cmp=core.std.FrameEval(cmp,functools.partial(callback,clip=cmp),prop_src=[cmp])
+# Compare.
+cmp_planes = [ core.complane.PSNR(a, b) for (a, b) in zip(rip_planes, src_planes) ]
+cmp = core.std.FrameEval(rip, callback, prop_src=cmp_planes)
 cmp.set_output()</value>
     <comment>计算PSNR的vpy模板</comment>
   </data>
   <data name="GMSD" xml:space="preserve">
     <value>import vapoursynth as vs
-import mvsfunc as mvf
+import sys
+from vapoursynth import core
 import muvsfunc as muf
-import functools
 
-core=vs.get_core()
-core.max_cache_size=5000
+# Load source &amp; ripped files.
+srcpath = r"%File1%"
+rippath = r"%File2%"
+src = core.lsmas.LWLibavSource(srcpath)
+rip = core.lsmas.LWLibavSource(rippath)
+assert rip.format.color_family in [vs.YUV, vs.GRAY], "only support YUV or Gray input"
 
-src=r"%File1%"
-opt=r"%File2%"
-fmt="yuv420p16"
+def force8bit(clip):
+    if clip.format.bits_per_sample == 8:
+        return clip
+    return clip.resize.Spline64(format=clip.format.replace(bits_per_sample=8).id, dither_type='none')
+src = force8bit(src)
+rip = force8bit(rip)
 
-source=lambda path:core.lsmas.LibavSMASHSource(path,format=fmt)if path.lower().endswith("mp4")else core.lsmas.LWLibavSource(path,format=fmt)
+# Get the clips in same dimention.
+if src.width != rip.width or src.height != rip.height:
+    src = src.resize.Bicubic(rip.width, rip.height)
 
-src=mvf.GetPlane(source(src))
-opt=mvf.GetPlane(source(opt))
+src_planes = [ src.std.ShufflePlanes(i, vs.GRAY) for i in range(src.format.num_planes) ]
+rip_planes = [ rip.std.ShufflePlanes(i, vs.GRAY) for i in range(rip.format.num_planes) ]
 
-if src.width!=opt.width:src=src.resize.Bicubic(width=opt.width,height=opt.height,format=vs.GRAY16)
+# runtime function to print gmsd value to console.
+def callback(n, f):
+    print("RPCOUT:", n, ' '.join([ str((1-min(1,float(p.props.PlaneGMSD)))*100) for p in f ]), flush=True, file=sys.stdout)
+    return rip
 
-def callback(n,f,clip):
-  print(n,(1-min(1,float(f.props.PlaneGMSD)))*100,flush=True)
-  #clip=core.text.Text(clip,str(n)+" "+str(f.props.PlaneGMSD))
-  return clip
-
-cmp=muf.GMSD(opt,src)
-cmp=core.std.FrameEval(cmp,functools.partial(callback,clip=cmp),prop_src=[cmp])
+# Compare.
+cmp_planes = [ muf.GMSD(a,b) for (a, b) in zip(rip_planes, src_planes) ]
+cmp=core.std.FrameEval(rip, callback, prop_src=cmp_planes)
 cmp.set_output()</value>
     <comment>计算GMSD的vpy模板</comment>
   </data>

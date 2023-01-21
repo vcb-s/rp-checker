@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using RPChecker.Util.FilterProcess;
 using System.Text.RegularExpressions;
+using Jil;
 
 namespace RPChecker.Forms
 {
@@ -124,14 +125,27 @@ namespace RPChecker.Forms
                 foreach (var rpc in rpcCollection)
                 {
                     var json = File.ReadAllText(rpc);
-
-                    _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                    try
+                    {
+                        _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ReSulT>>(json));
+                    }
+                    catch (Jil.DeserializationException)
+                    {
+                        try
+                        {
+                            _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ResultV1>>(json).Select(x => (ReSulT)x));
+                        }
+                        catch (Jil.DeserializationException)
+                        {
+                            _fullData.AddRange(Jil.JSON.Deserialize<IEnumerable<ResultV2>>(json).Select(x => (ReSulT)x));
+                        }
+                    }
                 }
 
                 _fullData.ForEach(item =>
                 {
                     cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? "");
-                    item.Data.Sort(delegate((int, double) lhs, (int, double) rhs)
+                    item.Data.Sort(delegate((int, double, double, double) lhs, (int, double, double, double) rhs)
                     {
                         if (Math.Abs(lhs.Item2 - rhs.Item2) > 1e-5)
                         {
@@ -322,11 +336,11 @@ namespace RPChecker.Forms
             dataGridView1.Rows.Clear();
             foreach (var item in info.Data)
             {
-                if ((item.value > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
+                if ((item.value_y > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
                 var newRow = new DataGridViewRow {Tag = item};
                 var temp = ToolKits.Second2Time(item.index / frameRate);
-                newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value, 4), temp.Time2String());
-                newRow.DefaultCellStyle.BackColor = item.value < _threshold
+                newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value_y, 4), Math.Round(item.value_u, 4), Math.Round(item.value_v, 4), temp.Time2String());
+                newRow.DefaultCellStyle.BackColor = item.value_y < _threshold
                     ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
             }
@@ -336,7 +350,7 @@ namespace RPChecker.Forms
 
         private bool _errorDialogShowed;
         private LogBuffer _currentBuffer;
-        private List<(int index, double value)> _data;
+        private List<(int index, double value_y, double value_u, double value_v)> _data;
 
         private void btnAnalyze_Click(object sender, EventArgs e)
         {
@@ -348,10 +362,10 @@ namespace RPChecker.Forms
                 {
                     _errorDialogShowed = false;
                     _currentBuffer = new LogBuffer();
-                    _data = new List<(int index, double value)>();
+                    _data = new List<(int index, double value_y, double value_u, double value_v)>();
 
                     AnalyzeClipLink(item);
-                    var data = _data.OrderBy(a => a.value).ThenBy(a => a.index).ToList();
+                    var data = _data.OrderBy(a => a.value_y).ThenBy(a => a.index).ToList();
                     _fullData.Add(new ReSulT {FileNamePair = item, Data = data, Logs = _currentBuffer});
                     if (_currentBuffer.Inf) continue;
                     if (!(_coreProcess is VsPipePSNRProcess) || _remainFile || !UseOriginPath) continue;
@@ -380,7 +394,7 @@ namespace RPChecker.Forms
             }
         }
 
-        private bool _useOriginPath;
+        private bool _useOriginPath = true;
 
         private bool UseOriginPath => _useOriginPath || !(_coreProcess is VsPipePSNRProcess);
 
@@ -542,14 +556,14 @@ namespace RPChecker.Forms
                     _errorDialogShowed = true;
                     new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"尚未安装 'L-SMASH' 滤镜{Environment.NewLine}大概的位置是在VapourSynth\\plugins64")).Start();
+                        text: $"尚未安装 'L-SMASH' 滤镜{Environment.NewLine}大概的位置是在VapourSynth\\plugins")).Start();
                 }
-                if (!_errorDialogShowed && progress.EndsWith("No module named 'mvsfunc'"))
+                if (!_errorDialogShowed && progress.Contains("No attribute with the name complane exists"))
                 {
                     _errorDialogShowed = true;
                     new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"尚未正确放置mawen菊苣的滤镜库 'mvsfunc'{Environment.NewLine}大概的位置是在Python3X\\Lib\\site-packages")).Start();
+                        text: $"尚未正确放置插件 'vs-ComparePlane' {Environment.NewLine}大概的位置是在VapourSynth\\plugins")).Start();
                 }
                 else if (!_errorDialogShowed && progress.EndsWith("There is no function named PlaneAverage"))
                 {
@@ -694,12 +708,73 @@ namespace RPChecker.Forms
             _threshold = ((ComboBox) sender).SelectedIndex == 1 ? 80 : 30;
             numericUpDown1.Value = _threshold;
         }
+
+        private void Form1_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] fileList = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            LoadRPCFile(fileList);
+        }
+
+        private void Form1_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+        }
     }
+
 
     public struct ReSulT
     {
+        public List<(int index, double value_y, double value_u, double value_v)> Data { get; set; }
+        public (string src, string opt) FileNamePair { get; set; }
+        [JilDirective(Ignore = true)]
+        public LogBuffer Logs { get; set; }
+
+        public static implicit operator ReSulT(ResultV1 result)
+        {
+            return new ReSulT
+            {
+                Data = result.Data.Select(item => (item.index, item.value, 0.0, 0.0)).ToList(),
+                FileNamePair = result.FileNamePair,
+                Logs = result.Logs
+            };
+        }
+
+        public static implicit operator ReSulT(ResultV2 result)
+        {
+            var data = new List<(int index, double value_y, double value_u, double value_v)>();
+            foreach (var item in result.Data)
+            {
+                if (item.Count == 3)
+                {
+                    data.Add((item[0].index, item[0].value, item[1].value, item[2].value));
+                }
+                else
+                {
+                    data.Add((item[0].index, item[0].value, 0, 0));
+                }
+            }
+            return new ReSulT
+            {
+                Data = data,
+                FileNamePair = result.FileNamePair,
+                Logs = result.Logs
+            };
+        }
+    }
+
+    public struct ResultV1
+    {
         public List<(int index, double value)> Data { get; set; }
         public (string src, string opt) FileNamePair { get; set; }
+        [JilDirective(Ignore = true)]
+        public LogBuffer Logs { get; set; }
+    }
+
+    public struct ResultV2
+    {
+        public List<List<(int index, double value)>> Data { get; set; }
+        public (string src, string opt) FileNamePair { get; set; }
+        [JilDirective(Ignore = true)]
         public LogBuffer Logs { get; set; }
     }
 }

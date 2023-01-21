@@ -36,7 +36,9 @@ namespace RPChecker.Forms
             this.btnAnalyze = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.frams = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.PSNR = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value_y = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value_u = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.value_v = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnLoad = new System.Windows.Forms.Button();
             this.cbFileList = new System.Windows.Forms.ComboBox();
@@ -81,7 +83,9 @@ namespace RPChecker.Forms
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.frams,
-            this.PSNR,
+            this.value_y,
+            this.value_u,
+            this.value_v,
             this.Time});
             this.dataGridView1.GridColor = System.Drawing.SystemColors.Highlight;
             this.dataGridView1.Location = new System.Drawing.Point(12, 13);
@@ -103,13 +107,29 @@ namespace RPChecker.Forms
             this.frams.ReadOnly = true;
             this.frams.Width = 200;
             // 
-            // PSNR
+            // value_y
             // 
-            this.PSNR.HeaderText = "指标";
-            this.PSNR.MinimumWidth = 10;
-            this.PSNR.Name = "PSNR";
-            this.PSNR.ReadOnly = true;
-            this.PSNR.Width = 200;
+            this.value_y.HeaderText = "指标1";
+            this.value_y.MinimumWidth = 10;
+            this.value_y.Name = "value_y";
+            this.value_y.ReadOnly = true;
+            this.value_y.Width = 150;
+            // 
+            // value_u
+            // 
+            this.value_u.HeaderText = "指标2";
+            this.value_u.MinimumWidth = 10;
+            this.value_u.Name = "value_u";
+            this.value_u.ReadOnly = true;
+            this.value_u.Width = 150;
+            // 
+            // value_v
+            // 
+            this.value_v.HeaderText = "指标3";
+            this.value_v.MinimumWidth = 10;
+            this.value_v.Name = "value_v";
+            this.value_v.ReadOnly = true;
+            this.value_v.Width = 150;
             // 
             // Time
             // 
@@ -117,7 +137,7 @@ namespace RPChecker.Forms
             this.Time.MinimumWidth = 10;
             this.Time.Name = "Time";
             this.Time.ReadOnly = true;
-            this.Time.Width = 200;
+            this.Time.Width = 150;
             // 
             // btnLoad
             // 
@@ -266,7 +286,7 @@ namespace RPChecker.Forms
             // toolStripStatusStdError
             // 
             this.toolStripStatusStdError.Name = "toolStripStatusStdError";
-            this.toolStripStatusStdError.Size = new System.Drawing.Size(397, 23);
+            this.toolStripStatusStdError.Size = new System.Drawing.Size(432, 23);
             this.toolStripStatusStdError.Spring = true;
             this.toolStripStatusStdError.Text = "   ";
             this.toolStripStatusStdError.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -285,7 +305,7 @@ namespace RPChecker.Forms
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
             this.toolStripDropDownButton1.ShowDropDownArrow = false;
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(24, 26);
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(20, 26);
             this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
             this.toolStripDropDownButton1.Click += new System.EventHandler(this.toolStripDropDownButton1_Click);
             this.toolStripDropDownButton1.MouseEnter += new System.EventHandler(this.toolStripDropDownButton1_MouseEnter);
@@ -293,6 +313,7 @@ namespace RPChecker.Forms
             // 
             // Form1
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(569, 485);
@@ -316,6 +337,8 @@ namespace RPChecker.Forms
             this.Text = "RP Checker";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.statusStrip1.ResumeLayout(false);
@@ -344,7 +367,9 @@ namespace RPChecker.Forms
         private ToolStripProgressBar toolStripProgressBar1;
         private ToolStripDropDownButton toolStripDropDownButton1;
         private DataGridViewTextBoxColumn frams;
-        private DataGridViewTextBoxColumn PSNR;
+        private DataGridViewTextBoxColumn value_y;
+        private DataGridViewTextBoxColumn value_u;
+        private DataGridViewTextBoxColumn value_v;
         private DataGridViewTextBoxColumn Time;
     }
 }

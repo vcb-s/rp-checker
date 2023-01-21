@@ -117,6 +117,6 @@ namespace RPChecker.Util.FilterProcess
 
         protected const string Number = @"(?:[-+]?[0-9]*\.?[0-9]+)";
 
-        public abstract void UpdateValue(string data, ref List<(int index, double value)> tempData);
+        public abstract void UpdateValue(string data, ref List<(int index, double value_y, double value_u, double value_v)> tempData);
     }
 }
