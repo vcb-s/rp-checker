@@ -23,7 +23,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
 
@@ -65,4 +65,6 @@ jobs:
       with:
         name: Package-${{ matrix.configuration }}
         path: |
-          RPChecker\bin\${{ matrix.configuration }}\
+          rp-checker\RPChecker\bin\${{ matrix.configuration }}\
+          !rp-checker\RPChecker\bin\${{ matrix.configuration }}\*.xml
+          !rp-checker\RPChecker\bin\${{ matrix.configuration }}\*.pdb
