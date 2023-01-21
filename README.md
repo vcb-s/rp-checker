@@ -19,7 +19,7 @@ A simple tool to check if a video file is corrupted by calculating [PSNR](https:
 
 - You need to install [VapourSynth R54](https://github.com/vapoursynth/vapoursynth/releases) or higher with the corresponding [python version](https://www.python.org/downloads/) to enable VapourSynth processor.
 
-- PSNR(VS) requires [L-SMASH](https://github.com/AkarinVS/L-SMASH-Works) and [vs-ComparePlan](https://github.com/AmusementClub/vs-ComparePlane) to be installed.
+- PSNR(VS) requires [L-SMASH](https://github.com/AkarinVS/L-SMASH-Works) and [vs-ComparePlane](https://github.com/AmusementClub/vs-ComparePlane) to be installed.
 
 - GMSD(VS) requires [L-SMASH](https://github.com/AkarinVS/L-SMASH-Works) and [muvsfunc](https://github.com/WolframRhodium/muvsfunc) and its corresponding dependency libraries: [mvsfunc](https://github.com/HomeOfVapourSynthEvolution/mvsfunc/releases), [havsfunc](https://github.com/HomeOfVapourSynthEvolution/havsfunc), [fmtconv](https://github.com/EleonoreMizo/fmtconv) to be installed.
 

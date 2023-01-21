@@ -556,14 +556,14 @@ namespace RPChecker.Forms
                     _errorDialogShowed = true;
                     new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"尚未安装 'L-SMASH' 滤镜{Environment.NewLine}大概的位置是在VapourSynth\\plugins64")).Start();
+                        text: $"尚未安装 'L-SMASH' 滤镜{Environment.NewLine}大概的位置是在VapourSynth\\plugins")).Start();
                 }
                 if (!_errorDialogShowed && progress.Contains("No attribute with the name complane exists"))
                 {
                     _errorDialogShowed = true;
                     new Task(() => MessageBox.Show(caption: @"RPChecker ERROR", icon: MessageBoxIcon.Error,
                         buttons: MessageBoxButtons.OK,
-                        text: $"尚未正确放置插件 'vs-ComparePlane' {Environment.NewLine}大概的位置是在VapourSynth\\plugins64")).Start();
+                        text: $"尚未正确放置插件 'vs-ComparePlane' {Environment.NewLine}大概的位置是在VapourSynth\\plugins")).Start();
                 }
                 else if (!_errorDialogShowed && progress.EndsWith("There is no function named PlaneAverage"))
                 {
