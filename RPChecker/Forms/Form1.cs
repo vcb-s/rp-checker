@@ -46,7 +46,6 @@ namespace RPChecker.Forms
             cbVpyFile.Items.AddRange(current.GetFiles("*.vpy").ToArray<object>());
             btnAnalyze.Enabled = false;
 
-            Updater.Utils.CheckUpdateWeekly("RPChecker");
             if (_rpcCollection.Any())
             {
                 LoadRPCFile(_rpcCollection);
@@ -191,7 +190,6 @@ namespace RPChecker.Forms
         private void AddCommand()
         {
             _systemMenu = new SystemMenu(this);
-            _systemMenu.AddCommand("检查更新(&U)", () => { Updater.Utils.CheckUpdate(true); }, true);
             _systemMenu.AddCommand("使用 PSNR(VS)", Set2VSPSNR, true);
             _systemMenu.AddCommand("使用 GMSD(VS)", Set2VSGMSD, false);
             _systemMenu.AddCommand("使用 PSNR(FF)", Set2FFPSNR, false);

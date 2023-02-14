@@ -366,12 +366,6 @@
     <None Include="Resources\ic_check_box_outline_blank_black_24dp.png" />
     <None Include="Resources\ic_check_box_black_24dp.png" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Updater\Updater.csproj">
-      <Project>{ee682a3c-2283-4c5d-806b-7ddc6774657d}</Project>
-      <Name>Updater</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
