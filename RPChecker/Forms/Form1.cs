@@ -51,6 +51,18 @@ namespace RPChecker.Forms
             {
                 LoadRPCFile(_rpcCollection);
             }
+
+            var yThreshold = RegistryStorage.Load("threshold", "y");
+            var uvThreshold = RegistryStorage.Load("threshold", "uv");
+            if (yThreshold != null && int.TryParse(yThreshold, out int y))
+            {
+                _threshold = y;
+                numericUpDown1.Value = y;
+            }
+            if (uvThreshold != null && int.TryParse(uvThreshold, out int uv))
+            {
+                _uv_threshold = uv;
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -63,6 +75,8 @@ namespace RPChecker.Forms
         public readonly List<(string src, string opt)> FilePathsPair = new List<(string src, string opt)>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
         private int _threshold = 30;
+
+        private int _uv_threshold = 40;
         private readonly double[] _frameRate = { 24000 / 1001.0, 24, 25, 30000 / 1001.0, 50, 60000 / 1001.0 };
         private IProcess _coreProcess = new VsPipePSNRProcess();
 
@@ -147,9 +161,11 @@ namespace RPChecker.Forms
                     cbFileList.Items.Add(Path.GetFileName(item.FileNamePair.src) ?? "");
                     item.Data.Sort(delegate((int, double, double, double) lhs, (int, double, double, double) rhs)
                     {
-                        if (Math.Abs(lhs.Item2 - rhs.Item2) > 1e-5)
+                        var lMin = Math.Min(lhs.Item2, Math.Min(lhs.Item3, lhs.Item4));
+                        var rMin = Math.Min(rhs.Item2, Math.Min(rhs.Item3, rhs.Item4));
+                        if (Math.Abs(lMin - rMin) > 1e-5)
                         {
-                            return lhs.Item2 - rhs.Item2 < 0 ? -1 : 1;
+                            return lMin - rMin < 0 ? -1 : 1;
                         }
 
                         return lhs.Item1 - rhs.Item1;
@@ -333,18 +349,27 @@ namespace RPChecker.Forms
         }
         private void UpdateGridView(ReSulT info, double frameRate)
         {
+            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+
             dataGridView1.Rows.Clear();
             foreach (var item in info.Data)
             {
-                if ((item.value_y > _threshold && dataGridView1.RowCount > 450) || dataGridView1.RowCount > 2048) break;
+                var warningRequired = item.value_y < _threshold || item.value_u < _uv_threshold || item.value_v < _uv_threshold;
+                if ((!warningRequired && dataGridView1.RowCount > 1000) || dataGridView1.RowCount > 10000) break;
                 var newRow = new DataGridViewRow {Tag = item};
-                var temp = ToolKits.Second2Time(item.index / frameRate);
-                newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value_y, 4), Math.Round(item.value_u, 4), Math.Round(item.value_v, 4), temp.Time2String());
-                newRow.DefaultCellStyle.BackColor = item.value_y < _threshold
-                    ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
+                var time = ToolKits.Second2Time(item.index / frameRate);
+                newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value_y, 4), Math.Round(item.value_u, 4), Math.Round(item.value_v, 4), time.Time2String());
+                newRow.DefaultCellStyle.BackColor = warningRequired ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
                 dataGridView1.Rows.Add(newRow);
             }
             Application.DoEvents();
+
+            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+
             Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines");
         }
 
