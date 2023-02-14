@@ -349,28 +349,32 @@ namespace RPChecker.Forms
         }
         private void UpdateGridView(ReSulT info, double frameRate)
         {
-            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            var timer = Stopwatch.StartNew();
+            dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
 
             dataGridView1.Rows.Clear();
             foreach (var item in info.Data)
             {
-                var warningRequired = item.value_y < _threshold || item.value_u < _uv_threshold || item.value_v < _uv_threshold;
-                if ((!warningRequired && dataGridView1.RowCount > 1000) || dataGridView1.RowCount > 10000) break;
+                var yWarningRequired = item.value_y < _threshold;
+                var uWarningRequired = item.value_u < _uv_threshold;
+                var vWarningRequired = item.value_v < _uv_threshold;
+                var warningRequired = yWarningRequired || uWarningRequired || vWarningRequired;
+                if ((!warningRequired && dataGridView1.RowCount > 1000) || dataGridView1.RowCount > 5000) break;
                 var newRow = new DataGridViewRow {Tag = item};
                 var time = ToolKits.Second2Time(item.index / frameRate);
                 newRow.CreateCells(dataGridView1, item.index, Math.Round(item.value_y, 4), Math.Round(item.value_u, 4), Math.Round(item.value_v, 4), time.Time2String());
-                newRow.DefaultCellStyle.BackColor = warningRequired ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
+
+                newRow.Cells[1].Style.BackColor = yWarningRequired ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
+                newRow.Cells[2].Style.BackColor = uWarningRequired ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
+                newRow.Cells[3].Style.BackColor = vWarningRequired ? Color.FromArgb(233, 76, 60) : Color.FromArgb(46, 205, 112);
+
                 dataGridView1.Rows.Add(newRow);
             }
             Application.DoEvents();
-
-            dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-
-            Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines");
+            Application.DoEvents();
+            timer.Stop();
+            Debug.WriteLine($"DataGridView with {dataGridView1.Rows.Count} lines in {timer.Elapsed.TotalSeconds}s");
         }
 
         private bool _errorDialogShowed;
