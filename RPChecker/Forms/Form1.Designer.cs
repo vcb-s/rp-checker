@@ -111,7 +111,7 @@ namespace RPChecker.Forms
             // 
             // value_y
             // 
-            this.value_y.HeaderText = "指标1";
+            this.value_y.HeaderText = "指标Y";
             this.value_y.MinimumWidth = 10;
             this.value_y.Name = "value_y";
             this.value_y.ReadOnly = true;
@@ -119,7 +119,7 @@ namespace RPChecker.Forms
             // 
             // value_u
             // 
-            this.value_u.HeaderText = "指标2";
+            this.value_u.HeaderText = "指标U";
             this.value_u.MinimumWidth = 10;
             this.value_u.Name = "value_u";
             this.value_u.ReadOnly = true;
@@ -127,7 +127,7 @@ namespace RPChecker.Forms
             // 
             // value_v
             // 
-            this.value_v.HeaderText = "指标3";
+            this.value_v.HeaderText = "指标V";
             this.value_v.MinimumWidth = 10;
             this.value_v.Name = "value_v";
             this.value_v.ReadOnly = true;
@@ -209,6 +209,7 @@ namespace RPChecker.Forms
             0,
             0,
             0});
+            this.numericUpDown1.DecimalPlaces = 1;
             this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label1

@@ -53,12 +53,12 @@ namespace RPChecker.Forms
 
             var yThreshold = RegistryStorage.Load("threshold", "y");
             var uvThreshold = RegistryStorage.Load("threshold", "uv");
-            if (yThreshold != null && int.TryParse(yThreshold, out int y))
+            if (yThreshold != null && double.TryParse(yThreshold, out var y))
             {
                 _threshold = y;
-                numericUpDown1.Value = y;
+                numericUpDown1.Value = (decimal) y;
             }
-            if (uvThreshold != null && int.TryParse(uvThreshold, out int uv))
+            if (uvThreshold != null && double.TryParse(uvThreshold, out var uv))
             {
                 _uv_threshold = uv;
             }
@@ -73,9 +73,9 @@ namespace RPChecker.Forms
 
         public readonly List<(string src, string opt)> FilePathsPair = new List<(string src, string opt)>();
         private readonly List<ReSulT> _fullData = new List<ReSulT>();
-        private int _threshold = 30;
+        private double _threshold = 30;
 
-        private int _uv_threshold = 40;
+        private double _uv_threshold = 40;
         private readonly double[] _frameRate = { 24000 / 1001.0, 24, 25, 30000 / 1001.0, 50, 60000 / 1001.0 };
         private IProcess _coreProcess = new VsPipePSNRProcess();
 
@@ -91,7 +91,7 @@ namespace RPChecker.Forms
             cbVpyFile.Enabled = _coreProcess is VsPipePSNRProcess;
             Text = $"[VCB-Studio] RP Checker v{Assembly.GetExecutingAssembly().GetName().Version} [{_coreProcess.Title}][{(UseOriginPath ? "O" : "L")}]";
             _threshold = _coreProcess.Threshold;
-            numericUpDown1.Value = _threshold;
+            numericUpDown1.Value = (decimal) _threshold;
         }
 
         void SwitchPath()
@@ -317,9 +317,9 @@ namespace RPChecker.Forms
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            var threshold = Convert.ToInt32(numericUpDown1.Value);
-            if (threshold == _threshold) return;
-            _threshold = threshold;
+            var threshold = numericUpDown1.Value;
+            if (Math.Abs((double) threshold - _threshold) < 1e-5) return;
+            _threshold = (double) threshold;
             if (_fullData == null || _fullData.Count == 0) return;
             UpdateGridView(CurrentData, FrameRate);
         }
@@ -732,8 +732,9 @@ namespace RPChecker.Forms
 
         private void cbVpyFile_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // threshold for GMSD
             _threshold = ((ComboBox) sender).SelectedIndex == 1 ? 80 : 30;
-            numericUpDown1.Value = _threshold;
+            numericUpDown1.Value = (decimal) _threshold;
         }
 
         private void Form1_DragDrop(object sender, DragEventArgs e)

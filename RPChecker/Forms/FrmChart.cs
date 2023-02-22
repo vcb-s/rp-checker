@@ -15,7 +15,7 @@ namespace RPChecker.Forms
         private readonly double _threshold;
         private readonly double _fps;
         private readonly string _type;
-        public FrmChart(ReSulT info, int threshold, double fps, string type)
+        public FrmChart(ReSulT info, double threshold, double fps, string type)
         {
             InitializeComponent();
             _info = info;
