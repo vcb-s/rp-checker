@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using CommandLine;
@@ -37,9 +36,6 @@ namespace RPChecker
             // AttachConsole(ATTACH_PARENT_PROCESS);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Updater.Utils.SoftwareName = "RPChecker";
-            Updater.Utils.RepoName = "vcb-s/rp-checker";
-            Updater.Utils.CurrentVersion = Assembly.GetExecutingAssembly().GetName().Version;
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(opts => Application.Run(new Form1(opts.InputFiles.ToList())))
                 .WithNotParsed(errs => MessageBox.Show(errs.First().ToString(), @"RPChecker Error"));

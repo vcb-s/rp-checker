@@ -74,6 +74,8 @@ namespace RPChecker.Forms
             // dataGridView1
             // 
             this.dataGridView1.AllowUserToDeleteRows = false;
+            this.dataGridView1.AllowUserToResizeRows = false;
+            this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -105,31 +107,31 @@ namespace RPChecker.Forms
             this.frams.MinimumWidth = 10;
             this.frams.Name = "frams";
             this.frams.ReadOnly = true;
-            this.frams.Width = 200;
+            this.frams.Width = 100;
             // 
             // value_y
             // 
-            this.value_y.HeaderText = "指标1";
+            this.value_y.HeaderText = "指标Y";
             this.value_y.MinimumWidth = 10;
             this.value_y.Name = "value_y";
             this.value_y.ReadOnly = true;
-            this.value_y.Width = 150;
+            this.value_y.Width = 100;
             // 
             // value_u
             // 
-            this.value_u.HeaderText = "指标2";
+            this.value_u.HeaderText = "指标U";
             this.value_u.MinimumWidth = 10;
             this.value_u.Name = "value_u";
             this.value_u.ReadOnly = true;
-            this.value_u.Width = 150;
+            this.value_u.Width = 100;
             // 
             // value_v
             // 
-            this.value_v.HeaderText = "指标3";
+            this.value_v.HeaderText = "指标V";
             this.value_v.MinimumWidth = 10;
             this.value_v.Name = "value_v";
             this.value_v.ReadOnly = true;
-            this.value_v.Width = 150;
+            this.value_v.Width = 100;
             // 
             // Time
             // 
@@ -207,6 +209,7 @@ namespace RPChecker.Forms
             0,
             0,
             0});
+            this.numericUpDown1.DecimalPlaces = 1;
             this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label1
