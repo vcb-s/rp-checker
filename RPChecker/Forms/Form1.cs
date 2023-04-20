@@ -206,6 +206,27 @@ namespace RPChecker.Forms
                     MessageBox.Show($"导出失败：\n{e.Message}", @"RPChecker Error");
                 }
             }, true);
+            _systemMenu.AddCommand("导出书签", () =>
+            {
+                if (cbFileList.SelectedIndex < 0)
+                {
+                    MessageBox.Show($"现在无签可导", @"RPChecker Error");
+                    return;
+                }
+                var bookmarks = string.Join(", ", CurrentData.Data
+                    .Where(frame => frame.value_y < _threshold || frame.value_u < _uv_threshold || frame.value_v < _uv_threshold)
+                    .Select(frame => frame.index)
+                    .OrderBy(frame => frame));
+                try
+                {
+                    var title = CurrentData.FileNamePair.src;
+                    File.WriteAllText($"[RPCR] {title}{DateTime.Now:yyyyMMddHHmmssffff}.bookmarks", bookmarks);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"导出书签失败：\n{e.Message}", @"RPChecker Error");
+                }
+            }, false);
             _systemMenu.AddCommand("载入结果", () =>
             {
                 var openFileDialog1 = new OpenFileDialog
